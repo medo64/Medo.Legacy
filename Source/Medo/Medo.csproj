@@ -82,7 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blueprints\Application\Args [001].cs" />
-    <Compile Include="Blueprints\Application\SingleInstance [008].cs" />
+    <Compile Include="Blueprints\Application\SingleInstance [009].cs" />
     <Compile Include="Blueprints\Application\UnhandledCatch [006].cs" />
     <Compile Include="Blueprints\Bitwise [001].cs" />
     <Compile Include="Blueprints\Collections\Generic\ReadOnlyDictionary [001].cs" />
