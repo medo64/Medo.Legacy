@@ -73,6 +73,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xaml" />
@@ -117,6 +118,7 @@
     <Compile Include="Blueprints\Extensions\HexadecimalEncodingExtensions [002].cs" />
     <Compile Include="Blueprints\Extensions\ScientificNotationExtensions [002].cs" />
     <Compile Include="Blueprints\Extensions\SIPrefixExtensions [003].cs" />
+    <Compile Include="Blueprints\Net\TinyMessage [000].cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Blueprints\KeyValuePacket [---].cs" />
     <Compile Include="Blueprints\Localization\Croatia\Holiday [003].cs" />
