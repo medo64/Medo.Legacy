@@ -1,6 +1,6 @@
-﻿//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
 
-//2010-10-13: Initial version.
+//2010-10-14: Initial version.
 
 
 using System;
@@ -267,6 +267,7 @@ namespace Medo.Net {
         /// <summary>
         /// Converts message to it's representation in bytes.
         /// </summary>
+        /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
         public byte[] GetBytes() {
             using (var stream = new MemoryStream()) {
                 byte[] productBytes = TextEncoding.GetBytes(this.Product);
@@ -280,6 +281,8 @@ namespace Medo.Net {
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
                 JsonSerializer.WriteObject(stream, this.Data);
+
+                if (stream.Position > 65507) { throw new InvalidOperationException("Packet length exceeds 65507 bytes."); }
 
                 return stream.ToArray();
             }

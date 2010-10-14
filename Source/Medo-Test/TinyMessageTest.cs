@@ -1,4 +1,4 @@
-﻿using Medo.Blueprints.Net;
+﻿using Medo.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
