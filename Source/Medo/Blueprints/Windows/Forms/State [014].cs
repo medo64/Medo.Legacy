@@ -14,7 +14,8 @@
 //2008-07-10: Fixed resize on load when window is maximized.
 //2008-12-27: Added LoadNowAndSaveOnClose method.
 //2009-07-04: Compatibility with Mono 2.4.
-//2010-10-16: Limited all loaded forms to screen's working area.
+//2010-10-17: Limited all loaded forms to screen's working area.
+//            Changed LoadNowAndSaveOnClose to use SetupOnLoadAndClose.
 
 
 using System.Windows.Forms;
@@ -85,24 +86,49 @@ namespace Medo.Windows.Forms {
         /// <exception cref="System.ArgumentNullException">Form is null.</exception>
         /// <exception cref="System.NotSupportedException">This control's parents cannot be resolved using Name property.</exception>
         /// <exception cref="System.ArgumentException">Form already used.</exception>
+        [Obsolete("Use SetupOnLoadAndClose instead.")]
         public static void LoadNowAndSaveOnClose(Form form, params Control[] controls) {
-            if (form == null) { throw new ArgumentNullException("form", "Form is null."); }
-
-            if (_closeHandlerForms.ContainsKey(form)) { throw new System.ArgumentException("Form already used.", "form"); }
-            if (controls != null) {
-                Load(controls);
-            }
-            _closeHandlerForms.Add(form, controls);
-            form.FormClosing += new FormClosingEventHandler(closeHandlerForm_FormClosing);
+            SetupOnLoadAndClose(form, controls);
         }
 
-        private static Dictionary<Form, Control[]> _closeHandlerForms = new Dictionary<Form, Control[]>();
+        /// <summary>
+        /// Loads previous state.
+        /// Supported controls are Form, PropertyGrid, ListView and SplitContainer.
+        /// </summary>
+        /// <param name="form">Form on which's FormClosing handler this function will attach. State will not be altered for this parameter.</param>
+        /// <param name="controls">Controls to load and to save.</param>
+        /// <exception cref="System.ArgumentNullException">Form is null.</exception>
+        /// <exception cref="System.NotSupportedException">This control's parents cannot be resolved using Name property.</exception>
+        /// <exception cref="System.ArgumentException">Form setup already done.</exception>
+        public static void SetupOnLoadAndClose(Form form, params Control[] controls) {
+            if (form == null) { throw new ArgumentNullException("form", "Form is null."); }
 
-        private static void closeHandlerForm_FormClosing(object sender, FormClosingEventArgs e) {
+            if (formSetup.ContainsKey(form)) { throw new System.ArgumentException("Form setup already done.", "form"); }
+
+            Load(form);
+            if (controls != null) { Load(controls); }
+
+            formSetup.Add(form, controls);
+            form.Load += new EventHandler(form_Load);
+            form.FormClosed += new FormClosedEventHandler(form_FormClosed);
+        }
+
+        private static Dictionary<Form, Control[]> formSetup = new Dictionary<Form, Control[]>();
+
+        private static void form_Load(object sender, EventArgs e) {
             var form = sender as Form;
-            if (_closeHandlerForms.ContainsKey(form)) {
-                Save(_closeHandlerForms[form]);
-                _closeHandlerForms.Remove(form);
+            if (formSetup.ContainsKey(form)) {
+                Load(form);
+                Load(formSetup[form]);
+            }
+        }
+
+        private static void form_FormClosed(object sender, FormClosedEventArgs e) {
+            var form = sender as Form;
+            if (formSetup.ContainsKey(form)) {
+                Save(form);
+                Save(formSetup[form]);
+                formSetup.Remove(form);
             }
         }
 
