@@ -476,6 +476,7 @@ namespace Medo.Windows.Forms {
                     using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(State.SubkeyPath, false)) {
                         if (rk != null) {
                             object value = rk.GetValue(valueName, null);
+                            if (value == null) { return defaultValue; }
                             var valueKind = RegistryValueKind.DWord;
                             if (!State.Helper.IsRunningOnMono) { valueKind = rk.GetValueKind(valueName); }
                             if ((value != null) && (valueKind == RegistryValueKind.DWord)) {
