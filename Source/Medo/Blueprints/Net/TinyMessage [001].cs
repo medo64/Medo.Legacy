@@ -180,8 +180,9 @@ namespace Medo.Net {
             if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)) {
                 if (remoteEndPoint.Address == IPAddress.Broadcast) {
-                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 }
+                socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false);
                 socket.SendTo(packet.GetBytes(), remoteEndPoint);
                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage [{0} -> {1}]", packet, remoteEndPoint));
             }
@@ -474,3 +475,35 @@ namespace Medo.Net {
     }
 
 }
+
+
+
+/*
+
+                          TinyMessage protocol                          
+
+TinyMessage is text based protocol. Each packet is encupselated in UDP
+datagram and it is of following content (each part encoded as UTF8,
+without quotes ("), <SP> denotes space):
+"Protocol<SP>Product<SP>Operation<SP>Data".
+
+Protocol
+
+   This field denotes protocol version. It is fixed to "Tiny".
+
+Product
+
+   This field denotes product which performes action. It is used to
+   segment space of available operations.
+
+Operation
+
+   Denotes which operation is to be performed by receiver of message.
+
+Data
+
+   JSON encoded object. Exact form is not specified in any manner. It is
+   up to product/operation pair to ensure mutual understanding of this
+   field.
+
+*/
