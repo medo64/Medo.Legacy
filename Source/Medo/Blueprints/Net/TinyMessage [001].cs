@@ -1,6 +1,6 @@
 //Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
 
-//2010-10-14: Initial version.
+//2010-10-21: Initial version.
 
 
 using System;
@@ -13,6 +13,8 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace Medo.Net {
 
@@ -22,7 +24,7 @@ namespace Medo.Net {
     /// </summary>
     public class TinyMessage : IDisposable {
 
-        private const int DefaultPort = 28433;
+        private const int DefaultPort = 5104;
 
 
         /// <summary>
@@ -101,10 +103,12 @@ namespace Medo.Net {
                 this.ListenSocket.Bind(this.LocalEndPoint);
 
                 var buffer = new byte[16384];
+                EndPoint remoteEP;
                 int inCount;
                 while (!this.IsCanceled) {
                     try {
-                        inCount = this.ListenSocket.Receive(buffer);
+                        remoteEP = new IPEndPoint(IPAddress.Any, 0);
+                        inCount = this.ListenSocket.ReceiveFrom(buffer, ref remoteEP);
                     } catch (SocketException ex) {
                         if (ex.SocketErrorCode == SocketError.Interrupted) {
                             return;
@@ -116,13 +120,16 @@ namespace Medo.Net {
                     if (TinyMessagePacketReceived != null) {
                         var newBuffer = new byte[inCount];
                         Buffer.BlockCopy(buffer, 0, newBuffer, 0, inCount);
-                        var args = new object[] { this, new TinyMessagePacketEventArgs(newBuffer) };
+#if DEBUG
+                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage [{0} <- {1}]", TinyMessagePacket<object>.ParseHeaderOnly(newBuffer, 0, inCount), remoteEP));
+#endif
+                        var invokeArgs = new object[] { this, new TinyMessagePacketEventArgs(newBuffer, 0, inCount, remoteEP as IPEndPoint) };
                         foreach (Delegate iDelegate in TinyMessagePacketReceived.GetInvocationList()) {
                             ISynchronizeInvoke syncer = iDelegate.Target as ISynchronizeInvoke;
                             if (syncer == null) {
-                                iDelegate.DynamicInvoke(args);
+                                iDelegate.DynamicInvoke(invokeArgs);
                             } else {
-                                syncer.BeginInvoke(iDelegate, args);
+                                syncer.BeginInvoke(iDelegate, invokeArgs);
                             }
                         }
                     }
@@ -176,6 +183,7 @@ namespace Medo.Net {
                     socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
                 }
                 socket.SendTo(packet.GetBytes(), remoteEndPoint);
+                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage [{0} -> {1}]", packet, remoteEndPoint));
             }
         }
 
@@ -212,13 +220,22 @@ namespace Medo.Net {
     public interface ITinyMessagePacket {
 
         /// <summary>
+        /// Gets name of product.
+        /// </summary>
+        string Product { get; }
+
+        /// <summary>
+        /// Gets operation.
+        /// </summary>
+        string Operation { get; }
+
+        /// <summary>
         /// Converts message to it's representation in bytes.
         /// </summary>
         /// <returns></returns>
         byte[] GetBytes();
 
     }
-
 
 
     /// <summary>
@@ -288,7 +305,6 @@ namespace Medo.Net {
             }
         }
 
-
         /// <summary>
         /// Returns parsed packet.
         /// </summary>
@@ -300,6 +316,29 @@ namespace Medo.Net {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
 
             return Parse(buffer, 0, buffer.Length);
+        }
+
+        /// <summary>
+        /// Returns partially parsed packet. Data argument is NOT parsed.
+        /// </summary>
+        /// <param name="buffer">Byte array.</param>
+        /// <param name="offset">Starting offset.</param>
+        /// <param name="count">Total lenght.</param>
+        /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
+        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "I disagree with this warning.")]
+        public static TinyMessagePacket<TData> ParseHeaderOnly(byte[] buffer, int offset, int count) {
+            if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
+            if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
+            if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
+            if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
+
+            using (var stream = new MemoryStream(buffer, offset, count)) {
+                string product = ReadToSpace(stream);
+                string operation = ReadToSpace(stream);
+                return new TinyMessagePacket<TData>(product, operation, default(TData));
+            }
         }
 
         /// <summary>
@@ -319,38 +358,27 @@ namespace Medo.Net {
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
 
             using (var stream = new MemoryStream(buffer, offset, count)) {
-                string product = null;
-                var productBytes = new List<byte>(); ;
-                while (true) {
-                    if (stream.Position == stream.Length) { throw new InvalidDataException("Cannot parse packet."); }
-                    var oneByte = (byte)stream.ReadByte();
-                    if (oneByte == 0x20) {
-                        product = TextEncoding.GetString(productBytes.ToArray());
-                        break;
-                    } else {
-                        productBytes.Add(oneByte);
-                    }
-                }
-
-                string operation = null;
-                var operationBytes = new List<byte>(); ;
-                while (true) {
-                    if (stream.Position == stream.Length) { throw new InvalidDataException("Cannot parse packet."); }
-                    var oneByte = (byte)stream.ReadByte();
-                    if (oneByte == 0x20) {
-                        operation = TextEncoding.GetString(operationBytes.ToArray());
-                        break;
-                    } else {
-                        operationBytes.Add(oneByte);
-                    }
-                }
+                string product = ReadToSpace(stream);
+                string operation = ReadToSpace(stream);
 
                 try {
                     TData data = (TData)JsonSerializer.ReadObject(stream);
-
                     return new TinyMessagePacket<TData>(product, operation, data);
                 } catch (SerializationException ex) {
                     throw new InvalidDataException("Cannot parse packet.", ex);
+                }
+            }
+        }
+
+        private static string ReadToSpace(MemoryStream stream) {
+            var bytes = new List<byte>(); ;
+            while (true) {
+                if (stream.Position == stream.Length) { throw new InvalidDataException("Cannot parse packet."); }
+                var oneByte = (byte)stream.ReadByte();
+                if (oneByte == 0x20) {
+                    return TextEncoding.GetString(bytes.ToArray());
+                } else {
+                    bytes.Add(oneByte);
                 }
             }
         }
@@ -395,33 +423,27 @@ namespace Medo.Net {
         /// Creates new instance.
         /// </summary>
         /// <param name="buffer">Buffer.</param>
-        /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
-        public TinyMessagePacketEventArgs(byte[] buffer) {
-            if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
-
-            this.Buffer = buffer;
-            this.Offset = 0;
-            this.Count = buffer.Length;
-        }
-
-        /// <summary>
-        /// Creates new instance.
-        /// </summary>
-        /// <param name="buffer">Buffer.</param>
         /// <param name="offset">Offset</param>
         /// <param name="count">Count.</param>
+        /// <param name="remoteEndPoint">Remote end point.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
-        public TinyMessagePacketEventArgs(byte[] buffer, int offset, int count) {
+        public TinyMessagePacketEventArgs(byte[] buffer, int offset, int count, IPEndPoint remoteEndPoint) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
-            
+
             this.Buffer = buffer;
             this.Offset = offset;
             this.Count = count;
+            this.RemoteEndPoint = remoteEndPoint;
         }
+
+        /// <summary>
+        /// Gets end point that was origin of message.
+        /// </summary>
+        public IPEndPoint RemoteEndPoint { get; private set; }
 
         /// <summary>
         /// Returns parsed packet.
@@ -430,6 +452,15 @@ namespace Medo.Net {
         /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
         public TinyMessagePacket<TData> GetPacket<TData>() {
             return TinyMessagePacket<TData>.Parse(this.Buffer, this.Offset, this.Count);
+        }
+
+        /// <summary>
+        /// Returns parsed packet.
+        /// </summary>
+        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification="Method is appropriate here.")]
+        public ITinyMessagePacket GetPacketWithoutData() {
+            return TinyMessagePacket<object>.ParseHeaderOnly(this.Buffer, this.Offset, this.Count);
         }
 
     }
