@@ -67,7 +67,7 @@ namespace Test {
             var target = new TinyMessagePacket<string>(product, operation, data);
 
             string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
-            string expected = @"Example Test ""Data""";
+            string expected = @"Tiny Example Test ""Data""";
             Assert.AreEqual(expected, actual);
         }
 
@@ -94,7 +94,7 @@ namespace Test {
             var target = new TinyMessagePacket<string>(product, operation, data);
 
             string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
-            string expected = @"Example Test null";
+            string expected = @"Tiny Example Test null";
             Assert.AreEqual(expected, actual);
         }
 

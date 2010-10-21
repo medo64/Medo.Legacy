@@ -287,14 +287,16 @@ namespace Medo.Net {
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
         public byte[] GetBytes() {
             using (var stream = new MemoryStream()) {
+                byte[] protocolBytes = TextEncoding.GetBytes("Tiny");
+                stream.Write(protocolBytes, 0, protocolBytes.Length);
+                stream.Write(new byte[] { 0x20 }, 0, 1);
+
                 byte[] productBytes = TextEncoding.GetBytes(this.Product);
                 stream.Write(productBytes, 0, productBytes.Length);
-
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
                 byte[] operationBytes = TextEncoding.GetBytes(this.Operation);
                 stream.Write(operationBytes, 0, operationBytes.Length);
-
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
                 JsonSerializer.WriteObject(stream, this.Data);
@@ -326,7 +328,6 @@ namespace Medo.Net {
         /// <param name="count">Total lenght.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
-        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "I disagree with this warning.")]
         public static TinyMessagePacket<TData> ParseHeaderOnly(byte[] buffer, int offset, int count) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
@@ -335,8 +336,12 @@ namespace Medo.Net {
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
 
             using (var stream = new MemoryStream(buffer, offset, count)) {
+                string protocol = ReadToSpace(stream);
+                if (string.CompareOrdinal(protocol, "Tiny") != 0) { return null; }
+
                 string product = ReadToSpace(stream);
                 string operation = ReadToSpace(stream);
+
                 return new TinyMessagePacket<TData>(product, operation, default(TData));
             }
         }
@@ -358,6 +363,9 @@ namespace Medo.Net {
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
 
             using (var stream = new MemoryStream(buffer, offset, count)) {
+                string protocol = ReadToSpace(stream);
+                if (string.CompareOrdinal(protocol, "Tiny") != 0) { throw new InvalidDataException("Cannot parse packet."); }
+
                 string product = ReadToSpace(stream);
                 string operation = ReadToSpace(stream);
 
@@ -458,7 +466,7 @@ namespace Medo.Net {
         /// Returns parsed packet.
         /// </summary>
         /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification="Method is appropriate here.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate here.")]
         public ITinyMessagePacket GetPacketWithoutData() {
             return TinyMessagePacket<object>.ParseHeaderOnly(this.Buffer, this.Offset, this.Count);
         }
