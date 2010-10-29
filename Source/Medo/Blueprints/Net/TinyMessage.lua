@@ -88,6 +88,9 @@ do
 
 
         subtree:append_text (", " .. valueProduct .. ":" .. valueOperation)
+        
+        pinfo.cols.protocol = "TINYMESSAGE"
+        pinfo.cols.info = valueProduct .. ":" .. valueOperation
     end
 
 
