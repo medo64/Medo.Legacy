@@ -89,7 +89,7 @@
     <Compile Include="Blueprints\Collections\Generic\ReadOnlyDictionary [001].cs" />
     <Compile Include="Blueprints\Configuration\RecentFiles [002].cs" />
     <Compile Include="Blueprints\Configuration\RunOnStartup [003].cs" />
-    <Compile Include="Blueprints\Configuration\Settings [010].cs" />
+    <Compile Include="Blueprints\Configuration\Settings [011].cs" />
     <Compile Include="Blueprints\Data\CommonConnection [006].cs" />
     <Compile Include="Blueprints\Data\InsertCommand [005].cs" />
     <Compile Include="Blueprints\Device\Elsidi [003].cs" />
@@ -97,7 +97,10 @@
     <Compile Include="Blueprints\Device\GigatekGp20 [001].cs" />
     <Compile Include="Blueprints\Device\GigatekPcr300F [001].cs" />
     <Compile Include="Blueprints\Device\Protocol\ABus [001].cs" />
-    <Compile Include="Blueprints\Diagnostics\ErrorReport [016].cs" />
+    <Compile Include="Blueprints\Diagnostics\ErrorReport [017].cs" />
+    <Compile Include="Blueprints\Diagnostics\ExceptionReport [001].cs" />
+    <Compile Include="Blueprints\Diagnostics\ExceptionReportWindow [001].cs" />
+    <Compile Include="Blueprints\Diagnostics\LifetimeWatch [001].cs" />
     <Compile Include="Blueprints\Extensions\FrameworkElementStateExtensions [003].cs" />
     <Compile Include="Blueprints\IO\AdsFileStream [001].cs" />
     <Compile Include="Blueprints\IO\VirtualDisk [005].cs" />
