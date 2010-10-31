@@ -87,7 +87,7 @@
     <Compile Include="Blueprints\Application\UnhandledCatch [006].cs" />
     <Compile Include="Blueprints\Bitwise [001].cs" />
     <Compile Include="Blueprints\Collections\Generic\ReadOnlyDictionary [001].cs" />
-    <Compile Include="Blueprints\Configuration\RecentFiles [002].cs" />
+    <Compile Include="Blueprints\Configuration\RecentFiles [003].cs" />
     <Compile Include="Blueprints\Configuration\RunOnStartup [003].cs" />
     <Compile Include="Blueprints\Configuration\Settings [011].cs" />
     <Compile Include="Blueprints\Data\CommonConnection [006].cs" />
@@ -180,7 +180,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Blueprints\Windows\Forms\SplashBox [010].cs" />
-    <Compile Include="Blueprints\Windows\Forms\State [014].cs" />
+    <Compile Include="Blueprints\Windows\Forms\State [015].cs" />
     <Compile Include="Blueprints\Windows\Forms\TaskbarProgress [002].cs" />
     <Compile Include="Blueprints\Windows\Forms\TextBox [001].cs">
       <SubType>Component</SubType>
