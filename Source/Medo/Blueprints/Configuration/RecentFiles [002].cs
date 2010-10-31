@@ -2,6 +2,7 @@
 
 //2009-05-23: New version.
 //2009-07-04: Compatibility with Mono 2.4.
+//2010-10-31: Added option to skip registry writes (NoRegistryWrites).
 
 
 using System;
@@ -78,6 +79,10 @@ namespace Medo.Configuration {
             this.Load();
         }
 
+        /// <summary>
+        /// Gets/sets whether settings should be written to registry.
+        /// </summary>
+        public static bool NoRegistryWrites { get; set; }
 
         /// <summary>
         /// Gets maximum number of file names to be saved.
@@ -197,8 +202,10 @@ namespace Medo.Configuration {
                 fileNames[i] = this._items[i].FileName;
             }
 
-            using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(this.SubkeyPath)) {
-                rk.SetValue(this.GroupName, fileNames, RegistryValueKind.MultiString);
+            if (RecentFiles.NoRegistryWrites == false) {
+                using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(this.SubkeyPath)) {
+                    rk.SetValue(this.GroupName, fileNames, RegistryValueKind.MultiString);
+                }
             }
         }
 
