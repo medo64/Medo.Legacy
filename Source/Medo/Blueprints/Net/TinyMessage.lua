@@ -38,9 +38,9 @@ do
 
         local valueId = buffer(start, index - start):string()
         if (valueId == "Tiny") then
-            subtree:add(f.version, "1")
+            subtree:add(f.version, buffer(start, index - start), "1")
         else
-            subtree:add(f.version, "Unknown version (" .. valueId .. ")")
+            subtree:add(f.version, buffer(start, index - start), "Unknown version (" .. valueId .. ")")
         end
 
 
@@ -58,7 +58,7 @@ do
         end
 
         local valueProduct = buffer(start, index - start):string()
-        subtree:add(f.product, valueProduct)
+        subtree:add(f.product, buffer(start, index - start), valueProduct)
 
 
         index = (index + 1)
@@ -74,7 +74,7 @@ do
         end
 
         local valueOperation = buffer(start, index - start):string()
-        subtree:add(f.operation, valueOperation)
+        subtree:add(f.operation, buffer(start, index - start), valueOperation)
 
 
         start = (index + 1);
