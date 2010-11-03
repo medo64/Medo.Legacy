@@ -122,6 +122,7 @@
     <Compile Include="Blueprints\Extensions\ScientificNotationExtensions [002].cs" />
     <Compile Include="Blueprints\Extensions\SIPrefixExtensions [003].cs" />
     <Compile Include="Blueprints\Net\TinyMessage [001].cs" />
+    <Compile Include="Blueprints\Windows\Forms\AboutBox [010].cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Blueprints\KeyValuePacket [---].cs" />
     <Compile Include="Blueprints\Localization\Croatia\Holiday [003].cs" />
@@ -155,7 +156,6 @@
     <Compile Include="Blueprints\WaitCursor [001].cs" />
     <Compile Include="Blueprints\Web\GData\GDataClientLogin [001].cs" />
     <Compile Include="Blueprints\Windows\AboutWindow [003].cs" />
-    <Compile Include="Blueprints\Windows\Forms\AboutBox [009].cs" />
     <Compile Include="Blueprints\Windows\Forms\Button [001].cs">
       <SubType>Component</SubType>
     </Compile>
