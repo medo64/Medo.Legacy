@@ -97,7 +97,7 @@
     <Compile Include="Blueprints\Device\GigatekGp20 [001].cs" />
     <Compile Include="Blueprints\Device\GigatekPcr300F [001].cs" />
     <Compile Include="Blueprints\Device\Protocol\ABus [001].cs" />
-    <Compile Include="Blueprints\Diagnostics\ErrorReport [017].cs" />
+    <Compile Include="Blueprints\Diagnostics\ErrorReport [018].cs" />
     <Compile Include="Blueprints\Diagnostics\ExceptionReport [001].cs" />
     <Compile Include="Blueprints\Diagnostics\ExceptionReportWindow [001].cs" />
     <Compile Include="Blueprints\Diagnostics\LifetimeWatch [001].cs" />
@@ -227,7 +227,9 @@
   </Target>
   -->
   <PropertyGroup>
-    <PreBuildEvent>Q:\Tools\BuildEvents\BuildEvents.exe /Prebuild /ConfigurationName:"$(ConfigurationName)" /TargetPath:"$(TargetPath)" /SolutionDir:"$(SolutionDir)"</PreBuildEvent>
-    <PostBuildEvent>Q:\Tools\BuildEvents\BuildEvents.exe /Postbuild /ConfigurationName:"$(ConfigurationName)" /TargetPath:"$(TargetPath)" /SolutionDir:"$(SolutionDir)"</PostBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
