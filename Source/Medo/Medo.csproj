@@ -84,7 +84,7 @@
   <ItemGroup>
     <Compile Include="Blueprints\Application\Args [001].cs" />
     <Compile Include="Blueprints\Application\SingleInstance [009].cs" />
-    <Compile Include="Blueprints\Application\UnhandledCatch [006].cs" />
+    <Compile Include="Blueprints\Application\UnhandledCatch [007].cs" />
     <Compile Include="Blueprints\Bitwise [001].cs" />
     <Compile Include="Blueprints\Collections\Generic\ReadOnlyDictionary [001].cs" />
     <Compile Include="Blueprints\Configuration\RecentFiles [003].cs" />
