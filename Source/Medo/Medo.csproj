@@ -90,7 +90,7 @@
     <Compile Include="Blueprints\Configuration\RecentFiles [003].cs" />
     <Compile Include="Blueprints\Configuration\RunOnStartup [003].cs" />
     <Compile Include="Blueprints\Configuration\Settings [011].cs" />
-    <Compile Include="Blueprints\Data\CommonConnection [006].cs" />
+    <Compile Include="Blueprints\Data\CommonConnection [007].cs" />
     <Compile Include="Blueprints\Data\InsertCommand [005].cs" />
     <Compile Include="Blueprints\Device\Elsidi [003].cs" />
     <Compile Include="Blueprints\Device\EltraEL4000 [002].cs" />
