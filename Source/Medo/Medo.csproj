@@ -123,6 +123,7 @@
     <Compile Include="Blueprints\Extensions\SIPrefixExtensions [003].cs" />
     <Compile Include="Blueprints\Net\TinyMessage [001].cs" />
     <Compile Include="Blueprints\Windows\Forms\AboutBox [010].cs" />
+    <Compile Include="Blueprints\Windows\Forms\InputBox [001].cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Blueprints\KeyValuePacket [---].cs" />
     <Compile Include="Blueprints\Localization\Croatia\Holiday [003].cs" />
