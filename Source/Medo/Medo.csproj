@@ -88,7 +88,7 @@
     <Compile Include="Blueprints\Bitwise [001].cs" />
     <Compile Include="Blueprints\Collections\Generic\ReadOnlyDictionary [001].cs" />
     <Compile Include="Blueprints\Configuration\RecentFiles [003].cs" />
-    <Compile Include="Blueprints\Configuration\RunOnStartup [003].cs" />
+    <Compile Include="Blueprints\Configuration\RunOnStartup [004].cs" />
     <Compile Include="Blueprints\Configuration\Settings [011].cs" />
     <Compile Include="Blueprints\Data\CommonConnection [007].cs" />
     <Compile Include="Blueprints\Data\InsertCommand [005].cs" />
