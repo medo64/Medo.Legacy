@@ -38,10 +38,21 @@ namespace Medo.Diagnostics {
             }
         }
 
+        /// <summary>
+        /// Executes POST request.
+        /// </summary>
+        /// <param name="text">Text to send.</param>
+        /// <param name="address">Destination URL.</param>
         public static bool PostToWeb(string text, Uri address) {
             return PostToWeb(text, address, null);
         }
 
+        /// <summary>
+        /// Executes POST request.
+        /// </summary>
+        /// <param name="text">Text to send.</param>
+        /// <param name="address">Destination URL.</param>
+        /// <param name="additionalParameters">Additional parameters.</param>
         public static bool PostToWeb(string text, Uri address, NameValueCollection additionalParameters) {
             if (additionalParameters == null) {
                 additionalParameters = new NameValueCollection();
