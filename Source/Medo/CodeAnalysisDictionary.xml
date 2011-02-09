@@ -24,6 +24,7 @@
             <Word>X</Word>
             <Word>Y</Word>
             <Word>SSPI</Word>
+            <Word>Uart</Word>
         </Recognized>
     </Words>
 </Dictionary>

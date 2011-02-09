@@ -1,4 +1,9 @@
-﻿using System;
+﻿//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com
+
+//2010-09-11: Initial version.
+
+
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -13,7 +18,7 @@ namespace Medo.IO {
     /// <summary>
     /// Represents a serial port resource.
     /// </summary>
-    public class RS232Port : IDisposable {
+    public class UartPort : IDisposable {
 
         /// <summary>
         /// Indicates that no time-out should occur.
@@ -25,7 +30,7 @@ namespace Medo.IO {
         /// Initializes a new instance of the class using the specified port name.
         /// </summary>
         /// <param name="portName">The port to use.</param>
-        public RS232Port(string portName)
+        public UartPort(string portName)
             : this(portName, 9600, Parity.None, 8, StopBits.One) {
         }
 
@@ -34,7 +39,7 @@ namespace Medo.IO {
         /// </summary>
         /// <param name="portName">The port to use.</param>
         /// <param name="baudRate">The baud rate.</param>
-        public RS232Port(string portName, int baudRate)
+        public UartPort(string portName, int baudRate)
             : this(portName, baudRate, Parity.None, 8, StopBits.One) {
         }
 
@@ -46,7 +51,7 @@ namespace Medo.IO {
         /// <param name="parity">One of the Parity values.</param>
         /// <param name="dataBits">The data bits value.</param>
         /// <param name="stopBits">The stop bits value.</param>
-        public RS232Port(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) {
+        public UartPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) {
             this.PortName = portName;
             this.BaudRate = baudRate;
             this.Parity = parity;
@@ -54,8 +59,8 @@ namespace Medo.IO {
             this.StopBits = stopBits;
 
             this.NewLine = "\n";
-            this.ReadTimeout = RS232Port.InfiniteTimeout;
-            this.WriteTimeout = RS232Port.InfiniteTimeout;
+            this.ReadTimeout = UartPort.InfiniteTimeout;
+            this.WriteTimeout = UartPort.InfiniteTimeout;
         }
 
 
@@ -183,14 +188,14 @@ namespace Medo.IO {
             config.dwProviderSize = 0;
             config.wcProviderData = null;
             var resultConfigSet = NativeMethods.SetCommConfig(this.Handle, ref config, config.dwSize);
-            if (resultConfigSet != true) { throw new IOException("An attempt to set the state of the underlying port failed (error " + Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture) + " while setting configuration)."); }
+            if (resultConfigSet != true) { throw new IOException("An attempt to set the state of the underlying port failed.", new Win32Exception()); }
 
             //var configGet = new NativeMethods.COMMCONFIG();
             //configGet.dcb = new NativeMethods.DCB();
             //configGet.dcb.DCBlength = Marshal.SizeOf(config.dcb);
             //var configGetCount = Marshal.SizeOf(configGet);
             //var resultConfigGet = NativeMethods.GetCommConfig(this.Handle, ref configGet, ref configGetCount);
-            //if (resultConfigGet != true) { throw new IOException("An attempt to get the state of the underlying port failed (error " + Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture) + " while getting configuration)."); }
+            //if (resultConfigGet != true) { throw new IOException("An attempt to set the state of the underlying port failed.", new Win32Exception()); }
             //this.BaudRate = configGet.dcb.BaudRate;
 
 
@@ -201,7 +206,7 @@ namespace Medo.IO {
             commTimeouts.WriteTotalTimeoutMultiplier = 0;
             commTimeouts.WriteTotalTimeoutConstant = (this.ReadTimeout != InfiniteTimeout) ? this.WriteTimeout : 0;
             var resultTimeouts = NativeMethods.SetCommTimeouts(this.Handle, ref commTimeouts);
-            if (resultTimeouts != true) { throw new IOException("An attempt to set the state of the underlying port failed (error " + Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture) + " while setting timeout)."); }
+            if (resultTimeouts != true) { throw new IOException("An attempt to set the state of the underlying port failed.", new Win32Exception()); }
 
             this.Purge();
         }
@@ -219,11 +224,15 @@ namespace Medo.IO {
         /// <summary>
         /// Gets the number of bytes of data in the receive buffer.
         /// </summary>
+        /// <exception cref="System.InvalidOperationException">Cannot read state.</exception>
         public int BytesToRead {
             get {
                 var errorFlags = IntPtr.Zero;
                 var stats = new NativeMethods.COMSTAT();
                 var result = NativeMethods.ClearCommError(this.Handle, ref errorFlags, ref stats);
+                if (result != true) {
+                    throw new InvalidOperationException("Cannot read state (native error " + Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture) + ").");
+                }
                 return (int)stats.cbInQue;
             }
         }
@@ -231,43 +240,54 @@ namespace Medo.IO {
         /// <summary>
         /// Discards data from the serial driver's receive and transmit buffer.
         /// </summary>
+        /// <exception cref="System.InvalidOperationException">Port is not open.</exception>
+        /// <exception cref="System.IO.IOException">Communication error.</exception>
         public void Purge() {
-            var result = NativeMethods.PurgeComm(this.Handle,
-                NativeMethods.PURGE_TXABORT | NativeMethods.PURGE_TXCLEAR | NativeMethods.PURGE_RXABORT | NativeMethods.PURGE_RXCLEAR);
+            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            var result = NativeMethods.PurgeComm(this.Handle, NativeMethods.PURGE_TXABORT | NativeMethods.PURGE_TXCLEAR | NativeMethods.PURGE_RXABORT | NativeMethods.PURGE_RXCLEAR);
+            if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
         }
 
         /// <summary>
         /// Clears all buffers and causes any buffered data to be written to the underlying device.
         /// </summary>
         /// <exception cref="System.InvalidOperationException">Port is not open.</exception>
-        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.IOException">Communication error.</exception>
         public void Flush() {
             if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             var result = NativeMethods.FlushFileBuffers(this.Handle);
-            if (result != true) { throw new Win32Exception("Native error " + Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture) + "."); }
+            if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
         }
 
         /// <summary>
         /// Discards data from the serial driver's receive buffer.
         /// </summary>
+        /// <exception cref="System.InvalidOperationException">Port is not open.</exception>
+        /// <exception cref="System.IO.IOException">Communication error.</exception>
         public void DiscardInBuffer() {
-            var result = NativeMethods.PurgeComm(this.Handle,
-                NativeMethods.PURGE_RXABORT | NativeMethods.PURGE_RXCLEAR);
+            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            var result = NativeMethods.PurgeComm(this.Handle, NativeMethods.PURGE_RXABORT | NativeMethods.PURGE_RXCLEAR);
+            if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
         }
 
         /// <summary>
         /// Discards data from the serial driver's transmit buffer.
         /// </summary>
+        /// <exception cref="System.InvalidOperationException">Port is not open.</exception>
+        /// <exception cref="System.IO.IOException">Communication error.</exception>
         public void DiscardOutBuffer() {
-            var result = NativeMethods.PurgeComm(this.Handle,
-                NativeMethods.PURGE_TXABORT | NativeMethods.PURGE_TXCLEAR);
+            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            var result = NativeMethods.PurgeComm(this.Handle, NativeMethods.PURGE_TXABORT | NativeMethods.PURGE_TXCLEAR);
+            if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
         }
 
         /// <summary>
         /// Reads a number of bytes from the input buffer and writes those bytes into a byte array at the specified offset.
         /// </summary>
         /// <param name="buffer">The byte array to write the input to.</param>
+        /// <exception cref="System.ArgumentNullException">The buffer passed is null.</exception>
         public int Read(byte[] buffer) {
+            if (buffer == null) { throw new ArgumentNullException("buffer", "The buffer passed is null."); }
             return Read(buffer, 0, buffer.Length);
         }
 
@@ -281,15 +301,15 @@ namespace Medo.IO {
         /// <exception cref="System.ArgumentNullException">The buffer passed is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">The offset or count is outside of valid buffer region.</exception>
         /// <exception cref="System.TimeoutException">The operation did not complete before the time-out period ended.</exception>
-        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.IOException">Communication error.</exception>
         public int Read(byte[] buffer, int offset, int count) {
             if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             if (buffer == null) { throw new ArgumentNullException("buffer", "The buffer passed is null."); }
-            if ((offset < 0) || (count < 0) || (offset + count > buffer.Length)) { throw new ArgumentOutOfRangeException("The offset or count is outside of valid buffer region."); }
+            if ((offset < 0) || (count < 0) || (offset + count > buffer.Length)) { throw new ArgumentOutOfRangeException("offset", "The offset or count is outside of valid buffer region."); }
             var nPtrRead = IntPtr.Zero;
             var overlapped = new NativeOverlapped();
             var result = NativeMethods.ReadFile(this.Handle, buffer, count, ref nPtrRead, ref overlapped);
-            if (result != true) { throw new Win32Exception("Native error " + Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture) + "."); }
+            if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
             var nRead = nPtrRead.ToInt32();
             if (nRead < count) { throw new TimeoutException("The operation did not complete before the time-out period ended."); }
             return nRead;
@@ -322,7 +342,9 @@ namespace Medo.IO {
         /// Writes a specified number of bytes to the serial port using data from a buffer.
         /// </summary>
         /// <param name="buffer">The byte array that contains the data to write to the port.</param>
+        /// <exception cref="System.ArgumentNullException">The buffer passed is null.</exception>
         public int Write(byte[] buffer) {
+            if (buffer == null) { throw new ArgumentNullException("buffer", "The buffer passed is null."); }
             return Write(buffer, 0, buffer.Length);
         }
 
@@ -336,11 +358,11 @@ namespace Medo.IO {
         /// <exception cref="System.ArgumentNullException">The buffer passed is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">The offset or count is outside of valid buffer region.</exception>
         /// <exception cref="System.TimeoutException">The operation did not complete before the time-out period ended.</exception>
-        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.IOException">Communication error.</exception>
         public int Write(byte[] buffer, int offset, int count) {
             if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             if (buffer == null) { throw new ArgumentNullException("buffer", "The buffer passed is null."); }
-            if ((offset < 0) || (count < 0) || (offset + count > buffer.Length)) { throw new ArgumentOutOfRangeException("The offset or count is outside of valid buffer region."); }
+            if ((offset < 0) || (count < 0) || (offset + count > buffer.Length)) { throw new ArgumentOutOfRangeException("offset", "The offset or count is outside of valid buffer region."); }
 
             if ((offset != 0) || (buffer.Length != count)) {
                 byte[] newBuffer = new byte[count];
@@ -350,7 +372,7 @@ namespace Medo.IO {
             var nPtrWritten = IntPtr.Zero;
             var overlapped = new NativeOverlapped();
             var result = NativeMethods.WriteFile(this.Handle, buffer, count, ref nPtrWritten, ref overlapped);
-            if (result != true) { throw new Win32Exception("Native error " + Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture) + "."); }
+            if (result != true) { throw new Win32Exception("Communication error.", new Win32Exception()); }
             var nWriten = nPtrWritten.ToInt32();
             if (nWriten < count) { throw new TimeoutException("The operation did not complete before the time-out period ended."); }
             return nWriten;
@@ -368,7 +390,7 @@ namespace Medo.IO {
 
 
 
-        private class NativeMethods {
+        private static class NativeMethods {
 
             public const UInt32 FILE_SHARE_READ = 0x00000001;
             public const UInt32 FILE_SHARE_WRITE = 0x00000002;
@@ -416,38 +438,38 @@ namespace Medo.IO {
                 public UInt32 bitvector1;
                 public UInt32 cbInQue;
                 public UInt32 cbOutQue;
-                public UInt32 fCtsHold {
-                    get { return ((UInt32)((this.bitvector1 & 0x1u))); }
-                    set { this.bitvector1 = ((UInt32)((value | this.bitvector1))); }
-                }
-                public UInt32 fDsrHold {
-                    get { return ((UInt32)(((this.bitvector1 & 0x2u) / 0x2))); }
-                    set { this.bitvector1 = ((UInt32)(((value * 0x2) | this.bitvector1))); }
-                }
-                public UInt32 fRlsdHold {
-                    get { return ((UInt32)(((this.bitvector1 & 0x4u) / 0x4))); }
-                    set { this.bitvector1 = ((UInt32)(((value * 0x4) | this.bitvector1))); }
-                }
-                public UInt32 fXoffHold {
-                    get { return ((UInt32)(((this.bitvector1 & 0x8u) / 0x8))); }
-                    set { this.bitvector1 = ((UInt32)(((value * 0x8) | this.bitvector1))); }
-                }
-                public UInt32 fXoffSent {
-                    get { return ((UInt32)(((this.bitvector1 & 0x10u) / 0x10))); }
-                    set { this.bitvector1 = ((UInt32)(((value * 0x10) | this.bitvector1))); }
-                }
-                public UInt32 fEof {
-                    get { return ((UInt32)(((this.bitvector1 & 0x20u) / 0x20))); }
-                    set { this.bitvector1 = ((UInt32)(((value * 0x20) | this.bitvector1))); }
-                }
-                public UInt32 fTxim {
-                    get { return ((UInt32)(((this.bitvector1 & 0x40u) / 0x40))); }
-                    set { this.bitvector1 = ((UInt32)(((value * 0x40) | this.bitvector1))); }
-                }
-                public UInt32 fReserved {
-                    get { return ((UInt32)(((this.bitvector1 & 0xFFFFFF80u) / 0x80))); }
-                    set { this.bitvector1 = ((UInt32)(((value * 0x80) | this.bitvector1))); }
-                }
+                //                public UInt32 fCtsHold {
+                //                    get { return ((UInt32)((this.bitvector1 & 0x1u))); }
+                //                    set { this.bitvector1 = ((UInt32)((value | this.bitvector1))); }
+                //                }
+                //                public UInt32 fDsrHold {
+                //                    get { return ((UInt32)(((this.bitvector1 & 0x2u) / 0x2))); }
+                //                    set { this.bitvector1 = ((UInt32)(((value * 0x2) | this.bitvector1))); }
+                //                }
+                //                public UInt32 fRlsdHold {
+                //                    get { return ((UInt32)(((this.bitvector1 & 0x4u) / 0x4))); }
+                //                    set { this.bitvector1 = ((UInt32)(((value * 0x4) | this.bitvector1))); }
+                //                }
+                //                public UInt32 fXoffHold {
+                //                    get { return ((UInt32)(((this.bitvector1 & 0x8u) / 0x8))); }
+                //                    set { this.bitvector1 = ((UInt32)(((value * 0x8) | this.bitvector1))); }
+                //                }
+                //                public UInt32 fXoffSent {
+                //                    get { return ((UInt32)(((this.bitvector1 & 0x10u) / 0x10))); }
+                //                    set { this.bitvector1 = ((UInt32)(((value * 0x10) | this.bitvector1))); }
+                //                }
+                //                public UInt32 fEof {
+                //                    get { return ((UInt32)(((this.bitvector1 & 0x20u) / 0x20))); }
+                //                    set { this.bitvector1 = ((UInt32)(((value * 0x20) | this.bitvector1))); }
+                //                }
+                //                public UInt32 fTxim {
+                //                    get { return ((UInt32)(((this.bitvector1 & 0x40u) / 0x40))); }
+                //                    set { this.bitvector1 = ((UInt32)(((value * 0x40) | this.bitvector1))); }
+                //                }
+                //                public UInt32 fReserved {
+                //                    get { return ((UInt32)(((this.bitvector1 & 0xFFFFFF80u) / 0x80))); }
+                //                    set { this.bitvector1 = ((UInt32)(((value * 0x80) | this.bitvector1))); }
+                //                }
             }
 
             [StructLayout(LayoutKind.Sequential)]
@@ -478,59 +500,59 @@ namespace Medo.IO {
                 public UInt16 wReserved1;
 
                 public UInt32 fBinary {
-                    get { return ((UInt32)((this.bitvector1 & 0x1u))); }
+                    //                    get { return ((UInt32)((this.bitvector1 & 0x1u))); }
                     set { this.bitvector1 = ((UInt32)((value | this.bitvector1))); }
                 }
                 public UInt32 fParity {
-                    get { return ((UInt32)(((this.bitvector1 & 0x2u) / 0x2))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x2u) / 0x2))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x2) | this.bitvector1))); }
                 }
                 public UInt32 fOutxCtsFlow {
-                    get { return ((UInt32)(((this.bitvector1 & 0x4u) / 0x4))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x4u) / 0x4))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x4) | this.bitvector1))); }
                 }
                 public UInt32 fOutxDsrFlow {
-                    get { return ((UInt32)(((this.bitvector1 & 0x8u) / 0x8))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x8u) / 0x8))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x8) | this.bitvector1))); }
                 }
                 public UInt32 fDtrControl {
-                    get { return ((UInt32)(((this.bitvector1 & 0x30u) / 0x10))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x30u) / 0x10))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x10) | this.bitvector1))); }
                 }
                 public UInt32 fDsrSensitivity {
-                    get { return ((UInt32)(((this.bitvector1 & 0x40u) / 0x40))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x40u) / 0x40))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x40) | this.bitvector1))); }
                 }
                 public UInt32 fTXContinueOnXoff {
-                    get { return ((UInt32)(((this.bitvector1 & 0x80u) / 0x80))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x80u) / 0x80))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x80) | this.bitvector1))); }
                 }
                 public UInt32 fOutX {
-                    get { return ((UInt32)(((this.bitvector1 & 0x100u) / 0x100))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x100u) / 0x100))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x100) | this.bitvector1))); }
                 }
                 public UInt32 fInX {
-                    get { return ((UInt32)(((this.bitvector1 & 0x200u) / 0x200))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x200u) / 0x200))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x200) | this.bitvector1))); }
                 }
                 public UInt32 fErrorChar {
-                    get { return ((UInt32)(((this.bitvector1 & 0x400u) / 0x400))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x400u) / 0x400))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x400) | this.bitvector1))); }
                 }
                 public UInt32 fNull {
-                    get { return ((UInt32)(((this.bitvector1 & 0x800u) / 0x800))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x800u) / 0x800))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x800) | this.bitvector1))); }
                 }
                 public UInt32 fRtsControl {
-                    get { return ((UInt32)(((this.bitvector1 & 0x3000u) / 0x1000))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x3000u) / 0x1000))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x1000) | this.bitvector1))); }
                 }
                 public UInt32 fAbortOnError {
-                    get { return ((UInt32)(((this.bitvector1 & 0x4000u) / 0x4000))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0x4000u) / 0x4000))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x4000) | this.bitvector1))); }
                 }
                 public UInt32 fDummy2 {
-                    get { return ((UInt32)(((this.bitvector1 & 0xFFFF8000u) / 0x8000))); }
+                    //                    get { return ((UInt32)(((this.bitvector1 & 0xFFFF8000u) / 0x8000))); }
                     set { this.bitvector1 = ((UInt32)(((value * 0x8000) | this.bitvector1))); }
                 }
             }
@@ -551,9 +573,9 @@ namespace Medo.IO {
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean FlushFileBuffers([In()] CreateFileWHandle hFile);
 
-            [DllImport("kernel32.dll", EntryPoint = "GetCommConfig", SetLastError = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool GetCommConfig([In()] CreateFileWHandle hCommDev, ref COMMCONFIG lpCC, ref Int32 lpdwSize);
+            //[DllImport("kernel32.dll", EntryPoint = "GetCommConfig", SetLastError = true)]
+            //[return: MarshalAs(UnmanagedType.Bool)]
+            //public static extern bool GetCommConfig([In()] CreateFileWHandle hCommDev, ref COMMCONFIG lpCC, ref Int32 lpdwSize);
 
             [DllImport("kernel32.dll", EntryPoint = "PurgeComm")]
             [return: MarshalAs(UnmanagedType.Bool)]
