@@ -61,7 +61,7 @@
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>Q:\Projects\My\Medo\CSharp\Binaries\Medo.xml</DocumentationFile>
+    <DocumentationFile>Q:\Projects\Blueprints\CSharp\Binaries\Medo.xml</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
