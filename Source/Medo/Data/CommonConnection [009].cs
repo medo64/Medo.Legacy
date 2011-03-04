@@ -10,6 +10,8 @@
 //2010-08-29: All IDbConnection members are internal to make usage from another assembly more clearer.
 //2010-11-12: Added ProviderName property.
 //            Open and Close are now public.
+//2010-11-19: ProviderName and CreateCommand are now internal protected.
+//2011-03-04: Fixed bug with null args in CreateCommand.
 
 
 using System;
@@ -282,7 +284,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets provider name.
         /// </summary>
-        protected string ProviderName { get; private set; }
+        protected internal string ProviderName { get; private set; }
 
         /// <summary>
         /// Gets underlying connection.
@@ -354,25 +356,27 @@ namespace Medo.Data {
         /// IDbCommand cmd = CreateCommand("INSERT INTO TT([Text], [Date]) VALUES({0},{1})", "Test", DateTime.Now);
         /// </example>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Injection attack is not possible since all args[] are converted to IDbDataParameter.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification="This is intended behaviour.")]
-        internal IDbCommand CreateCommand(string format, params object[] args) {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is intended behaviour.")]
+        internal protected IDbCommand CreateCommand(string format, params object[] args) {
             IDbCommand cmd = this.CreateCommand();
 
             List<string> argList = new List<string>();
-            for (int i = 0; i < args.Length; ++i) {
-                if (args[i] == null) {
-                    argList.Add("NULL");
-                } else {
-                    string paramName = string.Format(CultureInfo.InvariantCulture, "@P{0}", i);
-                    argList.Add(paramName);
-                    IDbDataParameter param = cmd.CreateParameter();
-                    param.ParameterName = paramName;
-                    param.Value = args[i];
-                    if (param.DbType == DbType.DateTime) {
-                        OleDbParameter odp = param as OleDbParameter;
-                        if (odp != null) { odp.OleDbType = OleDbType.Date; }
+            if (args != null) {
+                for (int i = 0; i < args.Length; ++i) {
+                    if (args[i] == null) {
+                        argList.Add("NULL");
+                    } else {
+                        string paramName = string.Format(CultureInfo.InvariantCulture, "@P{0}", i);
+                        argList.Add(paramName);
+                        IDbDataParameter param = cmd.CreateParameter();
+                        param.ParameterName = paramName;
+                        param.Value = args[i];
+                        if (param.DbType == DbType.DateTime) {
+                            OleDbParameter odp = param as OleDbParameter;
+                            if (odp != null) { odp.OleDbType = OleDbType.Date; }
+                        }
+                        cmd.Parameters.Add(param);
                     }
-                    cmd.Parameters.Add(param);
                 }
             }
             if (argList.Count > 0) {

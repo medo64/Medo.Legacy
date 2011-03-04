@@ -90,7 +90,7 @@
     <Compile Include="Configuration\RecentFiles [003].cs" />
     <Compile Include="Configuration\RunOnStartup [004].cs" />
     <Compile Include="Configuration\Settings [011].cs" />
-    <Compile Include="Data\CommonConnection [007].cs" />
+    <Compile Include="Data\CommonConnection [009].cs" />
     <Compile Include="Data\InsertCommand [005].cs" />
     <Compile Include="Device\Elsidi [003].cs" />
     <Compile Include="Device\EltraEL4000 [002].cs" />
