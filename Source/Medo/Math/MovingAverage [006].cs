@@ -5,9 +5,10 @@
 //2008-01-05: Moved to Medo.Math.Averaging.
 //2008-04-11: Cleaned code to match FxCop 1.36 beta 2 (DoNotRaiseExceptionsInUnexpectedLocations).
 //2010-05-14: Changed namespace from Medo.Math.Averaging to Medo.Math.
+//2011-03-05: Moved to Medo.Math.
 
 
-namespace Medo.Math.Averaging {
+namespace Medo.Math {
 
 	/// <summary>
 	/// Calculates moving average for added items.

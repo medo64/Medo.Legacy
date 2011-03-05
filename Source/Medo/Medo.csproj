@@ -130,9 +130,9 @@
     <Compile Include="Localization\Croatia\Holiday [003].cs" />
     <Compile Include="Localization\Croatia\NumberDeclination [001].cs" />
     <Compile Include="Localization\PostOffices [001].cs" />
-    <Compile Include="Math\ExponentialMovingAverage [005].cs" />
-    <Compile Include="Math\MovingAverage [005].cs" />
-    <Compile Include="Math\SimpleAverage [005].cs" />
+    <Compile Include="Math\ExponentialMovingAverage [006].cs" />
+    <Compile Include="Math\MovingAverage [006].cs" />
+    <Compile Include="Math\SimpleAverage [006].cs" />
     <Compile Include="Math\WeightedMovingAverage [005].cs" />
     <Compile Include="Math\LinearInterpolation [001].cs" />
     <Compile Include="MessageBox [006].cs" />
