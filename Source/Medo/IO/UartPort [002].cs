@@ -1,6 +1,8 @@
 ﻿//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com
 
 //2010-09-11: Initial version.
+//2011-02-16: Fixed ReadLine.
+//            Added fix for serial ports above COM9.
 
 
 using System;
@@ -51,8 +53,14 @@ namespace Medo.IO {
         /// <param name="parity">One of the Parity values.</param>
         /// <param name="dataBits">The data bits value.</param>
         /// <param name="stopBits">The stop bits value.</param>
+        /// <exception cref="System.ArgumentNullException">PortName cannot be null.</exception>
         public UartPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) {
-            this.PortName = portName;
+            if (portName == null) { throw new ArgumentNullException("portName", "PortName cannot be null."); }
+            if (portName.StartsWith(@"\\?\", StringComparison.Ordinal)) {
+                this.PortName = portName;
+            } else {
+                this.PortName = @"\\?\" + portName;
+            }
             this.BaudRate = baudRate;
             this.Parity = parity;
             this.DataBits = dataBits;
@@ -334,7 +342,7 @@ namespace Medo.IO {
                     if (isNewLine) { break; }
                 }
             }
-            return sb.ToString();
+            return sb.ToString(0, sb.Length - this.NewLine.Length);
         }
 
 
