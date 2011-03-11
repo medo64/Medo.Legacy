@@ -87,6 +87,7 @@
     <Compile Include="Application\UnhandledCatch [008].cs" />
     <Compile Include="Bitwise [001].cs" />
     <Compile Include="Collections\Generic\ReadOnlyDictionary [001].cs" />
+    <Compile Include="Configuration\IniFile [001].cs" />
     <Compile Include="Configuration\RecentFiles [003].cs" />
     <Compile Include="Configuration\RunOnStartup [004].cs" />
     <Compile Include="Configuration\Settings [011].cs" />

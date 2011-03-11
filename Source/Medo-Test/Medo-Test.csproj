@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="ABusFrameTest.cs" />
     <Compile Include="ArgsTest.cs" />
+    <Compile Include="IniFileTest.cs" />
     <Compile Include="LinearInterpolationTest.cs" />
     <Compile Include="OibTest.cs" />
     <Compile Include="Iso7064Test.cs" />
