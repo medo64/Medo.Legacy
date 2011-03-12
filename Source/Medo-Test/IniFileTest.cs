@@ -101,6 +101,22 @@ namespace Test {
         }
 
         [TestMethod()]
+        public void IniFileReadDoubleTest() {
+            var sb = new StringBuilder();
+            sb.AppendLine(@"[numbers]  ;comment here");
+            sb.AppendLine(@"number-0=0.01");
+            sb.AppendLine(@"number-1=1.23e6");
+            sb.AppendLine(@"number-2=123e-3");
+            sb.AppendLine(@"number-3=NaN");
+
+            IniFile target = new IniFile(new MemoryStream(UTF8Encoding.UTF8.GetBytes(sb.ToString())));
+            Assert.AreEqual(0.01, target.Read("numbers", "number-0", double.NaN));
+            Assert.AreEqual(1230000, target.Read("numbers", "number-1", double.NaN));
+            Assert.AreEqual(0.123, target.Read("numbers", "number-2", double.NaN));
+            Assert.AreEqual(double.NaN, target.Read("numbers", "number-3", double.NaN));
+        }
+
+        [TestMethod()]
         public void IniFileSaveTest() {
             IniFile target = new IniFile();
             target.Write("default", "name", "john");

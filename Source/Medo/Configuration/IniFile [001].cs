@@ -110,6 +110,21 @@ namespace Medo.Configuration {
             }
         }
 
+        /// <summary>
+        /// Returns value found and converted to double or defaultValue if value is not found or it cannot be converted.
+        /// </summary>
+        /// <param name="section">Section.</param>
+        /// <param name="name">Name.</param>
+        /// <param name="defaultValue">Default value.</param>
+        public double Read(string section, string name, double defaultValue) {
+            double result;
+            if (double.TryParse(this.Read(section, name, null), NumberStyles.Float, CultureInfo.InvariantCulture, out result)) {
+                return result;
+            } else {
+                return defaultValue;
+            }
+        }
+
 
         /// <summary>
         /// Sets value.
@@ -157,6 +172,16 @@ namespace Medo.Configuration {
         /// <param name="name">Name.</param>
         /// <param name="value">Value.</param>
         public void Write(string section, string name, int value) {
+            this.Write(section, name, value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>
+        /// Sets value.
+        /// </summary>
+        /// <param name="section">Section.</param>
+        /// <param name="name">Name.</param>
+        /// <param name="value">Value.</param>
+        public void Write(string section, string name, double value) {
             this.Write(section, name, value.ToString(CultureInfo.InvariantCulture));
         }
 
