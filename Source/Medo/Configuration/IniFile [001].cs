@@ -279,14 +279,14 @@ namespace Medo.Configuration {
                         if (!((ch == '\n') && (lastChar == '\r'))) {
                             lineIndex += 1;
                         }
-                        sbLine.Clear();
+                        sbLine.Length = 0;
                     } else {
                         sbLine.Append(ch);
                     }
                     switch (state) {
                         case CharState.FirstCharInLine: { //just starting 
                                 if (ch == '[') { //this might be start of section
-                                    sbSection.Clear();
+                                    sbSection.Length = 0;
                                     state = CharState.SectionCharacter;
                                 } else if ((ch == '\r') || (ch == '\n')) {
                                     state = CharState.FirstCharInLine;
@@ -295,7 +295,7 @@ namespace Medo.Configuration {
                                 } else if (ch == ';') {
                                     state = CharState.Comment;
                                 } else {
-                                    sbName.Clear();
+                                    sbName.Length = 0;
                                     sbName.Append(ch);
                                     state = CharState.NameCharacter;
                                 }
@@ -318,7 +318,7 @@ namespace Medo.Configuration {
                                 } else if ((ch == ' ') || (ch == '\t')) {
                                     state = CharState.NameCharacterWhitespaceSuffix;
                                 } else if (ch == '=') {
-                                    sbValue.Clear();
+                                    sbValue.Length = 0;
                                     state = CharState.ValueCharacterPossibleWhitespace;
                                 } else {
                                     sbName.Append(ch);
@@ -332,7 +332,7 @@ namespace Medo.Configuration {
                                 } else if ((ch == ' ') || (ch == '\t')) {
                                     state = CharState.NameCharacterWhitespaceSuffix;
                                 } else if (ch == '=') {
-                                    sbValue.Clear();
+                                    sbValue.Length = 0;
                                     state = CharState.ValueCharacterPossibleWhitespace;
                                 } else {
                                     throw new InvalidDataException(string.Format(CultureInfo.InvariantCulture, "File cannot be parsed (line {0}: \"{1}\").", lineIndex, sbLine), new InvalidOperationException("Unexpected end of name."));
@@ -349,7 +349,7 @@ namespace Medo.Configuration {
                                 } else if ((ch == ' ') || (ch == '\t')) {
                                     state = CharState.ValueCharacterPossibleWhitespace;
                                 } else if ((ch == '\"')) {
-                                    sbValue.Clear();
+                                    sbValue.Length = 0;
                                     state = CharState.QuotedValueCharacter;
                                 } else {
                                     sbValue.Append(ch);
