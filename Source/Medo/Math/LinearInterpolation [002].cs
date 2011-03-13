@@ -1,8 +1,9 @@
 ﻿//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com  http://blog.jmedved.com
 
 //2010-04-24: Initial version.
-//2011-03-13: Added AddCalibration method.
-//            Removed indexer.
+//2011-03-13: Changed Add method.
+//            Line is approximated between two points when calculating adjustments below or above.
+//            Not compatible with version 001!
 
 
 using System;
@@ -25,20 +26,10 @@ namespace Medo.Math {
         /// <summary>
         /// Adds new calibration point.
         /// </summary>
-        /// <param name="reference">Reference value.</param>
-        /// <param name="adjustment">Adjustment at reference point.</param>
-        [Obsolete("Unclear behaviour of adjustment. Use AddCalibration instead.")]
-        public void Add(double reference, double adjustment) {
-            _referencePoints.Add(reference, adjustment);
-        }
-
-        /// <summary>
-        /// Adds new calibration point.
-        /// </summary>
-        /// <param name="reference">Reference value.</param>
-        /// <param name="value">Value as measured by target device.</param>
-        public void AddCalibration(double reference, double value) {
-            _referencePoints.Add(reference, value - reference);
+        /// <param name="referenceValue">Reference value.</param>
+        /// <param name="measuredValue">Value as measured by target device.</param>
+        public void Add(double referenceValue, double measuredValue) {
+            _referencePoints.Add(referenceValue, measuredValue);
         }
 
         /// <summary>
@@ -46,30 +37,46 @@ namespace Medo.Math {
         /// </summary>
         /// <param name="value">Value to adjust.</param>
         public double GetAdjustedValue(double value) {
-            KeyValuePair<double, double>? itemBelow = null;
-            KeyValuePair<double, double>? itemAbove = null;
+            KeyValuePair<double, double>? itemBelowF = null;
+            KeyValuePair<double, double>? itemBelowN = null;
+            KeyValuePair<double, double>? itemAboveN = null;
+            KeyValuePair<double, double>? itemAboveF = null;
 
             foreach (var item in _referencePoints) {
-                if (item.Key == value) { //just sent it as output
-                    return value + item.Value;
-                } else if (item.Key < value) { //store for future reference - it may be more than one.
-                    itemBelow = item;
-                } else if (item.Key > value) { //first above limit
-                    itemAbove = item;
-                    break;
+                if (item.Value == value) { //just sent it as output
+                    return item.Key;
+                } else if (item.Value < value) { //store for future reference - it may be more than one.
+                    itemBelowF = itemBelowN;
+                    itemBelowN = item;
+                } else if (item.Value > value) { //first above limit
+                    itemAboveF = itemAboveN;
+                    itemAboveN = item;
+                    if (itemAboveF.HasValue) { break; }
                 }
             }
 
-            if (itemBelow.HasValue && itemAbove.HasValue) { //both reference points
-                var range = itemAbove.Value.Key - itemBelow.Value.Key;
-                var point = value - itemBelow.Value.Key;
+            if (itemBelowN.HasValue && itemAboveN.HasValue) { //both reference points
+                var range = itemAboveN.Value.Value - itemBelowN.Value.Value;
+                var point = value - itemBelowN.Value.Value;
                 var percentageAbove = point / range;
                 var percentageBelow = 1 - percentageAbove;
-                return value + itemBelow.Value.Value * percentageBelow + itemAbove.Value.Value * percentageAbove;
-            } else if (itemBelow.HasValue) { //just lower reference point
-                return value + itemBelow.Value.Value;
-            } else if (itemAbove.HasValue) { //just upper reference point
-                return value + itemAbove.Value.Value;
+                return value + (itemBelowN.Value.Key - itemBelowN.Value.Value) * percentageBelow + (itemAboveN.Value.Key - itemAboveN.Value.Value) * percentageAbove;
+            } else if (itemBelowN.HasValue) { //just lower reference point
+                if (itemBelowF.HasValue) {
+                    double m = (itemBelowF.Value.Key - itemBelowN.Value.Key) / ((itemBelowF.Value.Value - itemBelowN.Value.Value));
+                    double b = itemBelowN.Value.Key - m * itemBelowN.Value.Value;
+                    return m * value + b;
+                } else {
+                    return value + (itemBelowN.Value.Key - itemBelowN.Value.Value); //just offset
+                }
+            } else if (itemAboveN.HasValue) { //just upper reference point
+                if (itemAboveF.HasValue) {
+                    double m = (itemAboveF.Value.Key - itemAboveN.Value.Key) / ((itemAboveF.Value.Value - itemAboveN.Value.Value));
+                    double b = itemAboveN.Value.Key - m * itemAboveN.Value.Value;
+                    return m * value + b;
+                } else {
+                    return value + (itemAboveN.Value.Key - itemAboveN.Value.Value); //just offset
+                }
             } else { //no reference point
                 return value;
             }
