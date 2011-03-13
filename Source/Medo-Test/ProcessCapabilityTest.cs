@@ -69,6 +69,8 @@ namespace Test {
             target.Add(14);
             Assert.AreEqual(7, target.Mean);
             Assert.AreEqual(7, target.StDev);
+            Assert.AreEqual(0, target.Minimum);
+            Assert.AreEqual(14, target.Maximum);
         }
 
         [TestMethod()]
@@ -81,6 +83,8 @@ namespace Test {
             target.Add(14);
             Assert.AreEqual(7, target.Mean);
             Assert.AreEqual(5, target.StDev);
+            Assert.AreEqual(0, target.Minimum);
+            Assert.AreEqual(14, target.Maximum);
         }
 
         [TestMethod()]
@@ -93,6 +97,8 @@ namespace Test {
             target.Add(8);
             Assert.AreEqual(7, target.Mean);
             Assert.AreEqual(1, target.StDev);
+            Assert.AreEqual(6, target.Minimum);
+            Assert.AreEqual(8, target.Maximum);
         }
 
         [TestMethod()]

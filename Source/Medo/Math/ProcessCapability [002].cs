@@ -1,6 +1,7 @@
 ﻿//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com
 
-//2011-05-05: Initial version (based on description at http://en.wikipedia.org/wiki/Process_capability_index).
+//2011-03-05: Initial version (based on description at http://en.wikipedia.org/wiki/Process_capability_index).
+//2011-03-13: Added minimum/maximum.
 
 
 using System.Collections.Generic;
@@ -68,12 +69,14 @@ namespace Medo.Math {
         /// Gets/sets whether Bessel's correction is used inside standard deviation calculations.
         /// Default is true.
         /// </summary>
-        public bool UseBesselCorrection { 
+        public bool UseBesselCorrection {
             get { return this._useBesselCorrection; }
             set {
                 this._useBesselCorrection = value;
                 this._meanCache = null;
                 this._stDevCache = null;
+                this._minimumCache = null;
+                this._maximumCache = null;
             }
         }
 
@@ -126,6 +129,52 @@ namespace Medo.Math {
                     }
                 }
                 return this._stDevCache.Value;
+            }
+        }
+
+        private double? _minimumCache = null;
+        /// <summary>
+        /// Returns minimum value of all items of Double.NaN if there are no items.
+        /// </summary>
+        public double Minimum {
+            get {
+                if (_minimumCache == null) {
+                    if (this.Items.Count > 0) {
+                        double minimum = this.Items[0];
+                        for (int i = 1; i < this.Items.Count; i++) {
+                            if (this.Items[i] < minimum) {
+                                minimum = this.Items[i];
+                            }
+                        }
+                        this._minimumCache = minimum;
+                    } else {
+                        this._minimumCache = double.NaN;
+                    }
+                }
+                return this._minimumCache.Value;
+            }
+        }
+
+        private double? _maximumCache = null;
+        /// <summary>
+        /// Returns maximum value of all items of Double.NaN if there are no items.
+        /// </summary>
+        public double Maximum {
+            get {
+                if (_maximumCache == null) {
+                    if (this.Items.Count > 0) {
+                        double maximum = this.Items[0];
+                        for (int i = 1; i < this.Items.Count; i++) {
+                            if (this.Items[i] > maximum) {
+                                maximum = this.Items[i];
+                            }
+                        }
+                        this._maximumCache = maximum;
+                    } else {
+                        this._maximumCache = double.NaN;
+                    }
+                }
+                return this._maximumCache.Value;
             }
         }
 
@@ -206,6 +255,8 @@ namespace Medo.Math {
             this.Items.Add(item);
             this._meanCache = null;
             this._stDevCache = null;
+            this._minimumCache = null;
+            this._maximumCache = null;
         }
 
         /// <summary>
@@ -215,6 +266,8 @@ namespace Medo.Math {
             this.Items.Clear();
             this._meanCache = null;
             this._stDevCache = null;
+            this._minimumCache = null;
+            this._maximumCache = null;
         }
 
         /// <summary>
@@ -258,6 +311,8 @@ namespace Medo.Math {
             var res = this.Items.Remove(item);
             this._meanCache = null;
             this._stDevCache = null;
+            this._minimumCache = null;
+            this._maximumCache = null;
             return res;
         }
 
