@@ -1,7 +1,8 @@
 ﻿//Josip Medved <jmedved@jmedved.com>
 
 //2011-03-11: Initial version.
-
+//2011-03-13: Added GetSections, GetKeys, ContainsSection and ContainsKey.
+//            Exceptions from code are not wrapped anymore.
 
 using System;
 using System.Collections.Generic;
@@ -30,17 +31,12 @@ namespace Medo.Configuration {
         /// <summary>
         /// Creates new instance.
         /// </summary>
-        /// <param name="fileName">Name of INI file.</param>
+        /// <param name="fileName">File name of INI file.</param>
         /// <exception cref="System.ArgumentNullException">File name cannot be null.</exception>
-        /// <exception cref="System.IO.IOException">Can not open file.</exception>
         public IniFile(string fileName) {
             if (fileName == null) { throw new ArgumentNullException("fileName", "File name cannot be null."); }
-            try {
-                using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-                    Initialize(stream);
-                }
-            } catch (IOException ex) {
-                throw new IOException("Can not open file.", ex);
+            using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                Initialize(stream);
             }
         }
 
@@ -59,22 +55,22 @@ namespace Medo.Configuration {
         /// Returns value found or null if value is not found.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
-        public string Read(string section, string name) {
-            return Read(section, name, null);
+        /// <param name="key">Key.</param>
+        public string Read(string section, string key) {
+            return Read(section, key, null);
         }
 
         /// <summary>
         /// Returns value found or defaultValue if value is not found.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
-        public string Read(string section, string name, string defaultValue) {
+        public string Read(string section, string key, string defaultValue) {
             if (this.Items.ContainsKey(section)) {
                 var inner = this.Items[section];
-                if (inner.ContainsKey(name)) {
-                    return inner[name];
+                if (inner.ContainsKey(key)) {
+                    return inner[key];
                 }
             }
             return defaultValue;
@@ -84,11 +80,11 @@ namespace Medo.Configuration {
         /// Returns value found and converted to boolean or defaultValue if value is not found or it cannot be converted.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
-        public bool Read(string section, string name, bool defaultValue) {
+        public bool Read(string section, string key, bool defaultValue) {
             bool result;
-            if (bool.TryParse(this.Read(section, name, null), out result)) {
+            if (bool.TryParse(this.Read(section, key, null), out result)) {
                 return result;
             } else {
                 return defaultValue;
@@ -99,11 +95,11 @@ namespace Medo.Configuration {
         /// Returns value found and converted to integer or defaultValue if value is not found or it cannot be converted.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
-        public int Read(string section, string name, int defaultValue) {
+        public int Read(string section, string key, int defaultValue) {
             int result;
-            if (int.TryParse(this.Read(section, name, null), NumberStyles.Integer, CultureInfo.InvariantCulture, out result)) {
+            if (int.TryParse(this.Read(section, key, null), NumberStyles.Integer, CultureInfo.InvariantCulture, out result)) {
                 return result;
             } else {
                 return defaultValue;
@@ -114,11 +110,11 @@ namespace Medo.Configuration {
         /// Returns value found and converted to double or defaultValue if value is not found or it cannot be converted.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="key">Key.</param>
         /// <param name="defaultValue">Default value.</param>
-        public double Read(string section, string name, double defaultValue) {
+        public double Read(string section, string key, double defaultValue) {
             double result;
-            if (double.TryParse(this.Read(section, name, null), NumberStyles.Float, CultureInfo.InvariantCulture, out result)) {
+            if (double.TryParse(this.Read(section, key, null), NumberStyles.Float, CultureInfo.InvariantCulture, out result)) {
                 return result;
             } else {
                 return defaultValue;
@@ -130,27 +126,27 @@ namespace Medo.Configuration {
         /// Sets value.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
-        /// <exception cref="System.ArgumentException">Invalid characters in section. -or- Invalid characters in name. -or- Invalid characters in value.</exception>
-        public void Write(string section, string name, string value) {
+        /// <exception cref="System.ArgumentException">Invalid characters in section. -or- Invalid characters in key. -or- Invalid characters in value.</exception>
+        public void Write(string section, string key, string value) {
             if (IsSectionValid(section) == false) { throw new ArgumentException("Invalid characters in section.", "section"); }
-            if (IsNameValid(name) == false) { throw new ArgumentException("Invalid characters in name.", "name"); }
-            if (IsValueValid(name) == false) { throw new ArgumentException("Invalid characters in value.", "value"); }
+            if (IsKeyValid(key) == false) { throw new ArgumentException("Invalid characters in key.", "key"); }
+            if (IsValueValid(key) == false) { throw new ArgumentException("Invalid characters in value.", "value"); }
 
             if (this.Items.ContainsKey(section) == false) {
                 this.Items.Add(section, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
             }
             var inner = this.Items[section];
-            if (inner.ContainsKey(name) == false) {
+            if (inner.ContainsKey(key) == false) {
                 if (value != null) {
-                    inner.Add(name, value);
+                    inner.Add(key, value);
                 }
             } else {
                 if (value != null) {
-                    inner[name] = value;
+                    inner[key] = value;
                 } else {
-                    inner.Remove(name);
+                    inner.Remove(key);
                 }
             }
         }
@@ -159,30 +155,30 @@ namespace Medo.Configuration {
         /// Sets value.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
-        public void Write(string section, string name, bool value) {
-            this.Write(section, name, value.ToString(CultureInfo.InvariantCulture));
+        public void Write(string section, string key, bool value) {
+            this.Write(section, key, value.ToString(CultureInfo.InvariantCulture));
         }
 
         /// <summary>
         /// Sets value.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
-        public void Write(string section, string name, int value) {
-            this.Write(section, name, value.ToString(CultureInfo.InvariantCulture));
+        public void Write(string section, string key, int value) {
+            this.Write(section, key, value.ToString(CultureInfo.InvariantCulture));
         }
 
         /// <summary>
         /// Sets value.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
+        /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
-        public void Write(string section, string name, double value) {
-            this.Write(section, name, value.ToString(CultureInfo.InvariantCulture));
+        public void Write(string section, string key, double value) {
+            this.Write(section, key, value.ToString(CultureInfo.InvariantCulture));
         }
 
 
@@ -191,9 +187,19 @@ namespace Medo.Configuration {
         /// Same effect is archieved by setting value to null.
         /// </summary>
         /// <param name="section">Section.</param>
-        /// <param name="name">Name.</param>
-        public void Delete(string section, string name) {
-            this.Write(section, name, null);
+        /// <param name="key">Key.</param>
+        public void Delete(string section, string key) {
+            this.Write(section, key, null);
+        }
+
+        /// <summary>
+        /// Deletes whole section.
+        /// </summary>
+        /// <param name="section">Section.</param>
+        public void Delete(string section) {
+            if (this.Items.ContainsKey(section)) {
+                this.Items.Remove(section);
+            }
         }
 
 
@@ -202,15 +208,10 @@ namespace Medo.Configuration {
         /// </summary>
         /// <param name="fileName">File name.</param>
         /// <exception cref="System.ArgumentNullException">File name cannot be null.</exception>
-        /// <exception cref="System.IO.IOException">Can not open file.</exception>
         public void Save(string fileName) {
             if (fileName == null) { throw new ArgumentNullException("fileName", "File name cannot be null."); }
-            try {
-                using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read)) {
-                    Save(stream);
-                }
-            } catch (IOException ex) {
-                throw new IOException("Can not open file.", ex);
+            using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read)) {
+                Save(stream);
             }
         }
 
@@ -236,30 +237,51 @@ namespace Medo.Configuration {
         }
 
 
+        /// <summary>
+        /// Returns all sections.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification="Method is more appropriate choice.")]
+        public IEnumerable<string> GetSections() {
+            foreach (var section in this.Items) {
+                yield return section.Key;
+            }
+        }
 
-        #region IsValid
+        /// <summary>
+        /// Returns all keys within section.
+        /// </summary>
+        /// <param name="section">Section.</param>
+        public IEnumerable<string> GetKeys(string section) {
+            if (this.Items.ContainsKey(section)) {
+                foreach (var key in this.Items[section]) {
+                    yield return key.Key;
+                }
+            }
+        }
 
-        //private void Initialize(Stream stream) {
-        //    using (var sr = new StreamReader(stream, this.Encoding)) {
-        //        string section = null;
-        //        while (sr.Peek() >= 0) {
-        //            var line = sr.ReadLine().Trim();
-        //            if (line.StartsWith(";", StringComparison.OrdinalIgnoreCase)) { //comment
-        //            } else if (line.StartsWith("[", StringComparison.OrdinalIgnoreCase) && line.EndsWith("]", StringComparison.OrdinalIgnoreCase)) { //section
-        //                section = line.Substring(1, line.Length - 2);
-        //            } else if ((section != null) && line.Contains("=")) {
-        //                int iEq = line.IndexOf("=", StringComparison.OrdinalIgnoreCase);
-        //                string name = line.Substring(0, iEq).Trim();
-        //                string value = line.Substring(iEq + 1).Trim();
-        //                if (value.StartsWith("\"", StringComparison.OrdinalIgnoreCase) && value.EndsWith("\"", StringComparison.OrdinalIgnoreCase)) {
-        //                    this.Write(section, name, value.Substring(1, value.Length - 2));
-        //                } else {
-        //                    this.Write(section, name, value);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+        /// <summary>
+        /// Returns whether section exists.
+        /// </summary>
+        /// <param name="section">Section.</param>
+        public bool ContainsSection(string section) {
+            return this.Items.ContainsKey(section);
+        }
+
+        /// <summary>
+        /// Returns whether section exists.
+        /// </summary>
+        /// <param name="section">Section.</param>
+        /// <param name="key">Key.</param>
+        public bool ContainsKey(string section, string key) {
+            if (this.Items.ContainsKey(section)) {
+                return this.Items[section].ContainsKey(key);
+            } else {
+                return false;
+            }
+        }
+
+
+        #region Parsing
 
         private static bool IsSectionValid(string text) {
             foreach (var iChar in text) {
@@ -270,7 +292,7 @@ namespace Medo.Configuration {
             return true;
         }
 
-        private static bool IsNameValid(string text) {
+        private static bool IsKeyValid(string text) {
             foreach (var iChar in text) {
                 if (char.IsWhiteSpace(iChar) || (iChar == '=')) {
                     return false;
@@ -292,7 +314,7 @@ namespace Medo.Configuration {
         private void Initialize(Stream stream) {
             using (var sr = new StreamReader(stream, this.Encoding)) {
                 StringBuilder sbSection = new StringBuilder();
-                StringBuilder sbName = new StringBuilder();
+                StringBuilder sbKey = new StringBuilder();
                 StringBuilder sbValue = new StringBuilder();
                 StringBuilder sbLine = new StringBuilder();
                 int lineIndex = 1;
@@ -320,9 +342,9 @@ namespace Medo.Configuration {
                                 } else if (ch == ';') {
                                     state = CharState.Comment;
                                 } else {
-                                    sbName.Length = 0;
-                                    sbName.Append(ch);
-                                    state = CharState.NameCharacter;
+                                    sbKey.Length = 0;
+                                    sbKey.Append(ch);
+                                    state = CharState.KeyCharacter;
                                 }
                             } break;
 
@@ -337,39 +359,39 @@ namespace Medo.Configuration {
                                 }
                             } break;
 
-                        case CharState.NameCharacter: {
+                        case CharState.KeyCharacter: {
                                 if ((ch == '\r') || (ch == '\n') || (ch == ';')) {
-                                    throw new InvalidDataException(string.Format(CultureInfo.InvariantCulture, "File cannot be parsed (line {0}: \"{1}\").", lineIndex, sbLine), new InvalidOperationException("Unexpected end of name."));
+                                    throw new InvalidDataException(string.Format(CultureInfo.InvariantCulture, "File cannot be parsed (line {0}: \"{1}\").", lineIndex, sbLine), new InvalidOperationException("Unexpected end of key."));
                                 } else if ((ch == ' ') || (ch == '\t')) {
-                                    state = CharState.NameCharacterWhitespaceSuffix;
+                                    state = CharState.KeyCharacterWhitespaceSuffix;
                                 } else if (ch == '=') {
                                     sbValue.Length = 0;
                                     state = CharState.ValueCharacterPossibleWhitespace;
                                 } else {
-                                    sbName.Append(ch);
-                                    state = CharState.NameCharacter;
+                                    sbKey.Append(ch);
+                                    state = CharState.KeyCharacter;
                                 }
                             } break;
 
-                        case CharState.NameCharacterWhitespaceSuffix: {
+                        case CharState.KeyCharacterWhitespaceSuffix: {
                                 if ((ch == '\r') || (ch == '\n') || (ch == ';')) {
-                                    throw new InvalidDataException(string.Format(CultureInfo.InvariantCulture, "File cannot be parsed (line {0}: \"{1}\").", lineIndex, sbLine), new InvalidOperationException("Unexpected end of name."));
+                                    throw new InvalidDataException(string.Format(CultureInfo.InvariantCulture, "File cannot be parsed (line {0}: \"{1}\").", lineIndex, sbLine), new InvalidOperationException("Unexpected end of key."));
                                 } else if ((ch == ' ') || (ch == '\t')) {
-                                    state = CharState.NameCharacterWhitespaceSuffix;
+                                    state = CharState.KeyCharacterWhitespaceSuffix;
                                 } else if (ch == '=') {
                                     sbValue.Length = 0;
                                     state = CharState.ValueCharacterPossibleWhitespace;
                                 } else {
-                                    throw new InvalidDataException(string.Format(CultureInfo.InvariantCulture, "File cannot be parsed (line {0}: \"{1}\").", lineIndex, sbLine), new InvalidOperationException("Unexpected end of name."));
+                                    throw new InvalidDataException(string.Format(CultureInfo.InvariantCulture, "File cannot be parsed (line {0}: \"{1}\").", lineIndex, sbLine), new InvalidOperationException("Unexpected end of key."));
                                 }
                             } break;
 
                         case CharState.ValueCharacterPossibleWhitespace: {
                                 if ((ch == '\r') || (ch == '\n')) {
-                                    this.Write(sbSection.ToString(), sbName.ToString(), sbValue.ToString());
+                                    this.Write(sbSection.ToString(), sbKey.ToString(), sbValue.ToString());
                                     state = CharState.FirstCharInLine;
                                 } else if (ch == ';') {
-                                    this.Write(sbSection.ToString(), sbName.ToString(), sbValue.ToString());
+                                    this.Write(sbSection.ToString(), sbKey.ToString(), sbValue.ToString());
                                     state = CharState.Comment;
                                 } else if ((ch == ' ') || (ch == '\t')) {
                                     state = CharState.ValueCharacterPossibleWhitespace;
@@ -384,10 +406,10 @@ namespace Medo.Configuration {
 
                         case CharState.ValueCharacter: {
                                 if ((ch == '\r') || (ch == '\n')) {
-                                    this.Write(sbSection.ToString(), sbName.ToString(), sbValue.ToString().TrimEnd());
+                                    this.Write(sbSection.ToString(), sbKey.ToString(), sbValue.ToString().TrimEnd());
                                     state = CharState.FirstCharInLine;
                                 } else if (ch == ';') {
-                                    this.Write(sbSection.ToString(), sbName.ToString(), sbValue.ToString().TrimEnd());
+                                    this.Write(sbSection.ToString(), sbKey.ToString(), sbValue.ToString().TrimEnd());
                                     state = CharState.Comment;
                                 } else {
                                     sbValue.Append(ch);
@@ -411,7 +433,7 @@ namespace Medo.Configuration {
                                 if ((ch == '\r') || (ch == '\n')) {
                                     throw new InvalidDataException(string.Format(CultureInfo.InvariantCulture, "File cannot be parsed (line {0}: \"{1}\").", lineIndex, sbLine), new InvalidOperationException("Premature end of row."));
                                 } else if (ch == '\"') {
-                                    this.Write(sbSection.ToString(), sbName.ToString(), sbValue.ToString());
+                                    this.Write(sbSection.ToString(), sbKey.ToString(), sbValue.ToString());
                                     state = CharState.WhitespaceSufix;
                                 } else if (ch == '\\') {
                                     state = CharState.QuotedValueEscape;
@@ -474,8 +496,8 @@ namespace Medo.Configuration {
         private enum CharState {
             FirstCharInLine,
             SectionCharacter,
-            NameCharacter,
-            NameCharacterWhitespaceSuffix,
+            KeyCharacter,
+            KeyCharacterWhitespaceSuffix,
             ValueCharacterPossibleWhitespace,
             ValueCharacter,
             QuotedValueCharacter,

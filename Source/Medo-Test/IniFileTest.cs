@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Test {
 
@@ -62,7 +63,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void IniFileReadTest() {
+        public void IniFile_ReadTest() {
             var sb = new StringBuilder();
             sb.AppendLine("; last modified 1 April 2001 by John Doe");
             sb.AppendLine("[owner]");
@@ -84,7 +85,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IniFileReadEscapingTest() {
+        public void IniFile_ReadEscapingTest() {
             var sb = new StringBuilder();
             sb.AppendLine(@"   ; testing whitespace line");
             sb.AppendLine(@"[lines]  ;comment here");
@@ -101,7 +102,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IniFileReadDoubleTest() {
+        public void IniFile_ReadDoubleTest() {
             var sb = new StringBuilder();
             sb.AppendLine(@"[numbers]  ;comment here");
             sb.AppendLine(@"number-0=0.01");
@@ -117,7 +118,80 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IniFileSaveTest() {
+        public void IniFile_DeleteTest() {
+            var sb = new StringBuilder();
+            sb.AppendLine("[section1]");
+            sb.AppendLine("item1=A");
+            sb.AppendLine("item2=B");
+            sb.AppendLine("[section2]");
+            sb.AppendLine("item1=C");
+            sb.AppendLine("item2=D");
+
+            IniFile target = new IniFile(new MemoryStream(UTF8Encoding.UTF8.GetBytes(sb.ToString())));
+
+            target.Delete("section1", "item1");
+            target.Delete("section2", "item2");
+            Assert.AreEqual(null, target.Read("section1", "item1"));
+            Assert.AreEqual("B", target.Read("section1", "item2"));
+            Assert.AreEqual("C", target.Read("section2", "item1"));
+            Assert.AreEqual(null, target.Read("section2", "item2"));
+
+            target.Delete("section1");
+            Assert.AreEqual(null, target.Read("section1", "item1"));
+            Assert.AreEqual(null, target.Read("section1", "item2"));
+            Assert.AreEqual("C", target.Read("section2", "item1"));
+            Assert.AreEqual(null, target.Read("section2", "item2"));
+        }
+
+        [TestMethod()]
+        public void IniFile_EnumerateSectionsAndKeys() {
+            var sb = new StringBuilder();
+            sb.AppendLine("[section1]");
+            sb.AppendLine("item1=A");
+            sb.AppendLine("item2=B");
+            sb.AppendLine("[section2]");
+            sb.AppendLine("item3=C");
+            sb.AppendLine("item4=D");
+
+            IniFile target = new IniFile(new MemoryStream(UTF8Encoding.UTF8.GetBytes(sb.ToString())));
+
+            var sections = new List<string>(target.GetSections());
+            Assert.AreEqual(2, sections.Count);
+            Assert.IsTrue(sections.Contains("section1"));
+            Assert.IsTrue(sections.Contains("section2"));
+
+            var keys = new List<string>(target.GetKeys("section2"));
+            Assert.AreEqual(2, keys.Count);
+            Assert.IsTrue(keys.Contains("item3"));
+            Assert.IsTrue(keys.Contains("item4"));
+        }
+
+        [TestMethod()]
+        public void IniFile_ContainsForSectionsAndKeys() {
+            var sb = new StringBuilder();
+            sb.AppendLine("[section1]");
+            sb.AppendLine("item1=A");
+            sb.AppendLine("item2=B");
+            sb.AppendLine("[section2]");
+            sb.AppendLine("item3=C");
+            sb.AppendLine("item4=D");
+
+            IniFile target = new IniFile(new MemoryStream(UTF8Encoding.UTF8.GetBytes(sb.ToString())));
+
+            Assert.IsTrue(target.ContainsSection("section1"));
+            Assert.IsTrue(target.ContainsSection("section2"));
+            Assert.IsTrue(target.ContainsKey("section1", "item1"));
+            Assert.IsTrue(target.ContainsKey("section1", "item2"));
+            Assert.IsFalse(target.ContainsKey("section1", "item3"));
+            Assert.IsFalse(target.ContainsKey("section1", "item4"));
+            Assert.IsFalse(target.ContainsKey("section2", "item1"));
+            Assert.IsFalse(target.ContainsKey("section2", "item2"));
+            Assert.IsTrue(target.ContainsKey("section2", "item3"));
+            Assert.IsTrue(target.ContainsKey("section2", "item4"));
+        }
+
+        [TestMethod()]
+        public void IniFile_SaveTest() {
             IniFile target = new IniFile();
             target.Write("default", "name", "john");
             Assert.AreEqual("john", target.Read("default", "name"));
