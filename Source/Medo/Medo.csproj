@@ -136,7 +136,7 @@
     <Compile Include="Math\MovingAverage [006].cs" />
     <Compile Include="Math\SimpleAverage [006].cs" />
     <Compile Include="Math\WeightedMovingAverage [005].cs" />
-    <Compile Include="Math\LinearInterpolation [001].cs" />
+    <Compile Include="Math\LinearInterpolation [002].cs" />
     <Compile Include="MessageBox [006].cs" />
     <Compile Include="Net\KeyValuePacket [002].cs" />
     <Compile Include="Net\SyslogMessage [004].cs" />

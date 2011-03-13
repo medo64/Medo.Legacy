@@ -1,6 +1,8 @@
 ﻿//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com  http://blog.jmedved.com
 
 //2010-04-24: Initial version.
+//2011-03-13: Added AddCalibration method.
+//            Removed indexer.
 
 
 using System;
@@ -18,15 +20,25 @@ namespace Medo.Math {
         /// <summary>
         /// Creates new instance.
         /// </summary>
-        public LinearInterpolation() {  }
+        public LinearInterpolation() { }
 
         /// <summary>
         /// Adds new calibration point.
         /// </summary>
-        /// <param name="value">Reference value.</param>
+        /// <param name="reference">Reference value.</param>
         /// <param name="adjustment">Adjustment at reference point.</param>
-        public void Add(double value, double adjustment) {
-            _referencePoints.Add(value, adjustment);
+        [Obsolete("Unclear behaviour of adjustment. Use AddCalibration instead.")]
+        public void Add(double reference, double adjustment) {
+            _referencePoints.Add(reference, adjustment);
+        }
+
+        /// <summary>
+        /// Adds new calibration point.
+        /// </summary>
+        /// <param name="reference">Reference value.</param>
+        /// <param name="value">Value as measured by target device.</param>
+        public void AddCalibration(double reference, double value) {
+            _referencePoints.Add(reference, value - reference);
         }
 
         /// <summary>
@@ -36,7 +48,7 @@ namespace Medo.Math {
         public double GetAdjustedValue(double value) {
             KeyValuePair<double, double>? itemBelow = null;
             KeyValuePair<double, double>? itemAbove = null;
-            
+
             foreach (var item in _referencePoints) {
                 if (item.Key == value) { //just sent it as output
                     return value + item.Value;
@@ -53,23 +65,13 @@ namespace Medo.Math {
                 var point = value - itemBelow.Value.Key;
                 var percentageAbove = point / range;
                 var percentageBelow = 1 - percentageAbove;
-                return value  + itemBelow.Value.Value * percentageBelow + itemAbove.Value.Value * percentageAbove;
+                return value + itemBelow.Value.Value * percentageBelow + itemAbove.Value.Value * percentageAbove;
             } else if (itemBelow.HasValue) { //just lower reference point
                 return value + itemBelow.Value.Value;
             } else if (itemAbove.HasValue) { //just upper reference point
                 return value + itemAbove.Value.Value;
             } else { //no reference point
                 return value;
-            }
-        }
-
-        /// <summary>
-        /// Gets value adjusted with linear aproximation between two nearest calibration points.
-        /// </summary>
-        /// <param name="value">Value to adjust.</param>
-        public double this[double value] {
-            get {
-                return this.GetAdjustedValue(value);
             }
         }
 
