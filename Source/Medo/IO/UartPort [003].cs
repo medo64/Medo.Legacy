@@ -3,6 +3,8 @@
 //2010-09-11: Initial version.
 //2011-02-16: Fixed ReadLine.
 //            Added fix for serial ports above COM9.
+//2011-04-02: Removed Flush from Close.
+//            Port name is not immediately prepended with \\?\.
 
 
 using System;
@@ -56,11 +58,7 @@ namespace Medo.IO {
         /// <exception cref="System.ArgumentNullException">PortName cannot be null.</exception>
         public UartPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) {
             if (portName == null) { throw new ArgumentNullException("portName", "PortName cannot be null."); }
-            if (portName.StartsWith(@"\\?\", StringComparison.Ordinal)) {
-                this.PortName = portName;
-            } else {
-                this.PortName = @"\\?\" + portName;
-            }
+            this.PortName = portName.Trim().ToUpperInvariant();
             this.BaudRate = baudRate;
             this.Parity = parity;
             this.DataBits = dataBits;
@@ -136,13 +134,16 @@ namespace Medo.IO {
         public void Open() {
             if (this.IsOpen) { throw new InvalidOperationException("Port is already open."); }
 
-            this.Handle = NativeMethods.CreateFileW(this.PortName,
+            var portName = (this.PortName.StartsWith(@"\\?\", StringComparison.Ordinal) ? "" : @"\\?\") + this.PortName;
+            this.Handle = NativeMethods.CreateFileW(
+                portName,
                 NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE,
                 0, //exclusive access
                 IntPtr.Zero,
                 NativeMethods.OPEN_EXISTING,
                 0,
-                IntPtr.Zero);
+                IntPtr.Zero
+                );
 
             if (this.IsOpen == false) { throw new IOException("The port is in an invalid state."); }
 
@@ -224,7 +225,6 @@ namespace Medo.IO {
         /// </summary>
         public void Close() {
             if (this.IsOpen) {
-                this.Flush();
                 this.Handle.Close();
             }
         }

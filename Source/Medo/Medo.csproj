@@ -104,7 +104,7 @@
     <Compile Include="Diagnostics\LifetimeWatch [001].cs" />
     <Compile Include="Extensions\FrameworkElementStateExtensions [003].cs" />
     <Compile Include="IO\AdsFileStream [001].cs" />
-    <Compile Include="IO\UartPort [002].cs" />
+    <Compile Include="IO\UartPort [003].cs" />
     <Compile Include="IO\VirtualDisk [005].cs" />
     <Compile Include="Localization\Croatia\Jmbg [006].cs" />
     <Compile Include="Localization\Croatia\Oib [002].cs" />
