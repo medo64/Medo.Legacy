@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+//Copyright (c) 2007 Josip Medved <jmedved@jmedved.com>
 
 //2007-09-19: Moved to common.
 //2008-01-03: Added Resources.

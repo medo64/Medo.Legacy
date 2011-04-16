@@ -1,4 +1,4 @@
-﻿//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+﻿//Copyright (c) 2007 Josip Medved <jmedved@jmedved.com>
 
 //2007-12-22: New version. 
 //2007-12-27: Fixed error when application is without icon

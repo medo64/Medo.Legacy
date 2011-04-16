@@ -1,4 +1,6 @@
-﻿using System;
+﻿//Copyright (c) Josip Medved <jmedved@jmedved.com>
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Globalization;

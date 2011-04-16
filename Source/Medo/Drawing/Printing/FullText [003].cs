@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-01-03: Moved to blueprints.
 //            Removed PrintPreview.

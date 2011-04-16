@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-01-26: New version.
 //2008-04-11: Cleaned code to match FxCop 1.36 beta 2 (SpecifyIFormatProvider, SpecifyStringComparison).

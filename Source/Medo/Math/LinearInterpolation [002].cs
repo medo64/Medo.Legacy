@@ -1,4 +1,4 @@
-﻿//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com
+﻿//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-04-24: Initial version.
 //2011-03-13: Changed Add method.

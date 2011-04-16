@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com
+//Copyright (c) 2007 Josip Medved <jmedved@jmedved.com>
 
 //2007-10-15: New version.
 //2007-11-15: When setting is written, it's cache is invalidated in order to force re-reading from registry.

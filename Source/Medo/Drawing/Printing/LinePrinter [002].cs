@@ -1,4 +1,4 @@
-﻿//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+﻿//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-01-22: Initial version.
 //2008-01-31: All empty places are 0 instead of space.

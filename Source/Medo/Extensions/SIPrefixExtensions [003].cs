@@ -1,4 +1,4 @@
-﻿//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+﻿//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-03-29: Initial version.
 //2008-11-15: Added method overloads with Int64 data type.

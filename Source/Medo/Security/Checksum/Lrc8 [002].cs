@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-03-18: Initial version.
 //2008-06-07: Append is not longer returning intermediate digest (performance reasons).

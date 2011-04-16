@@ -1,4 +1,4 @@
-﻿//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com  http://medo64.blogspot.com
+﻿//Copyright (c) 2009 Josip Medved <jmedved@jmedved.com>
 
 //2009-04-07: First version.
 //2009-04-30: Updated for Windows 7 release candidate.

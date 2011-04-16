@@ -1,4 +1,4 @@
-/* Josip Medved <jmedved@jmedved.com> http://www.jmedved.com */
+//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-04-05: New version.
 //2008-04-11: Refactoring.

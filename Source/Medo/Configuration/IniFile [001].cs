@@ -1,4 +1,4 @@
-﻿//Josip Medved <jmedved@jmedved.com>
+﻿//Copyright (c) 2011 Josip Medved <jmedved@jmedved.com>
 
 //2011-03-11: Initial version.
 //2011-03-13: Added GetSections, GetKeys, ContainsSection and ContainsKey.

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-04-12: Initial version.
 //2010-05-19: Refactoring (CA1303:Do not pass literals as localized parameters).

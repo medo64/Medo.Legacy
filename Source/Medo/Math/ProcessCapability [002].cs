@@ -1,4 +1,4 @@
-﻿//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com
+﻿//Copyright (c) 2011 Josip Medved <jmedved@jmedved.com>
 
 //2011-03-05: Initial version (based on description at http://en.wikipedia.org/wiki/Process_capability_index).
 //2011-03-13: Added minimum/maximum.

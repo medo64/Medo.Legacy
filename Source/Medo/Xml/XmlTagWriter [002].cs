@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+//Copyright (c) 2007 Josip Medved <jmedved@jmedved.com>
 
 //2007-09-19: New version.
 //2007-12-24: Added WriteStartDocument method.

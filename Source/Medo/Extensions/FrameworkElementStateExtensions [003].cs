@@ -1,4 +1,4 @@
-﻿//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
+﻿//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-04-13: Initial version.
 //2010-04-25: Changed code to be compatible with .NET 3.5.
