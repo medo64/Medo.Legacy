@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-05-24: Initial version.
+//2011-06-30: Compatible with .NET Framework 2.0.
 
 
 using System;
@@ -239,11 +240,11 @@ namespace Medo.Web.GData {
         /// <exception cref="System.InvalidOperationException">Authorization failed. -or- Authorization token was not received.</exception>
         public string GetAuthorizationToken(string service) {
             StringBuilder postData = new StringBuilder();
-            if ((this.AccountType.HasFlag(GDataAccountTypes.Hosted) && this.AccountType.HasFlag(GDataAccountTypes.Google))) {
+            if ((((this.AccountType & GDataAccountTypes.Hosted) == GDataAccountTypes.Hosted) && ((this.AccountType & GDataAccountTypes.Google) == GDataAccountTypes.Google))) {
                 postData.AppendFormat(CultureInfo.InvariantCulture, "accountType={0}", Uri.EscapeUriString("HOSTED_OR_GOOGLE"));
-            } else if (this.AccountType.HasFlag(GDataAccountTypes.Hosted)) {
+            } else if ((this.AccountType & GDataAccountTypes.Hosted) == GDataAccountTypes.Hosted) {
                 postData.AppendFormat(CultureInfo.InvariantCulture, "accountType={0}", Uri.EscapeUriString("HOSTED"));
-            } else if (this.AccountType.HasFlag(GDataAccountTypes.Google)) {
+            } else if ((this.AccountType & GDataAccountTypes.Google) == GDataAccountTypes.Google) {
                 postData.AppendFormat(CultureInfo.InvariantCulture, "accountType={0}", Uri.EscapeUriString("GOOGLE "));
             }
 

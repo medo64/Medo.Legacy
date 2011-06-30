@@ -125,6 +125,7 @@
     <Compile Include="Extensions\SIPrefixExtensions [003].cs" />
     <Compile Include="Math\ProcessCapability [002].cs" />
     <Compile Include="Net\TinyMessage [001].cs" />
+    <Compile Include="Web\GData\GDataClientLogin [002].cs" />
     <Compile Include="Windows\Forms\AboutBox [010].cs" />
     <Compile Include="Windows\Forms\InputBox [001].cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -158,7 +159,6 @@
     <Compile Include="TagItem [004].cs" />
     <Compile Include="Text\StringAdder [002].cs" />
     <Compile Include="WaitCursor [001].cs" />
-    <Compile Include="Web\GData\GDataClientLogin [001].cs" />
     <Compile Include="Windows\AboutWindow [003].cs" />
     <Compile Include="Windows\Forms\Button [001].cs">
       <SubType>Component</SubType>
