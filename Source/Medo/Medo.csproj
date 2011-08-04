@@ -92,7 +92,10 @@
     <Compile Include="Configuration\RunOnStartup [004].cs" />
     <Compile Include="Configuration\Settings [011].cs" />
     <Compile Include="Data\CommonConnection [009].cs" />
-    <Compile Include="Data\InsertCommand [005].cs" />
+    <Compile Include="Data\DeleteCommand [004].cs" />
+    <Compile Include="Data\InsertCommand [006].cs" />
+    <Compile Include="Data\SelectCommand [004].cs" />
+    <Compile Include="Data\UpdateCommand [004].cs" />
     <Compile Include="Device\Elsidi [003].cs" />
     <Compile Include="Device\EltraEL4000 [002].cs" />
     <Compile Include="Device\GigatekGp20 [001].cs" />
@@ -104,13 +107,10 @@
     <Compile Include="Diagnostics\LifetimeWatch [001].cs" />
     <Compile Include="Extensions\FrameworkElementStateExtensions [003].cs" />
     <Compile Include="IO\AdsFileStream [001].cs" />
-    <Compile Include="IO\UartPort [003].cs" />
+    <Compile Include="IO\UartPort [004].cs" />
     <Compile Include="IO\VirtualDisk [005].cs" />
     <Compile Include="Localization\Croatia\Jmbg [006].cs" />
     <Compile Include="Localization\Croatia\Oib [002].cs" />
-    <Compile Include="Data\DeleteCommand [003].cs" />
-    <Compile Include="Data\SelectCommand [003].cs" />
-    <Compile Include="Data\UpdateCommand [003].cs" />
     <Compile Include="Drawing\AreaSplitter [001].cs" />
     <Compile Include="Drawing\BarcodeImage [004].cs" />
     <Compile Include="Drawing\Printing\FullText [003].cs" />

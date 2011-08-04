@@ -6,11 +6,11 @@
 //2008-04-10: Uses IFormatProvider.
 //2008-05-20: Small fixes.
 //2010-09-11: Added OutputColumn.
+//2011-08-04: Workaround mono bug #500987.
 
 
-using System.Collections.Generic;
+using System;
 using System.Data;
-using System.Data.OleDb;
 using System.Globalization;
 using System.Text;
 
@@ -24,6 +24,7 @@ namespace Medo.Data {
         private readonly string TableName;
         private readonly string ColumnsText;
         private readonly string ValuesText;
+        private bool NeedsMonoFix; //Mono bug #500987 / Error converting data type varchar to datetime
 
 
         /// <summary>
@@ -45,6 +46,7 @@ namespace Medo.Data {
 
             this.TableName = tableName;
 
+            this.NeedsMonoFix = false;
             StringBuilder sbColumns = new StringBuilder();
             StringBuilder sbValues = new StringBuilder();
             for (int i = 0; i < columnsAndValues.Length; i += 2) {
@@ -63,6 +65,10 @@ namespace Medo.Data {
                     sbValues.Append(paramName);
                     System.Data.IDbDataParameter param = this._baseCommand.CreateParameter();
                     param.ParameterName = paramName;
+                    if ((value is DateTime) && (IsRunningOnMono)) {
+                        value = ((DateTime)value).ToString(CultureInfo.InvariantCulture);
+                        this.NeedsMonoFix = true;
+                    }
                     param.Value = value;
                     if (param.DbType == System.Data.DbType.DateTime) {
                         System.Data.OleDb.OleDbParameter odp = param as System.Data.OleDb.OleDbParameter;
@@ -109,13 +115,26 @@ namespace Medo.Data {
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Proper parameterization is done in code.")]
         private void UpdateCommandText() {
             if (this.OutputColumn != null) {
-                this._baseCommand.CommandText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) OUTPUT INSERTED.{3} VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText, this.OutputColumn);
+                if (this.NeedsMonoFix) {
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; INSERT INTO {0}({1}) OUTPUT INSERTED.{3} VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText, this.OutputColumn);
+                } else {
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) OUTPUT INSERTED.{3} VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText, this.OutputColumn);
+                }
             } else if (this.UseScopeIdentity) {
-                this._baseCommand.CommandText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText);
+                if (this.NeedsMonoFix) {
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; INSERT INTO {0}({1}) VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText);
+                } else {
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText);
+                }
             } else {
-                this._baseCommand.CommandText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) VALUES({2});", TableName, this.ColumnsText, this.ValuesText);
+                if (this.NeedsMonoFix) {
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; INSERT INTO {0}({1}) VALUES({2});", TableName, this.ColumnsText, this.ValuesText);
+                } else {
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) VALUES({2});", TableName, this.ColumnsText, this.ValuesText);
+                }
             }
         }
 
@@ -144,6 +163,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets or sets the text command to run against the data source.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Proper parameterization is done in code.")]
         public string CommandText {
             get { return this._baseCommand.CommandText; }
             set { this._baseCommand.CommandText = value; }
@@ -283,7 +303,7 @@ namespace Medo.Data {
             for (int i = 0; i < this._baseCommand.Parameters.Count; ++i) {
                 System.Data.Common.DbParameter curr = this._baseCommand.Parameters[i] as System.Data.Common.DbParameter;
                 if (curr != null) {
-                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I:     {0}=\"{1}\".    {{Medo.Data.InsertCommand}}", curr.ParameterName, curr.Value));
+                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I:     {0}=\"{1}\" ({2}).    {{Medo.Data.InsertCommand}}", curr.ParameterName, curr.Value, curr.DbType));
                 } else {
                     System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I:     {0}.    {{Medo.Data.InsertCommand}}", this._baseCommand.Parameters[i].ToString()));
                 }
@@ -301,6 +321,12 @@ namespace Medo.Data {
 
             internal static string ExceptionNumberOfParametersMustBeMultipleOfTwo { get { return "Number of parameters must be multiple of two."; } }
 
+        }
+
+        private static bool IsRunningOnMono {
+            get {
+                return (Type.GetType("Mono.Runtime") != null);
+            }
         }
 
     }
