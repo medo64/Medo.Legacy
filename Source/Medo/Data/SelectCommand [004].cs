@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Text;
 
@@ -138,7 +139,7 @@ namespace Medo.Data {
             } else {
                 selectPrefix = string.Format(System.Globalization.CultureInfo.InvariantCulture, "SELECT TOP {0}", this._topCount);
             }
-            if (this._needsMonoFix) { selectPrefix = "SET LANGUAGE us_english; " + selectPrefix; }
+            if ((this.Connection is SqlConnection) && this._needsMonoFix) { selectPrefix = "SET LANGUAGE us_english; " + selectPrefix; }
             string orderBySuffix;
             if (string.IsNullOrEmpty(_orderByText)) {
                 orderBySuffix = string.Empty;

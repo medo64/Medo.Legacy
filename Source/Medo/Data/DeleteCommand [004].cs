@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Globalization;
+using System.Data.SqlClient;
 
 namespace Medo.Data {
 
@@ -97,16 +98,16 @@ namespace Medo.Data {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Proper parameterization is done in code.")]
         private void UpdateCommandText() {
             if (string.IsNullOrEmpty(this._whereText)) {
-                if (this._needsMonoFix) {
+                if ((this.Connection is SqlConnection) && this._needsMonoFix) {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; DELETE FROM {0};", this._tableName);
                 } else {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0};", this._tableName);
                 }
             } else {
-                if (this._needsMonoFix) {
-                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0} WHERE {1};", this._tableName, _whereText.ToString());
-                } else {
+                if ((this.Connection is SqlConnection) && this._needsMonoFix) {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; DELETE FROM {0} WHERE {1};", this._tableName, _whereText.ToString());
+                } else {
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0} WHERE {1};", this._tableName, _whereText.ToString());
                 }
             }
         }

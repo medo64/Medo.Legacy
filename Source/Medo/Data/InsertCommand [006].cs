@@ -11,6 +11,7 @@
 
 using System;
 using System.Data;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Text;
 
@@ -118,19 +119,19 @@ namespace Medo.Data {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Proper parameterization is done in code.")]
         private void UpdateCommandText() {
             if (this.OutputColumn != null) {
-                if (this.NeedsMonoFix) {
+                if ((this.Connection is SqlConnection) && this.NeedsMonoFix) {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; INSERT INTO {0}({1}) OUTPUT INSERTED.{3} VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText, this.OutputColumn);
                 } else {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) OUTPUT INSERTED.{3} VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText, this.OutputColumn);
                 }
             } else if (this.UseScopeIdentity) {
-                if (this.NeedsMonoFix) {
+                if ((this.Connection is SqlConnection) && this.NeedsMonoFix) {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; INSERT INTO {0}({1}) VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText);
                 } else {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) VALUES({2}); SELECT SCOPE_IDENTITY();", TableName, this.ColumnsText, this.ValuesText);
                 }
             } else {
-                if (this.NeedsMonoFix) {
+                if ((this.Connection is SqlConnection) && this.NeedsMonoFix) {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; INSERT INTO {0}({1}) VALUES({2});", TableName, this.ColumnsText, this.ValuesText);
                 } else {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "INSERT INTO {0}({1}) VALUES({2});", TableName, this.ColumnsText, this.ValuesText);

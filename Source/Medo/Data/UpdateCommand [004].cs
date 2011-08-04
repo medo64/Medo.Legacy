@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Text;
 
@@ -131,13 +132,13 @@ namespace Medo.Data {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Proper parameterization is done in code.")]
         private void UpdateCommandText() {
             if (this._whereText == null) {
-                if (this._needsMonoFix) {
+                if ((this.Connection is SqlConnection) && this._needsMonoFix) {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; UPDATE {0} SET {1};", this._tableName, this._columnsAndValuesText);
                 } else {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "UPDATE {0} SET {1};", this._tableName, this._columnsAndValuesText);
                 }
             } else {
-                if (this._needsMonoFix) {
+                if ((this.Connection is SqlConnection) && this._needsMonoFix) {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; UPDATE {0} SET {1} WHERE {2};", this._tableName, this._columnsAndValuesText, _whereText.ToString());
                 } else {
                     this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "UPDATE {0} SET {1} WHERE {2};", this._tableName, this._columnsAndValuesText, _whereText.ToString());
