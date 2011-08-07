@@ -3,7 +3,7 @@
 //2008-02-21: Initial version.
 //2008-02-29: Fixed bugs in debug mode.
 //2008-04-10: Uses IFormatProvider.
-//2011-08-04: Workaround mono bug #500987.
+//2011-08-07: Workaround mono bug #500987.
 
 
 using System;
@@ -311,7 +311,7 @@ namespace Medo.Data {
             for (int i = 0; i < this._baseCommand.Parameters.Count; ++i) {
                 System.Data.Common.DbParameter curr = this._baseCommand.Parameters[i] as System.Data.Common.DbParameter;
                 if (curr != null) {
-                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I:     {0}=\"{1}\" ([2}).    {{Medo.Data.UpdateCommand}}", curr.ParameterName, curr.Value, curr.DbType));
+                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I:     {0}=\"{1}\" ({2}).    {{Medo.Data.UpdateCommand}}", curr.ParameterName, curr.Value, curr.DbType));
                 } else {
                     System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I:     {0}.    {{Medo.Data.UpdateCommand}}", this._baseCommand.Parameters[i].ToString()));
                 }
