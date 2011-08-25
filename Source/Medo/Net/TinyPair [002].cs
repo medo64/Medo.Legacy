@@ -1,6 +1,7 @@
 //Copyright (c) 2011 Josip Medved <jmedved@jmedved.com>
 
 //2011-08-25: Initial version (based on TinyMessage).
+//2011-08-27: Added SendAndReceive methods.
 
 
 using System;
@@ -22,7 +23,10 @@ namespace Medo.Net {
     /// </summary>
     public class TinyPair : IDisposable {
 
-        private const int DefaultPort = 5104;
+        /// <summary>
+        /// Default port for TinyMessage protocol.
+        /// </summary>
+        public static int DefaultPort { get { return 5104; } }
 
 
         /// <summary>
@@ -118,9 +122,7 @@ namespace Medo.Net {
                     if (TinyPairPacketReceived != null) {
                         var newBuffer = new byte[inCount];
                         Buffer.BlockCopy(buffer, 0, newBuffer, 0, inCount);
-#if DEBUG
                         Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} <- {1}]", TinyPairPacket.ParseHeaderOnly(newBuffer, 0, inCount), remoteEP));
-#endif
                         var invokeArgs = new object[] { this, new TinyPairPacketEventArgs(newBuffer, 0, inCount, remoteEP as IPEndPoint) };
                         foreach (Delegate iDelegate in TinyPairPacketReceived.GetInvocationList()) {
                             ISynchronizeInvoke syncer = iDelegate.Target as ISynchronizeInvoke;
@@ -183,6 +185,65 @@ namespace Medo.Net {
                 socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false);
                 socket.SendTo(packet.GetBytes(), remoteEndPoint);
                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} -> {1}]", packet, remoteEndPoint));
+            }
+        }
+
+
+        /// <summary>
+        /// Sends one UDP packet and expects another in return.
+        /// Returns null if respose is not received within 1 second.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
+        /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
+        public static TinyPairPacket SendAndReceive(TinyPairPacket packet, IPAddress address) {
+            return SendAndReceive(packet, new IPEndPoint(address, TinyPair.DefaultPort), 1000);
+        }
+
+        /// <summary>
+        /// Sends UDP packet.
+        /// </summary>
+        /// Sends one UDP packet and expects another in return.
+        /// Returns null if respose is not received within 1 second.
+        /// <param name="packet">Packet to send.</param>
+        /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
+        /// <param name="port">Port of destination for packet.</param>
+        /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
+        public static TinyPairPacket SendAndReceive(TinyPairPacket packet, IPAddress address, int port) {
+            return SendAndReceive(packet, new IPEndPoint(address, port), 1000);
+        }
+
+        /// <summary>
+        /// Sends one UDP packet and expects another in return.
+        /// Returns null if respose is not received within receiveTimeout.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        /// <param name="remoteEndPoint">Address of destination for packet. It can be broadcast address.</param>
+        /// <param name="receiveTimeout">Number of milliseconds to wait for receive operation to be done. If number is zero, infinite timeout will be used.</param>
+        /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
+        public static TinyPairPacket SendAndReceive(TinyPairPacket packet, IPEndPoint remoteEndPoint, int receiveTimeout) {
+            if (packet == null) { throw new ArgumentNullException("packet", "Packet is null."); }
+            if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)) {
+                socket.ReceiveTimeout = receiveTimeout;
+                if (remoteEndPoint.Address == IPAddress.Broadcast) {
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                }
+                socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false);
+                var bytesOut = packet.GetBytes();
+                socket.SendTo(bytesOut, bytesOut.Length, SocketFlags.None, remoteEndPoint);
+                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} -> {1}]", packet, remoteEndPoint));
+
+                EndPoint remoteEndPointIn = (EndPoint)(new IPEndPoint(IPAddress.Any, 0));
+                var bytesIn = new byte[65536];
+                try {
+                    int len = socket.ReceiveFrom(bytesIn, ref remoteEndPointIn);
+                    var packetIn =  Medo.Net.TinyPairPacket.Parse(bytesIn, 0, len);
+                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} <- {1}]", packetIn, remoteEndPointIn));
+                    return packetIn;
+                } catch (SocketException) {
+                    return null;
+                }
             }
         }
 
