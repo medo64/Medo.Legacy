@@ -124,7 +124,7 @@
     <Compile Include="Extensions\ScientificNotationExtensions [002].cs" />
     <Compile Include="Extensions\SIPrefixExtensions [003].cs" />
     <Compile Include="Math\ProcessCapability [002].cs" />
-    <Compile Include="Net\TinyPairs [001].cs" />
+    <Compile Include="Net\TinyPair [001].cs" />
     <Compile Include="Net\TinyMessage [001].cs" />
     <Compile Include="Web\GData\GDataClientLogin [002].cs" />
     <Compile Include="Windows\Forms\AboutBox [010].cs" />

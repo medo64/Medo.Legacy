@@ -20,7 +20,7 @@ namespace Medo.Net {
     /// Sending and receiving UDP messages.
     /// Supports TinyMessage with Dictionary&lt;string,string&gt; as data.
     /// </summary>
-    public class TinyPairs : IDisposable {
+    public class TinyPair : IDisposable {
 
         private const int DefaultPort = 5104;
 
@@ -28,8 +28,8 @@ namespace Medo.Net {
         /// <summary>
         /// Creates new instance.
         /// </summary>
-        public TinyPairs()
-            : this(new IPEndPoint(IPAddress.Any, TinyPairs.DefaultPort)) {
+        public TinyPair()
+            : this(new IPEndPoint(IPAddress.Any, TinyPair.DefaultPort)) {
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="localEndPoint">Local end point where messages should be received at.</param>
         /// <exception cref="System.ArgumentNullException">Local IP end point is null.</exception>
-        public TinyPairs(IPEndPoint localEndPoint) {
+        public TinyPair(IPEndPoint localEndPoint) {
             if (localEndPoint == null) { throw new ArgumentNullException("localEndPoint", "Local IP end point is null."); }
             this.LocalEndPoint = localEndPoint;
         }
@@ -82,7 +82,7 @@ namespace Medo.Net {
         /// <summary>
         /// Raises event when packet arrives.
         /// </summary>
-        public event EventHandler<TinyDictionaryPacketEventArgs> TinyDictionaryPacketReceived;
+        public event EventHandler<TinyPairPacketEventArgs> TinyDictionaryPacketReceived;
 
 
         #region Threading
@@ -121,7 +121,7 @@ namespace Medo.Net {
 #if DEBUG
                         Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyDictionary [{0} <- {1}]", TinyDictionaryPacket.ParseHeaderOnly(newBuffer, 0, inCount), remoteEP));
 #endif
-                        var invokeArgs = new object[] { this, new TinyDictionaryPacketEventArgs(newBuffer, 0, inCount, remoteEP as IPEndPoint) };
+                        var invokeArgs = new object[] { this, new TinyPairPacketEventArgs(newBuffer, 0, inCount, remoteEP as IPEndPoint) };
                         foreach (Delegate iDelegate in TinyDictionaryPacketReceived.GetInvocationList()) {
                             ISynchronizeInvoke syncer = iDelegate.Target as ISynchronizeInvoke;
                             if (syncer == null) {
@@ -152,8 +152,8 @@ namespace Medo.Net {
         /// <param name="packet">Packet to send.</param>
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static void Send(TinyDictionaryPacket packet, IPAddress address) {
-            Send(packet, new IPEndPoint(address, TinyPairs.DefaultPort));
+        public static void Send(TinyPairPacket packet, IPAddress address) {
+            Send(packet, new IPEndPoint(address, TinyPair.DefaultPort));
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Medo.Net {
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <param name="port">Port of destination for packet.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static void Send(TinyDictionaryPacket packet, IPAddress address, int port) {
+        public static void Send(TinyPairPacket packet, IPAddress address, int port) {
             Send(packet, new IPEndPoint(address, port));
         }
 
@@ -173,7 +173,7 @@ namespace Medo.Net {
         /// <param name="packet">Packet to send.</param>
         /// <param name="remoteEndPoint">Address of destination for packet. It can be broadcast address.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static void Send(TinyDictionaryPacket packet, IPEndPoint remoteEndPoint) {
+        public static void Send(TinyPairPacket packet, IPEndPoint remoteEndPoint) {
             if (packet == null) { throw new ArgumentNullException("packet", "Packet is null."); }
             if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)) {
@@ -216,7 +216,7 @@ namespace Medo.Net {
     /// <summary>
     /// Encoder/decoder for TinyDictionary packets.
     /// </summary>
-    public class TinyDictionaryPacket {
+    public class TinyPairPacket {
 
         private static readonly UTF8Encoding TextEncoding = new UTF8Encoding(false);
 
@@ -228,7 +228,7 @@ namespace Medo.Net {
         /// <param name="data">Data to be encoded in JSON.</param>
         /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
         /// <exception cref="System.ArgumentException">Product contains space character. -or- Operation contains space character.</exception>
-        public TinyDictionaryPacket(string product, string operation, Dictionary<string, string> data) {
+        public TinyPairPacket(string product, string operation, Dictionary<string, string> data) {
             if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
             if (product.Contains(" ")) { throw new ArgumentException("Product contains space character.", "product"); }
             if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
@@ -317,7 +317,7 @@ namespace Medo.Net {
         /// <param name="buffer">Byte array.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
-        public static TinyDictionaryPacket Parse(byte[] buffer) {
+        public static TinyPairPacket Parse(byte[] buffer) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
 
             return Parse(buffer, 0, buffer.Length);
@@ -331,7 +331,7 @@ namespace Medo.Net {
         /// <param name="count">Total lenght.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
-        public static TinyDictionaryPacket ParseHeaderOnly(byte[] buffer, int offset, int count) {
+        public static TinyPairPacket ParseHeaderOnly(byte[] buffer, int offset, int count) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
@@ -344,7 +344,7 @@ namespace Medo.Net {
                 string product = ReadToSpace(stream);
                 string operation = ReadToSpace(stream);
 
-                return new TinyDictionaryPacket(product, operation, null);
+                return new TinyPairPacket(product, operation, null);
             }
         }
 
@@ -357,7 +357,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
         /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
-        public static TinyDictionaryPacket Parse(byte[] buffer, int offset, int count) {
+        public static TinyPairPacket Parse(byte[] buffer, int offset, int count) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
@@ -473,7 +473,7 @@ namespace Medo.Net {
 
                     }
                 }
-                return new TinyDictionaryPacket(product, operation, data);
+                return new TinyPairPacket(product, operation, data);
             }
         }
 
@@ -553,7 +553,7 @@ namespace Medo.Net {
     /// <summary>
     /// Event arguments for TinyDictionaryPacketReceived message.
     /// </summary>
-    public class TinyDictionaryPacketEventArgs : EventArgs {
+    public class TinyPairPacketEventArgs : EventArgs {
 
         private readonly byte[] Buffer;
         private readonly int Offset;
@@ -568,7 +568,7 @@ namespace Medo.Net {
         /// <param name="remoteEndPoint">Remote end point.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
-        public TinyDictionaryPacketEventArgs(byte[] buffer, int offset, int count, IPEndPoint remoteEndPoint) {
+        public TinyPairPacketEventArgs(byte[] buffer, int offset, int count, IPEndPoint remoteEndPoint) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
@@ -590,8 +590,8 @@ namespace Medo.Net {
         /// </summary>
         /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might throw exception.")]
-        public TinyDictionaryPacket GetPacket() {
-            return TinyDictionaryPacket.Parse(this.Buffer, this.Offset, this.Count);
+        public TinyPairPacket GetPacket() {
+            return TinyPairPacket.Parse(this.Buffer, this.Offset, this.Count);
         }
 
         /// <summary>
@@ -599,8 +599,8 @@ namespace Medo.Net {
         /// </summary>
         /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate here.")]
-        public TinyDictionaryPacket GetPacketWithoutData() {
-            return TinyDictionaryPacket.ParseHeaderOnly(this.Buffer, this.Offset, this.Count);
+        public TinyPairPacket GetPacketWithoutData() {
+            return TinyPairPacket.ParseHeaderOnly(this.Buffer, this.Offset, this.Count);
         }
 
     }
