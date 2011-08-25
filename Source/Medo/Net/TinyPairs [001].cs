@@ -1,0 +1,608 @@
+//Copyright (c) 2011 Josip Medved <jmedved@jmedved.com>
+
+//2011-08-25: Initial version (based on TinyMessage).
+
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+
+namespace Medo.Net {
+
+    /// <summary>
+    /// Sending and receiving UDP messages.
+    /// Supports TinyMessage with Dictionary&lt;string,string&gt; as data.
+    /// </summary>
+    public class TinyPairs : IDisposable {
+
+        private const int DefaultPort = 5104;
+
+
+        /// <summary>
+        /// Creates new instance.
+        /// </summary>
+        public TinyPairs()
+            : this(new IPEndPoint(IPAddress.Any, TinyPairs.DefaultPort)) {
+        }
+
+        /// <summary>
+        /// Creates new instance.
+        /// </summary>
+        /// <param name="localEndPoint">Local end point where messages should be received at.</param>
+        /// <exception cref="System.ArgumentNullException">Local IP end point is null.</exception>
+        public TinyPairs(IPEndPoint localEndPoint) {
+            if (localEndPoint == null) { throw new ArgumentNullException("localEndPoint", "Local IP end point is null."); }
+            this.LocalEndPoint = localEndPoint;
+        }
+
+        /// <summary>
+        /// Gets local IP end point.
+        /// </summary>
+        public IPEndPoint LocalEndPoint { get; private set; }
+
+
+        /// <summary>
+        /// Starts listener on background thread.
+        /// </summary>
+        public void ListenAsync() {
+            lock (this.ListenSyncRoot) {
+                if (this.ListenThread != null) { throw new InvalidOperationException("Already listening."); }
+
+                this.ListenCancelEvent = new ManualResetEvent(false);
+                this.ListenThread = new Thread(Run) { IsBackground = true, Name = "TinyDictionary " + this.LocalEndPoint.ToString() };
+                this.ListenThread.Start();
+            }
+        }
+
+        /// <summary>
+        /// Stops listener on background thread.
+        /// </summary>
+        public void CloseAsync() {
+            lock (this.ListenSyncRoot) {
+                if (this.ListenThread == null) { return; }
+
+                this.ListenCancelEvent.Set();
+                this.ListenSocket.Shutdown(SocketShutdown.Both);
+                this.ListenSocket.Close();
+
+                while (this.ListenThread.IsAlive) { Thread.Sleep(100); }
+                ((IDisposable)this.ListenCancelEvent).Dispose();
+                this.ListenThread = null;
+            }
+        }
+
+
+        /// <summary>
+        /// Raises event when packet arrives.
+        /// </summary>
+        public event EventHandler<TinyDictionaryPacketEventArgs> TinyDictionaryPacketReceived;
+
+
+        #region Threading
+
+        private Thread ListenThread;
+        private ManualResetEvent ListenCancelEvent = null;
+        private readonly object ListenSyncRoot = new object();
+        private Socket ListenSocket = null;
+
+        private bool IsCanceled { get { return ListenCancelEvent.WaitOne(0, false); } }
+
+        private void Run() {
+            try {
+                this.ListenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                this.ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                this.ListenSocket.Bind(this.LocalEndPoint);
+
+                var buffer = new byte[16384];
+                EndPoint remoteEP;
+                int inCount;
+                while (!this.IsCanceled) {
+                    try {
+                        remoteEP = new IPEndPoint(IPAddress.Any, 0);
+                        inCount = this.ListenSocket.ReceiveFrom(buffer, ref remoteEP);
+                    } catch (SocketException ex) {
+                        if (ex.SocketErrorCode == SocketError.Interrupted) {
+                            return;
+                        } else {
+                            throw;
+                        }
+                    }
+
+                    if (TinyDictionaryPacketReceived != null) {
+                        var newBuffer = new byte[inCount];
+                        Buffer.BlockCopy(buffer, 0, newBuffer, 0, inCount);
+#if DEBUG
+                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyDictionary [{0} <- {1}]", TinyDictionaryPacket.ParseHeaderOnly(newBuffer, 0, inCount), remoteEP));
+#endif
+                        var invokeArgs = new object[] { this, new TinyDictionaryPacketEventArgs(newBuffer, 0, inCount, remoteEP as IPEndPoint) };
+                        foreach (Delegate iDelegate in TinyDictionaryPacketReceived.GetInvocationList()) {
+                            ISynchronizeInvoke syncer = iDelegate.Target as ISynchronizeInvoke;
+                            if (syncer == null) {
+                                iDelegate.DynamicInvoke(invokeArgs);
+                            } else {
+                                syncer.BeginInvoke(iDelegate, invokeArgs);
+                            }
+                        }
+                    }
+                }
+
+            } catch (ThreadAbortException) {
+            } finally {
+                if (this.ListenSocket != null) {
+                    ((IDisposable)this.ListenSocket).Dispose();
+                    this.ListenSocket = null;
+                }
+            }
+
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// Sends UDP packet.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
+        /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
+        public static void Send(TinyDictionaryPacket packet, IPAddress address) {
+            Send(packet, new IPEndPoint(address, TinyPairs.DefaultPort));
+        }
+
+        /// <summary>
+        /// Sends UDP packet.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
+        /// <param name="port">Port of destination for packet.</param>
+        /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
+        public static void Send(TinyDictionaryPacket packet, IPAddress address, int port) {
+            Send(packet, new IPEndPoint(address, port));
+        }
+
+        /// <summary>
+        /// Sends UDP packet.
+        /// </summary>
+        /// <param name="packet">Packet to send.</param>
+        /// <param name="remoteEndPoint">Address of destination for packet. It can be broadcast address.</param>
+        /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
+        public static void Send(TinyDictionaryPacket packet, IPEndPoint remoteEndPoint) {
+            if (packet == null) { throw new ArgumentNullException("packet", "Packet is null."); }
+            if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)) {
+                if (remoteEndPoint.Address == IPAddress.Broadcast) {
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                }
+                socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false);
+                socket.SendTo(packet.GetBytes(), remoteEndPoint);
+                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyDictionary [{0} -> {1}]", packet, remoteEndPoint));
+            }
+        }
+
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        public void Dispose() {
+            this.Dispose(true);
+            System.GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
+        protected virtual void Dispose(bool disposing) {
+            if (disposing) {
+                this.CloseAsync();
+            }
+        }
+
+        #endregion
+
+    }
+
+
+
+    /// <summary>
+    /// Encoder/decoder for TinyDictionary packets.
+    /// </summary>
+    public class TinyDictionaryPacket {
+
+        private static readonly UTF8Encoding TextEncoding = new UTF8Encoding(false);
+
+        /// <summary>
+        /// Creates new instance
+        /// </summary>
+        /// <param name="product">Name of product. Preferred format would be application name, at (@) sign, IANA assigned Private Enterprise Number. E.g. Application@12345</param>
+        /// <param name="operation">Message type.</param>
+        /// <param name="data">Data to be encoded in JSON.</param>
+        /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
+        /// <exception cref="System.ArgumentException">Product contains space character. -or- Operation contains space character.</exception>
+        public TinyDictionaryPacket(string product, string operation, Dictionary<string, string> data) {
+            if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
+            if (product.Contains(" ")) { throw new ArgumentException("Product contains space character.", "product"); }
+            if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
+            if (operation.Contains(" ")) { throw new ArgumentException("Operation contains space character.", "operation"); }
+
+            this.Product = product;
+            this.Operation = operation;
+            this.Data = data;
+        }
+
+        /// <summary>
+        /// Gets name of product.
+        /// </summary>
+        public string Product { get; private set; }
+
+        /// <summary>
+        /// Gets operation.
+        /// </summary>
+        public string Operation { get; private set; }
+
+        /// <summary>
+        /// Gets data object.
+        /// </summary>
+        public Dictionary<string, string> Data { get; private set; }
+
+        /// <summary>
+        /// Converts message to it's representation in bytes.
+        /// </summary>
+        /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
+        public byte[] GetBytes() {
+            using (var stream = new MemoryStream()) {
+                byte[] protocolBytes = TextEncoding.GetBytes("Tiny");
+                stream.Write(protocolBytes, 0, protocolBytes.Length);
+                stream.Write(new byte[] { 0x20 }, 0, 1);
+
+                byte[] productBytes = TextEncoding.GetBytes(this.Product);
+                stream.Write(productBytes, 0, productBytes.Length);
+                stream.Write(new byte[] { 0x20 }, 0, 1);
+
+                byte[] operationBytes = TextEncoding.GetBytes(this.Operation);
+                stream.Write(operationBytes, 0, operationBytes.Length);
+                stream.Write(new byte[] { 0x20 }, 0, 1);
+
+                var addComma = false;
+                stream.Write(new byte[] { 0x5B }, 0, 1); //[
+                foreach (var item in this.Data) {
+                    byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
+                    byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
+                    if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
+                    stream.Write(new byte[] { 0x7B, 0x22, 0x4B, 0x65, 0x79, 0x22, 0x3A, 0x22 }, 0, 8); //"{Key":"
+                    stream.Write(keyBytes, 0, keyBytes.Length);
+                    stream.Write(new byte[] { 0x22, 0x2C, 0x22, 0x56, 0x61, 0x6C, 0x75, 0x65, 0x22, 0x3A, 0x22 }, 0, 11); //","Value":"
+                    stream.Write(valueBytes, 0, valueBytes.Length);
+                    stream.Write(new byte[] { 0x22, 0x7D }, 0, 2); //"}
+                    addComma = true;
+                }
+                stream.Write(new byte[] { 0x5D }, 0, 1); //]
+
+                if (stream.Position > 65507) { throw new InvalidOperationException("Packet length exceeds 65507 bytes."); }
+
+                return stream.ToArray();
+            }
+        }
+
+        private static string JsonEncode(string value) {
+            var sb = new StringBuilder();
+            foreach (char ch in value) {
+                switch (ch) {
+                    case '\"': sb.Append("\\\""); break;
+                    case '\\': sb.Append("\\\\"); break;
+                    default:
+                        if (char.IsControl(ch)) {
+                            sb.Append("\\u" + ((int)ch).ToString("x4", CultureInfo.InvariantCulture));
+                        } else {
+                            sb.Append(ch);
+                        }
+                        break;
+                }
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Returns parsed packet.
+        /// </summary>
+        /// <param name="buffer">Byte array.</param>
+        /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
+        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        public static TinyDictionaryPacket Parse(byte[] buffer) {
+            if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
+
+            return Parse(buffer, 0, buffer.Length);
+        }
+
+        /// <summary>
+        /// Returns partially parsed packet. Data argument is NOT parsed.
+        /// </summary>
+        /// <param name="buffer">Byte array.</param>
+        /// <param name="offset">Starting offset.</param>
+        /// <param name="count">Total lenght.</param>
+        /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
+        public static TinyDictionaryPacket ParseHeaderOnly(byte[] buffer, int offset, int count) {
+            if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
+            if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
+            if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
+            if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
+
+            using (var stream = new MemoryStream(buffer, offset, count)) {
+                string protocol = ReadToSpace(stream);
+                if (string.CompareOrdinal(protocol, "Tiny") != 0) { return null; }
+
+                string product = ReadToSpace(stream);
+                string operation = ReadToSpace(stream);
+
+                return new TinyDictionaryPacket(product, operation, null);
+            }
+        }
+
+        /// <summary>
+        /// Returns parsed packet.
+        /// </summary>
+        /// <param name="buffer">Byte array.</param>
+        /// <param name="offset">Starting offset.</param>
+        /// <param name="count">Total lenght.</param>
+        /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
+        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        public static TinyDictionaryPacket Parse(byte[] buffer, int offset, int count) {
+            if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
+            if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
+            if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
+            if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
+
+            using (var stream = new MemoryStream(buffer, offset, count)) {
+                string protocol = ReadToSpace(stream);
+                if (string.CompareOrdinal(protocol, "Tiny") != 0) { throw new InvalidDataException("Cannot parse packet."); }
+
+                string product = ReadToSpace(stream);
+                string operation = ReadToSpace(stream);
+
+                var data = new Dictionary<string, string>();
+
+                var nameValuePairs = new Dictionary<string, string>();
+                var sbName = new StringBuilder();
+                var sbValue = new StringBuilder();
+                var state = JsonState.Default;
+                var jsonBytes = new byte[stream.Length - stream.Position];
+                stream.Read(jsonBytes, 0, jsonBytes.Length);
+                var jsonText = new StringBuilder(TextEncoding.GetString(jsonBytes));
+                while (jsonText.Length > 0) {
+                    var ch = jsonText[0];
+                    jsonText.Remove(0, 1);
+                    switch (state) {
+                        case JsonState.Default: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case '[': state = JsonState.LookingForObjectStart; break;
+                                    default: throw new FormatException("Cannot find array start.");
+                                }
+                            } break;
+                        case JsonState.LookingForObjectStart: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case '{': state = JsonState.LookingForNameStart; break;
+                                    default: throw new FormatException("Cannot find item start.");
+                                }
+                            } break;
+
+                        case JsonState.LookingForNameStart: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case '\"': state = JsonState.LookingForNameEnd; break;
+                                    default: throw new FormatException("Cannot find key name start.");
+                                }
+                            } break;
+
+                        case JsonState.LookingForNameEnd: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case '\\': sbName.Append(Descape(jsonText)); break;
+                                    case '\"': state = JsonState.LookingForPairSeparator; break;
+                                    default: sbName.Append(ch); break;
+                                }
+                            } break;
+
+                        case JsonState.LookingForPairSeparator: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case ':': state = JsonState.LookingForValueStart; break;
+                                    default: throw new FormatException("Cannot find name/value separator.");
+                                }
+                            } break;
+
+                        case JsonState.LookingForValueStart: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case '\"': state = JsonState.LookingForValueEnd; break;
+                                    default: throw new FormatException("Cannot find key value start.");
+                                }
+                            } break;
+
+                        case JsonState.LookingForValueEnd: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case '\\': sbValue.Append(Descape(jsonText)); break;
+                                    case '\"':
+                                        nameValuePairs.Add(sbName.ToString(), sbValue.ToString());
+                                        sbName.Length = 0;
+                                        sbValue.Length = 0;
+                                        state = JsonState.LookingForObjectEnd;
+                                        break;
+                                    default: sbValue.Append(ch); break;
+                                }
+                            } break;
+
+                        case JsonState.LookingForObjectEnd: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case ',': state = JsonState.LookingForNameStart; break;
+                                    case '}':
+                                        if (nameValuePairs.ContainsKey("Key") && nameValuePairs.ContainsKey("Value")) {
+                                            data.Add(nameValuePairs["Key"], nameValuePairs["Value"]);
+                                        } else {
+                                            throw new FormatException("Cannot find key and value.");
+                                        }
+                                        nameValuePairs.Clear();
+                                        state = JsonState.LookingForObjectSeparator;
+                                        break;
+                                    default: throw new FormatException("Cannot find item start.");
+                                }
+                            } break;
+
+                        case JsonState.LookingForObjectSeparator: {
+                                switch (ch) {
+                                    case ' ': break;
+                                    case ',': state = JsonState.LookingForObjectStart; break;
+                                    case ']': state = JsonState.Default; break;
+                                    default: throw new FormatException("Cannot find item separator start.");
+                                }
+                            } break;
+
+                    }
+                }
+                return new TinyDictionaryPacket(product, operation, data);
+            }
+        }
+
+        private static string Descape(StringBuilder jsonText) {
+            var ch = jsonText[0];
+            jsonText.Remove(0, 1);
+            switch (ch) {
+                case '\"': return "\"";
+                case '\\': return "\\";
+                case '/': return "/";
+                case 'b': return Convert.ToChar(0x08).ToString();
+                case 'f': return Convert.ToChar(0x0C).ToString();
+                case 'n': return Convert.ToChar(0x0A).ToString();
+                case 'r': return Convert.ToChar(0x0D).ToString();
+                case 't': return Convert.ToChar(0x09).ToString();
+                case 'u':
+                    var codepoint = UInt32.Parse(jsonText.ToString(0, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    jsonText.Remove(0, 4);
+                    return Convert.ToChar(codepoint).ToString();
+                default: throw new FormatException("Cannot decode escape sequence.");
+            }
+        }
+
+        private static string ReadToSpace(MemoryStream stream) {
+            var bytes = new List<byte>(); ;
+            while (true) {
+                if (stream.Position == stream.Length) { throw new InvalidDataException("Cannot parse packet."); }
+                var oneByte = (byte)stream.ReadByte();
+                if (oneByte == 0x20) {
+                    return TextEncoding.GetString(bytes.ToArray());
+                } else {
+                    bytes.Add(oneByte);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        public override bool Equals(object obj) {
+            return base.Equals(obj);
+        }
+
+        /// <summary>
+        /// Serves as a hash function for a particular type.
+        /// </summary>
+        public override int GetHashCode() {
+            return (this.Product).GetHashCode() ^ this.Operation.GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        public override string ToString() {
+            return this.Product + ":" + this.Operation;
+        }
+
+
+        private enum JsonState {
+            Default,
+            LookingForObjectStart,
+            LookingForNameStart,
+            LookingForNameEnd,
+            LookingForPairSeparator,
+            LookingForValueStart,
+            LookingForValueEnd,
+            LookingForObjectEnd,
+            LookingForObjectSeparator,
+        }
+
+    }
+
+
+
+    /// <summary>
+    /// Event arguments for TinyDictionaryPacketReceived message.
+    /// </summary>
+    public class TinyDictionaryPacketEventArgs : EventArgs {
+
+        private readonly byte[] Buffer;
+        private readonly int Offset;
+        private readonly int Count;
+
+        /// <summary>
+        /// Creates new instance.
+        /// </summary>
+        /// <param name="buffer">Buffer.</param>
+        /// <param name="offset">Offset</param>
+        /// <param name="count">Count.</param>
+        /// <param name="remoteEndPoint">Remote end point.</param>
+        /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
+        public TinyDictionaryPacketEventArgs(byte[] buffer, int offset, int count, IPEndPoint remoteEndPoint) {
+            if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
+            if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
+            if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
+            if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
+
+            this.Buffer = buffer;
+            this.Offset = offset;
+            this.Count = count;
+            this.RemoteEndPoint = remoteEndPoint;
+        }
+
+        /// <summary>
+        /// Gets end point that was origin of message.
+        /// </summary>
+        public IPEndPoint RemoteEndPoint { get; private set; }
+
+        /// <summary>
+        /// Returns parsed packet.
+        /// </summary>
+        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might throw exception.")]
+        public TinyDictionaryPacket GetPacket() {
+            return TinyDictionaryPacket.Parse(this.Buffer, this.Offset, this.Count);
+        }
+
+        /// <summary>
+        /// Returns parsed packet.
+        /// </summary>
+        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate here.")]
+        public TinyDictionaryPacket GetPacketWithoutData() {
+            return TinyDictionaryPacket.ParseHeaderOnly(this.Buffer, this.Offset, this.Count);
+        }
+
+    }
+
+}
