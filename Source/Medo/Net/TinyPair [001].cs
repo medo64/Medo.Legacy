@@ -56,7 +56,7 @@ namespace Medo.Net {
                 if (this.ListenThread != null) { throw new InvalidOperationException("Already listening."); }
 
                 this.ListenCancelEvent = new ManualResetEvent(false);
-                this.ListenThread = new Thread(Run) { IsBackground = true, Name = "TinyDictionary " + this.LocalEndPoint.ToString() };
+                this.ListenThread = new Thread(Run) { IsBackground = true, Name = "TinyPair " + this.LocalEndPoint.ToString() };
                 this.ListenThread.Start();
             }
         }
@@ -82,7 +82,7 @@ namespace Medo.Net {
         /// <summary>
         /// Raises event when packet arrives.
         /// </summary>
-        public event EventHandler<TinyPairPacketEventArgs> TinyDictionaryPacketReceived;
+        public event EventHandler<TinyPairPacketEventArgs> TinyPairPacketReceived;
 
 
         #region Threading
@@ -115,14 +115,14 @@ namespace Medo.Net {
                         }
                     }
 
-                    if (TinyDictionaryPacketReceived != null) {
+                    if (TinyPairPacketReceived != null) {
                         var newBuffer = new byte[inCount];
                         Buffer.BlockCopy(buffer, 0, newBuffer, 0, inCount);
 #if DEBUG
-                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyDictionary [{0} <- {1}]", TinyDictionaryPacket.ParseHeaderOnly(newBuffer, 0, inCount), remoteEP));
+                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} <- {1}]", TinyPairPacket.ParseHeaderOnly(newBuffer, 0, inCount), remoteEP));
 #endif
                         var invokeArgs = new object[] { this, new TinyPairPacketEventArgs(newBuffer, 0, inCount, remoteEP as IPEndPoint) };
-                        foreach (Delegate iDelegate in TinyDictionaryPacketReceived.GetInvocationList()) {
+                        foreach (Delegate iDelegate in TinyPairPacketReceived.GetInvocationList()) {
                             ISynchronizeInvoke syncer = iDelegate.Target as ISynchronizeInvoke;
                             if (syncer == null) {
                                 iDelegate.DynamicInvoke(invokeArgs);
@@ -182,7 +182,7 @@ namespace Medo.Net {
                 }
                 socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false);
                 socket.SendTo(packet.GetBytes(), remoteEndPoint);
-                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyDictionary [{0} -> {1}]", packet, remoteEndPoint));
+                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} -> {1}]", packet, remoteEndPoint));
             }
         }
 
@@ -214,7 +214,7 @@ namespace Medo.Net {
 
 
     /// <summary>
-    /// Encoder/decoder for TinyDictionary packets.
+    /// Encoder/decoder for TinyPair packets.
     /// </summary>
     public class TinyPairPacket {
 
@@ -272,20 +272,22 @@ namespace Medo.Net {
                 stream.Write(operationBytes, 0, operationBytes.Length);
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
-                var addComma = false;
-                stream.Write(new byte[] { 0x5B }, 0, 1); //[
-                foreach (var item in this.Data) {
-                    byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
-                    byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
-                    if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
-                    stream.Write(new byte[] { 0x7B, 0x22, 0x4B, 0x65, 0x79, 0x22, 0x3A, 0x22 }, 0, 8); //"{Key":"
-                    stream.Write(keyBytes, 0, keyBytes.Length);
-                    stream.Write(new byte[] { 0x22, 0x2C, 0x22, 0x56, 0x61, 0x6C, 0x75, 0x65, 0x22, 0x3A, 0x22 }, 0, 11); //","Value":"
-                    stream.Write(valueBytes, 0, valueBytes.Length);
-                    stream.Write(new byte[] { 0x22, 0x7D }, 0, 2); //"}
-                    addComma = true;
+                if (this.Data != null) {
+                    var addComma = false;
+                    stream.Write(new byte[] { 0x5B }, 0, 1); //[
+                    foreach (var item in this.Data) {
+                        byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
+                        byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
+                        if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
+                        stream.Write(new byte[] { 0x7B, 0x22, 0x4B, 0x65, 0x79, 0x22, 0x3A, 0x22 }, 0, 8); //"{Key":"
+                        stream.Write(keyBytes, 0, keyBytes.Length);
+                        stream.Write(new byte[] { 0x22, 0x2C, 0x22, 0x56, 0x61, 0x6C, 0x75, 0x65, 0x22, 0x3A, 0x22 }, 0, 11); //","Value":"
+                        stream.Write(valueBytes, 0, valueBytes.Length);
+                        stream.Write(new byte[] { 0x22, 0x7D }, 0, 2); //"}
+                        addComma = true;
+                    }
+                    stream.Write(new byte[] { 0x5D }, 0, 1); //]
                 }
-                stream.Write(new byte[] { 0x5D }, 0, 1); //]
 
                 if (stream.Position > 65507) { throw new InvalidOperationException("Packet length exceeds 65507 bytes."); }
 
@@ -551,7 +553,7 @@ namespace Medo.Net {
 
 
     /// <summary>
-    /// Event arguments for TinyDictionaryPacketReceived message.
+    /// Event arguments for TinyPairPacketReceived message.
     /// </summary>
     public class TinyPairPacketEventArgs : EventArgs {
 
