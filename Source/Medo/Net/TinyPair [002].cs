@@ -1,7 +1,7 @@
 //Copyright (c) 2011 Josip Medved <jmedved@jmedved.com>
 
 //2011-08-25: Initial version (based on TinyMessage).
-//2011-08-27: Added SendAndReceive methods.
+//2011-08-26: Added SendAndReceive methods.
 
 
 using System;
