@@ -238,7 +238,7 @@ namespace Medo.Net {
                 var bytesIn = new byte[65536];
                 try {
                     int len = socket.ReceiveFrom(bytesIn, ref remoteEndPointIn);
-                    var packetIn =  Medo.Net.TinyPairPacket.Parse(bytesIn, 0, len);
+                    var packetIn = Medo.Net.TinyPairPacket.Parse(bytesIn, 0, len);
                     Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} <- {1}]", packetIn, remoteEndPointIn));
                     return packetIn;
                 } catch (SocketException) {
@@ -453,10 +453,12 @@ namespace Medo.Net {
                                     default: throw new FormatException("Cannot find array start.");
                                 }
                             } break;
+
                         case JsonState.LookingForObjectStart: {
                                 switch (ch) {
                                     case ' ': break;
                                     case '{': state = JsonState.LookingForNameStart; break;
+                                    case ']': state = JsonState.DeadEnd; break;
                                     default: throw new FormatException("Cannot find item start.");
                                 }
                             } break;
@@ -534,6 +536,9 @@ namespace Medo.Net {
                                 }
                             } break;
 
+                        case JsonState.DeadEnd:
+                            throw new FormatException("Unexpected data");
+
                     }
                 }
                 return new TinyPairPacket(product, operation, data);
@@ -607,6 +612,7 @@ namespace Medo.Net {
             LookingForValueEnd,
             LookingForObjectEnd,
             LookingForObjectSeparator,
+            DeadEnd,
         }
 
     }
