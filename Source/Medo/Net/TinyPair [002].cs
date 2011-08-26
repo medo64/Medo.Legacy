@@ -552,15 +552,15 @@ namespace Medo.Net {
                 case '\"': return "\"";
                 case '\\': return "\\";
                 case '/': return "/";
-                case 'b': return Convert.ToChar(0x08).ToString();
-                case 'f': return Convert.ToChar(0x0C).ToString();
-                case 'n': return Convert.ToChar(0x0A).ToString();
-                case 'r': return Convert.ToChar(0x0D).ToString();
-                case 't': return Convert.ToChar(0x09).ToString();
+                case 'b': return System.Convert.ToChar(0x08).ToString();
+                case 'f': return System.Convert.ToChar(0x0C).ToString();
+                case 'n': return System.Convert.ToChar(0x0A).ToString();
+                case 'r': return System.Convert.ToChar(0x0D).ToString();
+                case 't': return System.Convert.ToChar(0x09).ToString();
                 case 'u':
                     var codepoint = UInt32.Parse(jsonText.ToString(0, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                     jsonText.Remove(0, 4);
-                    return Convert.ToChar(codepoint).ToString();
+                    return System.Convert.ToChar(codepoint).ToString();
                 default: throw new FormatException("Cannot decode escape sequence.");
             }
         }
