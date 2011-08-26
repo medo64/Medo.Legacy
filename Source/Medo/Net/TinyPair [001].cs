@@ -190,26 +190,26 @@ namespace Medo.Net {
 
         /// <summary>
         /// Sends one UDP packet and expects another in return.
-        /// Returns null if respose is not received within 1 second.
+        /// Returns null if respose is not received within 250 milliseconds.
         /// </summary>
         /// <param name="packet">Packet to send.</param>
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
         public static TinyPairPacket SendAndReceive(TinyPairPacket packet, IPAddress address) {
-            return SendAndReceive(packet, new IPEndPoint(address, TinyPair.DefaultPort), 1000);
+            return SendAndReceive(packet, new IPEndPoint(address, TinyPair.DefaultPort), 250);
         }
 
         /// <summary>
         /// Sends UDP packet.
         /// </summary>
         /// Sends one UDP packet and expects another in return.
-        /// Returns null if respose is not received within 1 second.
+        /// Returns null if respose is not received within 250 milliseconds.
         /// <param name="packet">Packet to send.</param>
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <param name="port">Port of destination for packet.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
         public static TinyPairPacket SendAndReceive(TinyPairPacket packet, IPAddress address, int port) {
-            return SendAndReceive(packet, new IPEndPoint(address, port), 1000);
+            return SendAndReceive(packet, new IPEndPoint(address, port), 250);
         }
 
         /// <summary>
