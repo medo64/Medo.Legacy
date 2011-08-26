@@ -90,7 +90,7 @@
     <Compile Include="Configuration\IniFile [001].cs" />
     <Compile Include="Configuration\RecentFiles [003].cs" />
     <Compile Include="Configuration\RunOnStartup [004].cs" />
-    <Compile Include="Configuration\Settings [011].cs" />
+    <Compile Include="Configuration\Settings [012].cs" />
     <Compile Include="Data\CommonConnection [009].cs" />
     <Compile Include="Data\DeleteCommand [004].cs" />
     <Compile Include="Data\InsertCommand [006].cs" />
@@ -124,7 +124,7 @@
     <Compile Include="Extensions\ScientificNotationExtensions [002].cs" />
     <Compile Include="Extensions\SIPrefixExtensions [003].cs" />
     <Compile Include="Math\ProcessCapability [002].cs" />
-    <Compile Include="Net\TinyPair [002].cs" />
+    <Compile Include="Net\TinyPair [001].cs" />
     <Compile Include="Net\TinyMessage [001].cs" />
     <Compile Include="Web\GData\GDataClientLogin [002].cs" />
     <Compile Include="Windows\Forms\AboutBox [010].cs" />
