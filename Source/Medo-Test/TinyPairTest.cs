@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Test {
 
@@ -78,6 +79,37 @@ namespace Test {
             Assert.AreEqual(operation, actual.Operation);
             Assert.AreEqual(0, actual.Data.Count);
         }
+
+        [TestMethod()]
+        public void Test_TinyPairPacket_EncodeDecode_SpeedTest() {
+            string product = "Example";
+            string operation = "Test";
+            var data = new Dictionary<string, string>();
+            data.Add("Key1Text", "Value1Text");
+            data.Add("Key2Text", "Value2Text");
+
+            TinyPairPacket target = null;
+            byte[] bytes = null;
+
+            var n = 100000;
+            var swEncode = new Stopwatch();
+            swEncode.Start();
+            for (int i = 0; i < n; i++) {
+                target = new TinyPairPacket(product, operation, data);
+                bytes = target.GetBytes();
+            }
+            swEncode.Stop();
+
+            var swDecode = new Stopwatch();
+            swDecode.Start();
+            for (int i = 0; i < n; i++) {
+                var target2 = TinyPairPacket.Parse(bytes);
+            }
+            swDecode.Stop();
+
+            //Assert.Inconclusive(string.Format("TinyPair (encode/decode): {0} + {1} = {2} ms", swEncode.ElapsedMilliseconds, swDecode.ElapsedMilliseconds, swEncode.ElapsedMilliseconds + swDecode.ElapsedMilliseconds));
+        }
+
 
     }
 }

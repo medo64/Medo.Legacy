@@ -3,6 +3,7 @@
 //2011-08-26: Initial version (based on TinyMessage).
 //2011-10-22: Adjusted to work on Mono.
 //            Added IsListening property.
+//2011-10-24: Refactoring.
 
 
 using System;
@@ -444,117 +445,130 @@ namespace Medo.Net {
 
                 var data = new Dictionary<string, string>();
 
-                var nameValuePairs = new Dictionary<string, string>();
-                var sbName = new StringBuilder();
-                var sbValue = new StringBuilder();
-                var state = JsonState.Default;
                 var jsonBytes = new byte[stream.Length - stream.Position];
                 stream.Read(jsonBytes, 0, jsonBytes.Length);
-                var jsonText = new StringBuilder(TextEncoding.GetString(jsonBytes));
-                while (jsonText.Length > 0) {
-                    var ch = jsonText[0];
-                    jsonText.Remove(0, 1);
-                    switch (state) {
-                        case JsonState.Default: {
-                                switch (ch) {
-                                    case ' ': break;
-                                    case '[': state = JsonState.LookingForObjectStart; break;
-                                    default: throw new FormatException("Cannot find array start.");
-                                }
-                            } break;
-
-                        case JsonState.LookingForObjectStart: {
-                                switch (ch) {
-                                    case ' ': break;
-                                    case '{': state = JsonState.LookingForNameStart; break;
-                                    case ']': state = JsonState.DeadEnd; break;
-                                    default: throw new FormatException("Cannot find item start.");
-                                }
-                            } break;
-
-                        case JsonState.LookingForNameStart: {
-                                switch (ch) {
-                                    case ' ': break;
-                                    case '\"': state = JsonState.LookingForNameEnd; break;
-                                    default: throw new FormatException("Cannot find key name start.");
-                                }
-                            } break;
-
-                        case JsonState.LookingForNameEnd: {
-                                switch (ch) {
-                                    case '\\': sbName.Append(Descape(jsonText)); break;
-                                    case '\"': state = JsonState.LookingForPairSeparator; break;
-                                    default: sbName.Append(ch); break;
-                                }
-                            } break;
-
-                        case JsonState.LookingForPairSeparator: {
-                                switch (ch) {
-                                    case ' ': break;
-                                    case ':': state = JsonState.LookingForValueStart; break;
-                                    default: throw new FormatException("Cannot find name/value separator.");
-                                }
-                            } break;
-
-                        case JsonState.LookingForValueStart: {
-                                switch (ch) {
-                                    case ' ': break;
-                                    case '\"': state = JsonState.LookingForValueEnd; break;
-                                    default: throw new FormatException("Cannot find key value start.");
-                                }
-                            } break;
-
-                        case JsonState.LookingForValueEnd: {
-                                switch (ch) {
-                                    case '\\': sbValue.Append(Descape(jsonText)); break;
-                                    case '\"':
-                                        nameValuePairs.Add(sbName.ToString(), sbValue.ToString());
-                                        sbName.Length = 0;
-                                        sbValue.Length = 0;
-                                        state = JsonState.LookingForObjectEnd;
-                                        break;
-                                    default: sbValue.Append(ch); break;
-                                }
-                            } break;
-
-                        case JsonState.LookingForObjectEnd: {
-                                switch (ch) {
-                                    case ' ': break;
-                                    case ',': state = JsonState.LookingForNameStart; break;
-                                    case '}':
-                                        if (nameValuePairs.ContainsKey("Key") && nameValuePairs.ContainsKey("Value")) {
-                                            data.Add(nameValuePairs["Key"], nameValuePairs["Value"]);
-                                        } else {
-                                            throw new FormatException("Cannot find key and value.");
-                                        }
-                                        nameValuePairs.Clear();
-                                        state = JsonState.LookingForObjectSeparator;
-                                        break;
-                                    default: throw new FormatException("Cannot find item start.");
-                                }
-                            } break;
-
-                        case JsonState.LookingForObjectSeparator: {
-                                switch (ch) {
-                                    case ' ': break;
-                                    case ',': state = JsonState.LookingForObjectStart; break;
-                                    case ']': state = JsonState.Default; break;
-                                    default: throw new FormatException("Cannot find item separator start.");
-                                }
-                            } break;
-
-                        case JsonState.DeadEnd:
-                            throw new FormatException("Unexpected data");
-
+                var jsonText = new Queue<char>(TextEncoding.GetString(jsonBytes));
+                while (true) { //remove whitespace and determine content kind
+                    var ch = jsonText.Peek();
+                    if (ch == ' ') {
+                        jsonText.Dequeue();
+                    } else if (ch == '[') {
+                        ParseJsonArray(jsonText, data);
+                        break;
+                    } else {
+                        throw new FormatException("Cannot determine data kind.");
                     }
                 }
                 return new TinyPairPacket(product, operation, data);
             }
         }
 
-        private static string Descape(StringBuilder jsonText) {
-            var ch = jsonText[0];
-            jsonText.Remove(0, 1);
+        private static JsonState ParseJsonArray(Queue<char> jsonText, Dictionary<string, string> data) {
+            var nameValuePairs = new Dictionary<string, string>();
+            var state = JsonState.Default;
+            var sbName = new StringBuilder();
+            var sbValue = new StringBuilder();
+            while (jsonText.Count > 0) {
+                var ch = jsonText.Dequeue();
+                switch (state) {
+                    case JsonState.Default: {
+                            switch (ch) {
+                                case ' ': break;
+                                case '[': state = JsonState.LookingForObjectStart; break;
+                                default: throw new FormatException("Cannot find array start.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForObjectStart: {
+                            switch (ch) {
+                                case ' ': break;
+                                case '{': state = JsonState.LookingForNameStart; break;
+                                case ']': state = JsonState.DeadEnd; break;
+                                default: throw new FormatException("Cannot find item start.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForNameStart: {
+                            switch (ch) {
+                                case ' ': break;
+                                case '\"': state = JsonState.LookingForNameEnd; break;
+                                default: throw new FormatException("Cannot find key name start.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForNameEnd: {
+                            switch (ch) {
+                                case '\\': sbName.Append(Descape(jsonText)); break;
+                                case '\"': state = JsonState.LookingForPairSeparator; break;
+                                default: sbName.Append(ch); break;
+                            }
+                        } break;
+
+                    case JsonState.LookingForPairSeparator: {
+                            switch (ch) {
+                                case ' ': break;
+                                case ':': state = JsonState.LookingForValueStart; break;
+                                default: throw new FormatException("Cannot find name/value separator.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForValueStart: {
+                            switch (ch) {
+                                case ' ': break;
+                                case '\"': state = JsonState.LookingForValueEnd; break;
+                                default: throw new FormatException("Cannot find key value start.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForValueEnd: {
+                            switch (ch) {
+                                case '\\': sbValue.Append(Descape(jsonText)); break;
+                                case '\"':
+                                    nameValuePairs.Add(sbName.ToString(), sbValue.ToString());
+                                    sbName.Length = 0;
+                                    sbValue.Length = 0;
+                                    state = JsonState.LookingForObjectEnd;
+                                    break;
+                                default: sbValue.Append(ch); break;
+                            }
+                        } break;
+
+                    case JsonState.LookingForObjectEnd: {
+                            switch (ch) {
+                                case ' ': break;
+                                case ',': state = JsonState.LookingForNameStart; break;
+                                case '}':
+                                    if (nameValuePairs.ContainsKey("Key") && nameValuePairs.ContainsKey("Value")) {
+                                        data.Add(nameValuePairs["Key"], nameValuePairs["Value"]);
+                                    } else {
+                                        throw new FormatException("Cannot find key and value.");
+                                    }
+                                    nameValuePairs.Clear();
+                                    state = JsonState.LookingForObjectSeparator;
+                                    break;
+                                default: throw new FormatException("Cannot find item start.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForObjectSeparator: {
+                            switch (ch) {
+                                case ' ': break;
+                                case ',': state = JsonState.LookingForObjectStart; break;
+                                case ']': state = JsonState.Default; break;
+                                default: throw new FormatException("Cannot find item separator start.");
+                            }
+                        } break;
+
+                    case JsonState.DeadEnd:
+                        throw new FormatException("Unexpected data");
+
+                }
+            }
+            return state;
+        }
+
+        private static string Descape(Queue<char> jsonText) {
+            var ch = jsonText.Dequeue();
             switch (ch) {
                 case '\"': return "\"";
                 case '\\': return "\\";
@@ -565,8 +579,8 @@ namespace Medo.Net {
                 case 'r': return System.Convert.ToChar(0x0D).ToString();
                 case 't': return System.Convert.ToChar(0x09).ToString();
                 case 'u':
-                    var codepoint = UInt32.Parse(jsonText.ToString(0, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-                    jsonText.Remove(0, 4);
+                    var hex = new string(new char[] { jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue() });
+                    var codepoint = UInt32.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                     return System.Convert.ToChar(codepoint).ToString();
                 default: throw new FormatException("Cannot decode escape sequence.");
             }
