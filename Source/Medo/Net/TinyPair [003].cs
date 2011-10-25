@@ -3,7 +3,7 @@
 //2011-08-26: Initial version (based on TinyMessage).
 //2011-10-22: Adjusted to work on Mono.
 //            Added IsListening property.
-//2011-10-24: Refactoring.
+//2011-10-24: Added UseObjectEncoding.
 
 
 using System;
@@ -325,6 +325,14 @@ namespace Medo.Net {
         /// </summary>
         public Dictionary<string, string> Data { get; private set; }
 
+
+        /// <summary>
+        /// Gets/sets whether data will be encoded as dictionary-style JSON (false) or in object notation (true).
+        /// False (default) should only be used for compatibility with older versions of this encoder.
+        /// </summary>
+        public bool UseObjectEncoding { get; set; }
+
+
         /// <summary>
         /// Converts message to it's representation in bytes.
         /// </summary>
@@ -344,20 +352,37 @@ namespace Medo.Net {
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
                 if (this.Data != null) {
-                    var addComma = false;
-                    stream.Write(new byte[] { 0x5B }, 0, 1); //[
-                    foreach (var item in this.Data) {
-                        byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
-                        byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
-                        if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
-                        stream.Write(new byte[] { 0x7B, 0x22, 0x4B, 0x65, 0x79, 0x22, 0x3A, 0x22 }, 0, 8); //"{Key":"
-                        stream.Write(keyBytes, 0, keyBytes.Length);
-                        stream.Write(new byte[] { 0x22, 0x2C, 0x22, 0x56, 0x61, 0x6C, 0x75, 0x65, 0x22, 0x3A, 0x22 }, 0, 11); //","Value":"
-                        stream.Write(valueBytes, 0, valueBytes.Length);
-                        stream.Write(new byte[] { 0x22, 0x7D }, 0, 2); //"}
-                        addComma = true;
+                    if (this.UseObjectEncoding) {
+                        var addComma = false;
+                        stream.Write(new byte[] { 0x7B }, 0, 1); //{
+                        foreach (var item in this.Data) {
+                            byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
+                            byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
+                            if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
+                            stream.Write(new byte[] { 0x22 }, 0, 1); //"
+                            stream.Write(keyBytes, 0, keyBytes.Length);
+                            stream.Write(new byte[] { 0x22, 0x3A, 0x22 }, 0, 3); //":"
+                            stream.Write(valueBytes, 0, valueBytes.Length);
+                            stream.Write(new byte[] { 0x22 }, 0, 1); //"
+                            addComma = true;
+                        }
+                        stream.Write(new byte[] { 0x7D }, 0, 1); //}
+                    } else {
+                        var addComma = false;
+                        stream.Write(new byte[] { 0x5B }, 0, 1); //[
+                        foreach (var item in this.Data) {
+                            byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
+                            byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
+                            if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
+                            stream.Write(new byte[] { 0x7B, 0x22, 0x4B, 0x65, 0x79, 0x22, 0x3A, 0x22 }, 0, 8); //"{Key":"
+                            stream.Write(keyBytes, 0, keyBytes.Length);
+                            stream.Write(new byte[] { 0x22, 0x2C, 0x22, 0x56, 0x61, 0x6C, 0x75, 0x65, 0x22, 0x3A, 0x22 }, 0, 11); //","Value":"
+                            stream.Write(valueBytes, 0, valueBytes.Length);
+                            stream.Write(new byte[] { 0x22, 0x7D }, 0, 2); //"}
+                            addComma = true;
+                        }
+                        stream.Write(new byte[] { 0x5D }, 0, 1); //]
                     }
-                    stream.Write(new byte[] { 0x5D }, 0, 1); //]
                 }
 
                 if (stream.Position > 65507) { throw new InvalidOperationException("Packet length exceeds 65507 bytes."); }
@@ -455,7 +480,22 @@ namespace Medo.Net {
                     } else if (ch == '[') {
                         ParseJsonArray(jsonText, data);
                         break;
+                    } else if (ch == '{') {
+                        ParseJsonObject(jsonText, data);
+                        break;
                     } else {
+                        if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'n')) {
+                            if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'u')) {
+                                if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l')) {
+                                    if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l')) {
+                                        while ((jsonText.Count > 0) && (jsonText.Peek() == ' ')) {
+                                            jsonText.Dequeue();
+                                        }
+                                        if (jsonText.Count == 0) { break; }
+                                    }
+                                }
+                            }
+                        }
                         throw new FormatException("Cannot determine data kind.");
                     }
                 }
@@ -463,6 +503,7 @@ namespace Medo.Net {
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Cyclomatic complexity is actually lower than code analysis shows.")]
         private static JsonState ParseJsonArray(Queue<char> jsonText, Dictionary<string, string> data) {
             var nameValuePairs = new Dictionary<string, string>();
             var state = JsonState.Default;
@@ -559,8 +600,96 @@ namespace Medo.Net {
                             }
                         } break;
 
-                    case JsonState.DeadEnd:
-                        throw new FormatException("Unexpected data");
+                    case JsonState.DeadEnd: {
+                            switch (ch) {
+                                case ' ': break;
+                                default: throw new FormatException("Unexpected data.");
+                            }
+                        } break;
+
+                }
+            }
+            return state;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Cyclomatic complexity is actually lower than code analysis shows.")]
+        private static JsonState ParseJsonObject(Queue<char> jsonText, Dictionary<string, string> data) {
+            var state = JsonState.Default;
+            var sbName = new StringBuilder();
+            var sbValue = new StringBuilder();
+            while (jsonText.Count > 0) {
+                var ch = jsonText.Dequeue();
+                switch (state) {
+                    case JsonState.Default: {
+                            switch (ch) {
+                                case '{': state = JsonState.LookingForNameStart; break;
+                                default: throw new FormatException("Cannot find item start.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForNameStart: {
+                            switch (ch) {
+                                case ' ': break;
+                                case '}': state = JsonState.DeadEnd; break; //empty object
+                                case '\"': state = JsonState.LookingForNameEnd; break;
+                                default: throw new FormatException("Cannot find key name start.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForNameEnd: {
+                            switch (ch) {
+                                case '\\': sbName.Append(Descape(jsonText)); break;
+                                case '\"': state = JsonState.LookingForPairSeparator; break;
+                                default: sbName.Append(ch); break;
+                            }
+                        } break;
+
+                    case JsonState.LookingForPairSeparator: {
+                            switch (ch) {
+                                case ' ': break;
+                                case ':': state = JsonState.LookingForValueStart; break;
+                                default: throw new FormatException("Cannot find name/value separator.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForValueStart: {
+                            switch (ch) {
+                                case ' ': break;
+                                case '\"': state = JsonState.LookingForValueEnd; break;
+                                default: throw new FormatException("Cannot find key value start.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForValueEnd: {
+                            switch (ch) {
+                                case '\\': sbValue.Append(Descape(jsonText)); break;
+                                case '\"':
+                                    data.Add(sbName.ToString(), sbValue.ToString());
+                                    sbName.Length = 0;
+                                    sbValue.Length = 0;
+                                    state = JsonState.LookingForObjectEnd;
+                                    break;
+                                default: sbValue.Append(ch); break;
+                            }
+                        } break;
+
+                    case JsonState.LookingForObjectEnd: {
+                            switch (ch) {
+                                case ' ': break;
+                                case ',': state = JsonState.LookingForNameStart; break;
+                                case '}': state = JsonState.DeadEnd; break;
+                                default: throw new FormatException("Cannot find item start.");
+                            }
+                        } break;
+
+                    case JsonState.DeadEnd: {
+                            switch (ch) {
+                                case ' ': break;
+                                default: throw new FormatException("Unexpected data.");
+                            }
+                        } break;
+
+                    default: throw new FormatException("Unexpected state.");
 
                 }
             }

@@ -19,7 +19,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Encode_Default() {
+        public void Test_TinyPairPacket_Encode_Default_AsArray() {
             string product = "Example";
             string operation = "Test";
             var data = new Dictionary<string, string>();
@@ -34,14 +34,30 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Decode_Default() {
+        public void Test_TinyPairPacket_Encode_Default_AsObject() {
             string product = "Example";
             string operation = "Test";
             var data = new Dictionary<string, string>();
             data.Add("Key1Text", "Value1Text");
             data.Add("Key2Text", "Value2Text");
 
-            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test [{""Key"":""Key1Text"",""Value"":""Value1Text""},{""Key"":""Key2Text"",""Value"":""Value2Text""}]"));
+            var target = new TinyPairPacket(product, operation, data);
+            target.UseObjectEncoding = true;
+
+            string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
+            string expected = @"Tiny Example Test {""Key1Text"":""Value1Text"",""Key2Text"":""Value2Text""}";
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void Test_TinyPairPacket_Decode_Default_AsArray() {
+            string product = "Example";
+            string operation = "Test";
+            var data = new Dictionary<string, string>();
+            data.Add("Key1Text", "Value1Text");
+            data.Add("Key2Text", "Value2Text");
+
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test [{""Key"":""Key1Text"",""Value"":""Value1Text""},{""Key"":""Key2Text"",""Value"":""Value2Text""}]  "));
 
             Assert.AreEqual(product, actual.Product);
             Assert.AreEqual(operation, actual.Operation);
@@ -56,7 +72,29 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Encode_DataEmpty() {
+        public void Test_TinyPairPacket_Decode_Default_AsObject() {
+            string product = "Example";
+            string operation = "Test";
+            var data = new Dictionary<string, string>();
+            data.Add("Key1Text", "Value1Text");
+            data.Add("Key2Text", "Value2Text");
+
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""Key1Text"":""Value1Text"",""Key2Text"":""Value2Text""}  "));
+
+            Assert.AreEqual(product, actual.Product);
+            Assert.AreEqual(operation, actual.Operation);
+            Assert.AreEqual(data.Count, actual.Data.Count);
+            foreach (var key in data.Keys) {
+                if (actual.Data.ContainsKey(key)) {
+                    Assert.AreEqual(data[key], actual.Data[key]);
+                } else {
+                    Assert.Fail("Content mismatch.");
+                }
+            }
+        }
+
+        [TestMethod()]
+        public void Test_TinyPairPacket_Encode_DataEmpty_AsArray() {
             string product = "Example";
             string operation = "Test";
             var data = new Dictionary<string, string>();
@@ -69,11 +107,49 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Decode_DataEmpty() {
+        public void Test_TinyPairPacket_Encode_DataEmpty_AsObject() {
+            string product = "Example";
+            string operation = "Test";
+            var data = new Dictionary<string, string>();
+
+            var target = new TinyPairPacket(product, operation, data);
+            target.UseObjectEncoding = true;
+
+            string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
+            string expected = @"Tiny Example Test {}";
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void Test_TinyPairPacket_Decode_DataEmpty_AsArray() {
             string product = "Example";
             string operation = "Test";
 
-            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test []"));
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test  [] "));
+
+            Assert.AreEqual(product, actual.Product);
+            Assert.AreEqual(operation, actual.Operation);
+            Assert.AreEqual(0, actual.Data.Count);
+        }
+
+        [TestMethod()]
+        public void Test_TinyPairPacket_Decode_DataEmpty_AsObject() {
+            string product = "Example";
+            string operation = "Test";
+
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test  {} "));
+
+            Assert.AreEqual(product, actual.Product);
+            Assert.AreEqual(operation, actual.Operation);
+            Assert.AreEqual(0, actual.Data.Count);
+        }
+
+        [TestMethod()]
+        public void Test_TinyPairPacket_Decode_DataNull() {
+            string product = "Example";
+            string operation = "Test";
+
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test  null "));
 
             Assert.AreEqual(product, actual.Product);
             Assert.AreEqual(operation, actual.Operation);
@@ -96,6 +172,7 @@ namespace Test {
             swEncode.Start();
             for (int i = 0; i < n; i++) {
                 target = new TinyPairPacket(product, operation, data);
+                target.UseObjectEncoding = true;
                 bytes = target.GetBytes();
             }
             swEncode.Stop();
