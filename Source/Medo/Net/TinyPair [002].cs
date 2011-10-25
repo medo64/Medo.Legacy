@@ -1,6 +1,8 @@
 //Copyright (c) 2011 Josip Medved <jmedved@jmedved.com>
 
 //2011-08-26: Initial version (based on TinyMessage).
+//2011-10-22: Adjusted to work on Mono.
+//            Added IsListening property.
 
 
 using System;
@@ -81,6 +83,12 @@ namespace Medo.Net {
             }
         }
 
+        /// <summary>
+        /// Gets whether TinyPair is in listening state.
+        /// </summary>
+        public bool IsListening {
+            get { return (this.ListenThread != null) && (this.ListenThread.IsAlive); }
+        }
 
         /// <summary>
         /// Raises event when packet arrives.
@@ -181,7 +189,7 @@ namespace Medo.Net {
                 if (remoteEndPoint.Address == IPAddress.Broadcast) {
                     socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 }
-                socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false);
+                if (IsRunningOnMono == false) { socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false); }
                 socket.SendTo(packet.GetBytes(), remoteEndPoint);
                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} -> {1}]", packet, remoteEndPoint));
             }
@@ -228,7 +236,7 @@ namespace Medo.Net {
                 if (remoteEndPoint.Address == IPAddress.Broadcast) {
                     socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 }
-                socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false);
+                if (IsRunningOnMono == false) { socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false); }
                 var bytesOut = packet.GetBytes();
                 socket.SendTo(bytesOut, bytesOut.Length, SocketFlags.None, remoteEndPoint);
                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPair [{0} -> {1}]", packet, remoteEndPoint));
@@ -268,6 +276,8 @@ namespace Medo.Net {
         }
 
         #endregion
+
+        private static bool IsRunningOnMono { get { return (Type.GetType("Mono.Runtime") != null); } }
 
     }
 
@@ -670,5 +680,4 @@ namespace Medo.Net {
         }
 
     }
-
 }
