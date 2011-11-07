@@ -4,6 +4,7 @@
 //2011-10-22: Adjusted to work on Mono.
 //            Added IsListening property.
 //2011-10-24: Added UseObjectEncoding.
+//2011-11-07: Fixing encoding/decoding.
 
 
 using System;
@@ -351,9 +352,9 @@ namespace Medo.Net {
                 stream.Write(operationBytes, 0, operationBytes.Length);
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
-                if (this.Data != null) {
-                    if (this.UseObjectEncoding) {
-                        var addComma = false;
+                if (this.UseObjectEncoding) {
+                    var addComma = false;
+                    if (this.Data != null) {
                         stream.Write(new byte[] { 0x7B }, 0, 1); //{
                         foreach (var item in this.Data) {
                             byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
@@ -368,8 +369,12 @@ namespace Medo.Net {
                         }
                         stream.Write(new byte[] { 0x7D }, 0, 1); //}
                     } else {
-                        var addComma = false;
-                        stream.Write(new byte[] { 0x5B }, 0, 1); //[
+                        stream.Write(new byte[] { 0x6E, 0x75, 0x6C, 0x6C }, 0, 4); //null
+                    }
+                } else {
+                    var addComma = false;
+                    stream.Write(new byte[] { 0x5B }, 0, 1); //[
+                    if (this.Data != null) {
                         foreach (var item in this.Data) {
                             byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
                             byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
@@ -381,8 +386,8 @@ namespace Medo.Net {
                             stream.Write(new byte[] { 0x22, 0x7D }, 0, 2); //"}
                             addComma = true;
                         }
-                        stream.Write(new byte[] { 0x5D }, 0, 1); //]
                     }
+                    stream.Write(new byte[] { 0x5D }, 0, 1); //]
                 }
 
                 if (stream.Position > 65507) { throw new InvalidOperationException("Packet length exceeds 65507 bytes."); }
@@ -436,11 +441,13 @@ namespace Medo.Net {
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
 
             using (var stream = new MemoryStream(buffer, offset, count)) {
-                string protocol = ReadToSpace(stream);
-                if (string.CompareOrdinal(protocol, "Tiny") != 0) { return null; }
+                string protocol = ReadToSpaceOrEnd(stream);
+                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new InvalidDataException("Cannot parse packet."); }
 
-                string product = ReadToSpace(stream);
-                string operation = ReadToSpace(stream);
+                string product = ReadToSpaceOrEnd(stream);
+                if (string.IsNullOrEmpty(product)) { throw new InvalidDataException("Cannot parse packet."); }
+                string operation = ReadToSpaceOrEnd(stream);
+                if (string.IsNullOrEmpty(operation)) { throw new InvalidDataException("Cannot parse packet."); }
 
                 return new TinyPairPacket(product, operation, null);
             }
@@ -462,41 +469,45 @@ namespace Medo.Net {
             if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
 
             using (var stream = new MemoryStream(buffer, offset, count)) {
-                string protocol = ReadToSpace(stream);
-                if (string.CompareOrdinal(protocol, "Tiny") != 0) { throw new InvalidDataException("Cannot parse packet."); }
+                string protocol = ReadToSpaceOrEnd(stream);
+                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new InvalidDataException("Cannot parse packet."); }
 
-                string product = ReadToSpace(stream);
-                string operation = ReadToSpace(stream);
+                string product = ReadToSpaceOrEnd(stream);
+                if (string.IsNullOrEmpty(product)) { throw new InvalidDataException("Cannot parse packet."); }
+                string operation = ReadToSpaceOrEnd(stream);
+                if (string.IsNullOrEmpty(operation)) { throw new InvalidDataException("Cannot parse packet."); }
 
                 var data = new Dictionary<string, string>();
 
                 var jsonBytes = new byte[stream.Length - stream.Position];
-                stream.Read(jsonBytes, 0, jsonBytes.Length);
-                var jsonText = new Queue<char>(TextEncoding.GetString(jsonBytes));
-                while (true) { //remove whitespace and determine content kind
-                    var ch = jsonText.Peek();
-                    if (ch == ' ') {
-                        jsonText.Dequeue();
-                    } else if (ch == '[') {
-                        ParseJsonArray(jsonText, data);
-                        break;
-                    } else if (ch == '{') {
-                        ParseJsonObject(jsonText, data);
-                        break;
-                    } else {
-                        if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'n')) {
-                            if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'u')) {
-                                if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l')) {
+                if (jsonBytes.Length > 0) {
+                    stream.Read(jsonBytes, 0, jsonBytes.Length);
+                    var jsonText = new Queue<char>(TextEncoding.GetString(jsonBytes));
+                    while (true) { //remove whitespace and determine content kind
+                        var ch = jsonText.Peek();
+                        if (ch == ' ') {
+                            jsonText.Dequeue();
+                        } else if (ch == '[') {
+                            ParseJsonArray(jsonText, data);
+                            break;
+                        } else if (ch == '{') {
+                            ParseJsonObject(jsonText, data);
+                            break;
+                        } else {
+                            if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'n')) {
+                                if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'u')) {
                                     if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l')) {
-                                        while ((jsonText.Count > 0) && (jsonText.Peek() == ' ')) {
-                                            jsonText.Dequeue();
+                                        if ((jsonText.Count > 0) && (jsonText.Dequeue() == 'l')) {
+                                            while ((jsonText.Count > 0) && (jsonText.Peek() == ' ')) {
+                                                jsonText.Dequeue();
+                                            }
+                                            if (jsonText.Count == 0) { break; }
                                         }
-                                        if (jsonText.Count == 0) { break; }
                                     }
                                 }
                             }
+                            throw new FormatException("Cannot determine data kind.");
                         }
-                        throw new FormatException("Cannot determine data kind.");
                     }
                 }
                 return new TinyPairPacket(product, operation, data);
@@ -715,19 +726,18 @@ namespace Medo.Net {
             }
         }
 
-        private static string ReadToSpace(MemoryStream stream) {
+        private static string ReadToSpaceOrEnd(MemoryStream stream) {
             var bytes = new List<byte>(); ;
-            while (true) {
-                if (stream.Position == stream.Length) { throw new InvalidDataException("Cannot parse packet."); }
+            while (stream.Position < stream.Length) {
                 var oneByte = (byte)stream.ReadByte();
                 if (oneByte == 0x20) {
-                    return TextEncoding.GetString(bytes.ToArray());
+                    break;
                 } else {
                     bytes.Add(oneByte);
                 }
             }
+            return TextEncoding.GetString(bytes.ToArray());
         }
-
 
         /// <summary>
         /// Determines whether the specified object is equal to the current object.

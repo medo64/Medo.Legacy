@@ -121,6 +121,31 @@ namespace Test {
         }
 
         [TestMethod()]
+        public void Test_TinyPairPacket_Encode_DataNull_AsArray() { //encodes it empty because of compatibility
+            string product = "Example";
+            string operation = "Test";
+
+            var target = new TinyPairPacket(product, operation, null);
+
+            string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
+            string expected = @"Tiny Example Test []";
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void Test_TinyPairPacket_Encode_DataNull_AsObject() {
+            string product = "Example";
+            string operation = "Test";
+
+            var target = new TinyPairPacket(product, operation, null);
+            target.UseObjectEncoding = true;
+
+            string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
+            string expected = @"Tiny Example Test null";
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
         public void Test_TinyPairPacket_Decode_DataEmpty_AsArray() {
             string product = "Example";
             string operation = "Test";
@@ -157,6 +182,48 @@ namespace Test {
         }
 
         [TestMethod()]
+        public void Test_TinyPairPacket_Decode_DataMissing1() { //it is an error state, but we shall recognize it.
+            string product = "Example";
+            string operation = "Test";
+
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test "));
+
+            Assert.AreEqual(product, actual.Product);
+            Assert.AreEqual(operation, actual.Operation);
+            Assert.AreEqual(0, actual.Data.Count);
+        }
+
+        [TestMethod()]
+        public void Test_TinyPairPacket_Decode_DataMissing2() { //it is an error state, but we shall recognize it.
+            string product = "Example";
+            string operation = "Test";
+
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test"));
+
+            Assert.AreEqual(product, actual.Product);
+            Assert.AreEqual(operation, actual.Operation);
+            Assert.AreEqual(0, actual.Data.Count);
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(System.IO.InvalidDataException))]
+        public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket1() {
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example "));
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(System.IO.InvalidDataException))]
+        public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket2() {
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny "));
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(System.IO.InvalidDataException))]
+        public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket3() {
+            TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@""));
+        }
+
+        [TestMethod()]
         public void Test_TinyPairPacket_EncodeDecode_SpeedTest() {
             string product = "Example";
             string operation = "Test";
@@ -186,7 +253,6 @@ namespace Test {
 
             //Assert.Inconclusive(string.Format("TinyPair (encode/decode): {0} + {1} = {2} ms", swEncode.ElapsedMilliseconds, swDecode.ElapsedMilliseconds, swEncode.ElapsedMilliseconds + swDecode.ElapsedMilliseconds));
         }
-
 
     }
 }
