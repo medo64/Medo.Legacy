@@ -206,19 +206,19 @@ namespace Test {
         }
 
         [TestMethod()]
-        [ExpectedException(typeof(System.IO.InvalidDataException))]
+        [ExpectedException(typeof(System.FormatException))]
         public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket1() {
             TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example "));
         }
 
         [TestMethod()]
-        [ExpectedException(typeof(System.IO.InvalidDataException))]
+        [ExpectedException(typeof(System.FormatException))]
         public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket2() {
             TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny "));
         }
 
         [TestMethod()]
-        [ExpectedException(typeof(System.IO.InvalidDataException))]
+        [ExpectedException(typeof(System.FormatException))]
         public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket3() {
             TinyPairPacket actual = TinyPairPacket.Parse(UTF8Encoding.UTF8.GetBytes(@""));
         }

@@ -5,6 +5,7 @@
 //            Added IsListening property.
 //2011-10-24: Added UseObjectEncoding.
 //2011-11-07: Fixing encoding/decoding.
+//            Changed all parsing errors to throw FormatException.
 
 
 using System;
@@ -434,6 +435,7 @@ namespace Medo.Net {
         /// <param name="count">Total lenght.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
+        /// <exception cref="System.FormatException">Cannot parse packet.</exception>
         public static TinyPairPacket ParseHeaderOnly(byte[] buffer, int offset, int count) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
@@ -442,12 +444,12 @@ namespace Medo.Net {
 
             using (var stream = new MemoryStream(buffer, offset, count)) {
                 string protocol = ReadToSpaceOrEnd(stream);
-                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new InvalidDataException("Cannot parse packet."); }
+                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new System.FormatException("Cannot parse packet."); }
 
                 string product = ReadToSpaceOrEnd(stream);
-                if (string.IsNullOrEmpty(product)) { throw new InvalidDataException("Cannot parse packet."); }
+                if (string.IsNullOrEmpty(product)) { throw new System.FormatException("Cannot parse packet."); }
                 string operation = ReadToSpaceOrEnd(stream);
-                if (string.IsNullOrEmpty(operation)) { throw new InvalidDataException("Cannot parse packet."); }
+                if (string.IsNullOrEmpty(operation)) { throw new System.FormatException("Cannot parse packet."); }
 
                 return new TinyPairPacket(product, operation, null);
             }
@@ -461,7 +463,7 @@ namespace Medo.Net {
         /// <param name="count">Total lenght.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
-        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        /// <exception cref="System.FormatException">Cannot parse packet.</exception>
         public static TinyPairPacket Parse(byte[] buffer, int offset, int count) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
@@ -470,12 +472,12 @@ namespace Medo.Net {
 
             using (var stream = new MemoryStream(buffer, offset, count)) {
                 string protocol = ReadToSpaceOrEnd(stream);
-                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new InvalidDataException("Cannot parse packet."); }
+                if (string.Equals(protocol, "Tiny", StringComparison.Ordinal) == false) { throw new System.FormatException("Cannot parse packet."); }
 
                 string product = ReadToSpaceOrEnd(stream);
-                if (string.IsNullOrEmpty(product)) { throw new InvalidDataException("Cannot parse packet."); }
+                if (string.IsNullOrEmpty(product)) { throw new System.FormatException("Cannot parse packet."); }
                 string operation = ReadToSpaceOrEnd(stream);
-                if (string.IsNullOrEmpty(operation)) { throw new InvalidDataException("Cannot parse packet."); }
+                if (string.IsNullOrEmpty(operation)) { throw new System.FormatException("Cannot parse packet."); }
 
                 var data = new Dictionary<string, string>();
 
@@ -506,7 +508,7 @@ namespace Medo.Net {
                                     }
                                 }
                             }
-                            throw new FormatException("Cannot determine data kind.");
+                            throw new System.FormatException("Cannot determine data kind.");
                         }
                     }
                 }
@@ -527,7 +529,7 @@ namespace Medo.Net {
                             switch (ch) {
                                 case ' ': break;
                                 case '[': state = JsonState.LookingForObjectStart; break;
-                                default: throw new FormatException("Cannot find array start.");
+                                default: throw new System.FormatException("Cannot find array start.");
                             }
                         } break;
 
@@ -536,7 +538,7 @@ namespace Medo.Net {
                                 case ' ': break;
                                 case '{': state = JsonState.LookingForNameStart; break;
                                 case ']': state = JsonState.DeadEnd; break;
-                                default: throw new FormatException("Cannot find item start.");
+                                default: throw new System.FormatException("Cannot find item start.");
                             }
                         } break;
 
@@ -544,7 +546,7 @@ namespace Medo.Net {
                             switch (ch) {
                                 case ' ': break;
                                 case '\"': state = JsonState.LookingForNameEnd; break;
-                                default: throw new FormatException("Cannot find key name start.");
+                                default: throw new System.FormatException("Cannot find key name start.");
                             }
                         } break;
 
@@ -560,7 +562,7 @@ namespace Medo.Net {
                             switch (ch) {
                                 case ' ': break;
                                 case ':': state = JsonState.LookingForValueStart; break;
-                                default: throw new FormatException("Cannot find name/value separator.");
+                                default: throw new System.FormatException("Cannot find name/value separator.");
                             }
                         } break;
 
@@ -568,7 +570,7 @@ namespace Medo.Net {
                             switch (ch) {
                                 case ' ': break;
                                 case '\"': state = JsonState.LookingForValueEnd; break;
-                                default: throw new FormatException("Cannot find key value start.");
+                                default: throw new System.FormatException("Cannot find key value start.");
                             }
                         } break;
 
@@ -593,12 +595,12 @@ namespace Medo.Net {
                                     if (nameValuePairs.ContainsKey("Key") && nameValuePairs.ContainsKey("Value")) {
                                         data.Add(nameValuePairs["Key"], nameValuePairs["Value"]);
                                     } else {
-                                        throw new FormatException("Cannot find key and value.");
+                                        throw new System.FormatException("Cannot find key and value.");
                                     }
                                     nameValuePairs.Clear();
                                     state = JsonState.LookingForObjectSeparator;
                                     break;
-                                default: throw new FormatException("Cannot find item start.");
+                                default: throw new System.FormatException("Cannot find item start.");
                             }
                         } break;
 
@@ -607,14 +609,14 @@ namespace Medo.Net {
                                 case ' ': break;
                                 case ',': state = JsonState.LookingForObjectStart; break;
                                 case ']': state = JsonState.Default; break;
-                                default: throw new FormatException("Cannot find item separator start.");
+                                default: throw new System.FormatException("Cannot find item separator start.");
                             }
                         } break;
 
                     case JsonState.DeadEnd: {
                             switch (ch) {
                                 case ' ': break;
-                                default: throw new FormatException("Unexpected data.");
+                                default: throw new System.FormatException("Unexpected data.");
                             }
                         } break;
 
@@ -634,7 +636,7 @@ namespace Medo.Net {
                     case JsonState.Default: {
                             switch (ch) {
                                 case '{': state = JsonState.LookingForNameStart; break;
-                                default: throw new FormatException("Cannot find item start.");
+                                default: throw new System.FormatException("Cannot find item start.");
                             }
                         } break;
 
@@ -643,7 +645,7 @@ namespace Medo.Net {
                                 case ' ': break;
                                 case '}': state = JsonState.DeadEnd; break; //empty object
                                 case '\"': state = JsonState.LookingForNameEnd; break;
-                                default: throw new FormatException("Cannot find key name start.");
+                                default: throw new System.FormatException("Cannot find key name start.");
                             }
                         } break;
 
@@ -659,7 +661,7 @@ namespace Medo.Net {
                             switch (ch) {
                                 case ' ': break;
                                 case ':': state = JsonState.LookingForValueStart; break;
-                                default: throw new FormatException("Cannot find name/value separator.");
+                                default: throw new System.FormatException("Cannot find name/value separator.");
                             }
                         } break;
 
@@ -667,7 +669,7 @@ namespace Medo.Net {
                             switch (ch) {
                                 case ' ': break;
                                 case '\"': state = JsonState.LookingForValueEnd; break;
-                                default: throw new FormatException("Cannot find key value start.");
+                                default: throw new System.FormatException("Cannot find key value start.");
                             }
                         } break;
 
@@ -689,18 +691,18 @@ namespace Medo.Net {
                                 case ' ': break;
                                 case ',': state = JsonState.LookingForNameStart; break;
                                 case '}': state = JsonState.DeadEnd; break;
-                                default: throw new FormatException("Cannot find item start.");
+                                default: throw new System.FormatException("Cannot find item start.");
                             }
                         } break;
 
                     case JsonState.DeadEnd: {
                             switch (ch) {
                                 case ' ': break;
-                                default: throw new FormatException("Unexpected data.");
+                                default: throw new System.FormatException("Unexpected data.");
                             }
                         } break;
 
-                    default: throw new FormatException("Unexpected state.");
+                    default: throw new System.FormatException("Unexpected state.");
 
                 }
             }
@@ -722,7 +724,7 @@ namespace Medo.Net {
                     var hex = new string(new char[] { jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue() });
                     var codepoint = UInt32.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                     return System.Convert.ToChar(codepoint).ToString();
-                default: throw new FormatException("Cannot decode escape sequence.");
+                default: throw new System.FormatException("Cannot decode escape sequence.");
             }
         }
 
@@ -817,7 +819,7 @@ namespace Medo.Net {
         /// <summary>
         /// Returns parsed packet.
         /// </summary>
-        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        /// <exception cref="System.FormatException">Cannot parse packet.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might throw exception.")]
         public TinyPairPacket GetPacket() {
             return TinyPairPacket.Parse(this.Buffer, this.Offset, this.Count);
@@ -826,7 +828,7 @@ namespace Medo.Net {
         /// <summary>
         /// Returns parsed packet.
         /// </summary>
-        /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
+        /// <exception cref="System.FormatException">Cannot parse packet.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is appropriate here.")]
         public TinyPairPacket GetPacketWithoutData() {
             return TinyPairPacket.ParseHeaderOnly(this.Buffer, this.Offset, this.Count);
