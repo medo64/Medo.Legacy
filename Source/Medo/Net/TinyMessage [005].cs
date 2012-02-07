@@ -344,19 +344,21 @@ namespace Medo.Net {
         public string Operation { get; private set; }
 
         private readonly bool IsReadOnly;
+        private readonly IDictionary<string, string> Items;
 
         /// <summary>
-        /// Gets data items.
-        /// </summary>
-        public IDictionary<string, string> Items { get; private set; }
-
-        /// <summary>
-        /// Gets/sets data.
+        /// Gets/sets data item.
         /// </summary>
         /// <param name="key">Key.</param>
         /// <exception cref="System.NotSupportedException">Data is read-only.</exception>
         public string this[string key] {
-            get { return this.Items[key]; }
+            get {
+                if (this.Items.ContainsKey(key)) {
+                    return this.Items[key];
+                } else {
+                    return null;
+                }
+            }
             set {
                 if (this.IsReadOnly) { throw new NotSupportedException("Data is read-only."); }
                 if (this.Items.ContainsKey(key)) {
@@ -593,7 +595,13 @@ namespace Medo.Net {
                             switch (ch) {
                                 case '\\': sbValue.Append(Descape(jsonText)); break;
                                 case '\"':
-                                    data.Add(sbName.ToString(), sbValue.ToString());
+                                    var name = sbName.ToString();
+                                    var value = sbValue.ToString();
+                                    if (data.ContainsKey(name)) {
+                                        data[name] = value;
+                                    } else {
+                                        data.Add(name, value);
+                                    }
                                     sbName.Length = 0;
                                     sbValue.Length = 0;
                                     state = JsonState.LookingForObjectEnd;
@@ -619,8 +627,12 @@ namespace Medo.Net {
                     case JsonState.LookingForNullChar4: {
                             switch (ch) {
                                 case 'l':
-                                    state = JsonState.LookingForObjectEnd;
-                                    data.Add(sbName.ToString(), null);
+                                    var name = sbName.ToString();
+                                    if (data.ContainsKey(name)) {
+                                        data[name] = null;
+                                    } else {
+                                        data.Add(name, null);
+                                    }
                                     sbName.Length = 0;
                                     sbValue.Length = 0;
                                     state = JsonState.LookingForObjectEnd;

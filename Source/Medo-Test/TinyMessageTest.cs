@@ -31,14 +31,8 @@ namespace Test {
 
             Assert.AreEqual("Example", actual.Product);
             Assert.AreEqual("Test", actual.Operation);
-            Assert.AreEqual(data.Count, actual.Items.Count);
-            foreach (var key in data.Keys) {
-                if (actual.Items.ContainsKey(key)) {
-                    Assert.AreEqual(data[key], actual.Items[key]);
-                } else {
-                    Assert.Fail("Content mismatch.");
-                }
-            }
+            Assert.AreEqual("Value1Text", actual["Key1Text"]);
+            Assert.AreEqual("Value2Text", actual["Key2Text"]);
         }
 
         [TestMethod()]
@@ -55,9 +49,9 @@ namespace Test {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""Key1"":""A\n\rB"",""Key2"":""\u0000"",""Key3"":""\\""}"));
             Assert.AreEqual("Example", actual.Product);
             Assert.AreEqual("Test", actual.Operation);
-            Assert.AreEqual("A\n\rB", actual.Items["Key1"]);
-            Assert.AreEqual("\0", actual.Items["Key2"]);
-            Assert.AreEqual("\\", actual.Items["Key3"]);
+            Assert.AreEqual("A\n\rB", actual["Key1"]);
+            Assert.AreEqual("\0", actual["Key2"]);
+            Assert.AreEqual("\\", actual["Key3"]);
         }
 
 
@@ -79,7 +73,6 @@ namespace Test {
             Assert.AreEqual("1", actual["A"]);
             Assert.AreEqual(null, actual["B"]);
             Assert.AreEqual("2", actual["C"]);
-            Assert.AreEqual(3, actual.Items.Count);
         }
 
         [TestMethod()]
@@ -91,7 +84,6 @@ namespace Test {
             Assert.AreEqual("1", actual["A"]);
             Assert.AreEqual(null, actual["B"]);
             Assert.AreEqual("2", actual["C"]);
-            Assert.AreEqual(3, actual.Items.Count);
         }
 
 
@@ -107,7 +99,6 @@ namespace Test {
 
             Assert.AreEqual("Example", actual.Product);
             Assert.AreEqual("Test", actual.Operation);
-            Assert.AreEqual(0, actual.Items.Count);
         }
 
         [TestMethod()]
@@ -116,7 +107,6 @@ namespace Test {
 
             Assert.AreEqual("Example", actual.Product);
             Assert.AreEqual("Test", actual.Operation);
-            Assert.AreEqual(0, actual.Items.Count);
         }
 
         [TestMethod()]
@@ -125,7 +115,6 @@ namespace Test {
 
             Assert.AreEqual("Example", actual.Product);
             Assert.AreEqual("Test", actual.Operation);
-            Assert.AreEqual(0, actual.Items.Count);
         }
 
         [TestMethod()]
@@ -134,7 +123,26 @@ namespace Test {
 
             Assert.AreEqual("Example", actual.Product);
             Assert.AreEqual("Test", actual.Operation);
-            Assert.AreEqual(0, actual.Items.Count);
+        }
+
+        [TestMethod()]
+        public void Test_TinyPacket_Encode_Indexer() {
+            var target = new TinyPacket("Example", "Test");
+            target["A"] = "0";
+            target["A"] = "1";
+
+            Assert.AreEqual(@"Tiny Example Test {""A"":""1""}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
+        }
+
+        [TestMethod()]
+        public void Test_TinyPacket_Decode_Indexer() {
+            TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""A"":""0"",""A"":""1"",""B"":""null"",""B"":null}"));
+
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual("1", actual["A"]);
+            Assert.AreEqual(null, actual["B"]);
+            Assert.AreEqual(null, actual["C"]);
         }
 
         [TestMethod()]
@@ -170,8 +178,8 @@ namespace Test {
             swEncode.Start();
             for (int i = 0; i < n; i++) {
                 target = new TinyPacket("Example", "Test");
-                target.Items.Add("Key1Text", "Value1Text");
-                target.Items.Add("Key2Text", "Value2Text");
+                target["Key1Text"] = "Value1Text";
+                target["Key2Text"] = "Value2Text";
                 bytes = target.GetBytes();
             }
             swEncode.Stop();
