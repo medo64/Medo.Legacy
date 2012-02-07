@@ -8,6 +8,7 @@
 //            Changed all parsing errors to throw FormatException.
 //2012-02-06: Renamed to TinyMessage.
 //            Removed array encoding.
+//            TinyPacket data items are accessible through indexed property.
 
 
 using System;
@@ -291,19 +292,16 @@ namespace Medo.Net {
     /// <summary>
     /// Encoder/decoder for Tiny packets.
     /// </summary>
-    public class TinyPacket {
-
-        private static readonly UTF8Encoding TextEncoding = new UTF8Encoding(false);
+    public class TinyPacket : IDisposable {
 
         /// <summary>
         /// Creates new instance
         /// </summary>
         /// <param name="product">Name of product. Preferred format would be application name, at (@) sign, IANA assigned Private Enterprise Number. E.g. Application@12345</param>
         /// <param name="operation">Message type.</param>
-        /// <param name="data">Data to be encoded in JSON.</param>
         /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
         /// <exception cref="System.ArgumentException">Product contains space character. -or- Operation contains space character.</exception>
-        public TinyPacket(string product, string operation, Dictionary<string, string> data) {
+        public TinyPacket(string product, string operation) {
             if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
             if (product.Contains(" ")) { throw new ArgumentException("Product contains space character.", "product"); }
             if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
@@ -311,7 +309,27 @@ namespace Medo.Net {
 
             this.Product = product;
             this.Operation = operation;
-            this.Data = data;
+            this.Items = new Dictionary<string, string>();
+        }
+
+        /// <summary>
+        /// Creates new instance
+        /// </summary>
+        /// <param name="product">Name of product. Preferred format would be application name, at (@) sign, IANA assigned Private Enterprise Number. E.g. Application@12345</param>
+        /// <param name="operation">Message type.</param>
+        /// <param name="items">Data to be encoded in JSON.</param>
+        /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
+        /// <exception cref="System.ArgumentException">Product contains space character. -or- Operation contains space character.</exception>
+        internal TinyPacket(string product, string operation, IDictionary<string, string> items) {
+            if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
+            if (product.Contains(" ")) { throw new ArgumentException("Product contains space character.", "product"); }
+            if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
+            if (operation.Contains(" ")) { throw new ArgumentException("Operation contains space character.", "operation"); }
+
+            this.Product = product;
+            this.Operation = operation;
+            this.Items = items;
+            this.IsReadOnly = true;
         }
 
         /// <summary>
@@ -324,11 +342,32 @@ namespace Medo.Net {
         /// </summary>
         public string Operation { get; private set; }
 
-        /// <summary>
-        /// Gets data object.
-        /// </summary>
-        public Dictionary<string, string> Data { get; private set; }
+        private readonly bool IsReadOnly;
 
+        /// <summary>
+        /// Gets data items.
+        /// </summary>
+        public IDictionary<string, string> Items { get; private set; }
+
+        /// <summary>
+        /// Gets/sets data.
+        /// </summary>
+        /// <param name="key">Key.</param>
+        /// <exception cref="System.NotSupportedException">Data is read-only.</exception>
+        public string this[string key] {
+            get { return this.Items[key]; }
+            set {
+                if (this.IsReadOnly) { throw new NotSupportedException("Data is read-only."); }
+                if (this.Items.ContainsKey(key)) {
+                    this.Items[key] = value;
+                } else {
+                    this.Items.Add(key, value);
+                }
+            }
+        }
+
+
+        private static readonly UTF8Encoding TextEncoding = new UTF8Encoding(false);
 
         /// <summary>
         /// Converts message to it's representation in bytes.
@@ -349,9 +388,9 @@ namespace Medo.Net {
                 stream.Write(new byte[] { 0x20 }, 0, 1);
 
                 var addComma = false;
-                if (this.Data != null) {
+                if (this.Items != null) {
                     stream.Write(new byte[] { 0x7B }, 0, 1); //{
-                    foreach (var item in this.Data) {
+                    foreach (var item in this.Items) {
                         byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
                         byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
                         if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
@@ -632,6 +671,31 @@ namespace Medo.Net {
         public override string ToString() {
             return this.Product + ":" + this.Operation;
         }
+
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        public void Dispose() {
+            this.Dispose(true);
+            System.GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
+        protected virtual void Dispose(bool disposing) {
+            if (disposing) {
+                this.Product = null;
+                this.Operation = null;
+                this.Items.Clear();
+            }
+        }
+
+        #endregion
 
 
         private enum JsonState {

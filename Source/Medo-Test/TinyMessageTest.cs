@@ -1,9 +1,9 @@
-﻿using Medo.Net;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Text;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
+using Medo.Net;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Test {
 
@@ -14,57 +14,27 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Encode_Default_AsObject() {
-            string product = "Example";
-            string operation = "Test";
-            var data = new Dictionary<string, string>();
-            data.Add("Key1Text", "Value1Text");
-            data.Add("Key2Text", "Value2Text");
-
-            var target = new TinyPacket(product, operation, data);
-            string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
-            string expected = @"Tiny Example Test {""Key1Text"":""Value1Text"",""Key2Text"":""Value2Text""}";
-            Assert.AreEqual(expected, actual);
+        public void Test_TinyPacket_Encode_01() {
+            var target = new TinyPacket("Example", "Test");
+            target["Key1Text"] = "Value1Text";
+            target["Key2Text"] = "Value2Text";
+            Assert.AreEqual(@"Tiny Example Test {""Key1Text"":""Value1Text"",""Key2Text"":""Value2Text""}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Decode_Default_AsArray() {
-            string product = "Example";
-            string operation = "Test";
-            var data = new Dictionary<string, string>();
-            data.Add("Key1Text", "Value1Text");
-            data.Add("Key2Text", "Value2Text");
-
-            TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test [{""Key"":""Key1Text"",""Value"":""Value1Text""},{""Key"":""Key2Text"",""Value"":""Value2Text""}]  "));
-
-            Assert.AreEqual(product, actual.Product);
-            Assert.AreEqual(operation, actual.Operation);
-            Assert.AreEqual(data.Count, actual.Data.Count);
-            foreach (var key in data.Keys) {
-                if (actual.Data.ContainsKey(key)) {
-                    Assert.AreEqual(data[key], actual.Data[key]);
-                } else {
-                    Assert.Fail("Content mismatch.");
-                }
-            }
-        }
-
-        [TestMethod()]
-        public void Test_TinyPairPacket_Decode_Default_AsObject() {
-            string product = "Example";
-            string operation = "Test";
+        public void Test_TinyPacket_Decode_01() {
             var data = new Dictionary<string, string>();
             data.Add("Key1Text", "Value1Text");
             data.Add("Key2Text", "Value2Text");
 
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""Key1Text"":""Value1Text"",""Key2Text"":""Value2Text""}  "));
 
-            Assert.AreEqual(product, actual.Product);
-            Assert.AreEqual(operation, actual.Operation);
-            Assert.AreEqual(data.Count, actual.Data.Count);
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual(data.Count, actual.Items.Count);
             foreach (var key in data.Keys) {
-                if (actual.Data.ContainsKey(key)) {
-                    Assert.AreEqual(data[key], actual.Data[key]);
+                if (actual.Items.ContainsKey(key)) {
+                    Assert.AreEqual(data[key], actual.Items[key]);
                 } else {
                     Assert.Fail("Content mismatch.");
                 }
@@ -72,100 +42,88 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Encode_DataEmpty_AsObject() {
-            string product = "Example";
-            string operation = "Test";
-            var data = new Dictionary<string, string>();
-
-            var target = new TinyPacket(product, operation, data);
-
-            string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
-            string expected = @"Tiny Example Test {}";
-            Assert.AreEqual(expected, actual);
+        public void Test_TinyPacket_Encode_02() {
+            var target = new TinyPacket("Example", "Test");
+            target["Key1"] = "A\n\rB";
+            target["Key2"] = "\0";
+            target["Key3"] = "\\";
+            Assert.AreEqual(@"Tiny Example Test {""Key1"":""A\n\rB"",""Key2"":""\u0000"",""Key3"":""\\""}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Encode_DataNull_AsObject() {
-            string product = "Example";
-            string operation = "Test";
+        public void Test_TinyPacket_Decode_02() {
+            TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""Key1"":""A\n\rB"",""Key2"":""\u0000"",""Key3"":""\\""}"));
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual("A\n\rB", actual.Items["Key1"]);
+            Assert.AreEqual("\0", actual.Items["Key2"]);
+            Assert.AreEqual("\\", actual.Items["Key3"]);
+        }
 
-            var target = new TinyPacket(product, operation, null);
 
-            string actual = System.Text.UTF8Encoding.UTF8.GetString(target.GetBytes());
-            string expected = @"Tiny Example Test null";
-            Assert.AreEqual(expected, actual);
+        [TestMethod()]
+        public void Test_TinyPacket_Encode_Empty() {
+            var target = new TinyPacket("Example", "Test");
+            Assert.AreEqual(@"Tiny Example Test {}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Decode_DataEmpty_AsObject() {
-            string product = "Example";
-            string operation = "Test";
-
+        public void Test_TinyPacket_Decode_Empty() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test  {} "));
 
-            Assert.AreEqual(product, actual.Product);
-            Assert.AreEqual(operation, actual.Operation);
-            Assert.AreEqual(0, actual.Data.Count);
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual(0, actual.Items.Count);
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Decode_DataNull() {
-            string product = "Example";
-            string operation = "Test";
-
+        public void Test_TinyPacket_Decode_Null() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test  null "));
 
-            Assert.AreEqual(product, actual.Product);
-            Assert.AreEqual(operation, actual.Operation);
-            Assert.AreEqual(0, actual.Data.Count);
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual(0, actual.Items.Count);
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Decode_DataMissing1() { //it is an error state, but we shall recognize it.
-            string product = "Example";
-            string operation = "Test";
-
+        public void Test_TinyPacket_Decode_MissingData_01() { //it is an error state, but we shall recognize it.
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test "));
 
-            Assert.AreEqual(product, actual.Product);
-            Assert.AreEqual(operation, actual.Operation);
-            Assert.AreEqual(0, actual.Data.Count);
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual(0, actual.Items.Count);
         }
 
         [TestMethod()]
-        public void Test_TinyPairPacket_Decode_DataMissing2() { //it is an error state, but we shall recognize it.
-            string product = "Example";
-            string operation = "Test";
-
+        public void Test_TinyPacket_Decode_MissingData_02() { //it is an error state, but we shall recognize it.
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test"));
 
-            Assert.AreEqual(product, actual.Product);
-            Assert.AreEqual(operation, actual.Operation);
-            Assert.AreEqual(0, actual.Data.Count);
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual(0, actual.Items.Count);
         }
 
         [TestMethod()]
-        [ExpectedException(typeof(System.FormatException))]
-        public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket1() {
+        [ExpectedException(typeof(FormatException))]
+        public void Test_TinyPacket_Decode_Error_01() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example "));
         }
 
         [TestMethod()]
-        [ExpectedException(typeof(System.FormatException))]
-        public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket2() {
+        [ExpectedException(typeof(FormatException))]
+        public void Test_TinyPacket_Decode_Error_02() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny "));
         }
 
         [TestMethod()]
-        [ExpectedException(typeof(System.FormatException))]
-        public void Test_TinyPairPacket_Decode_ErrorCannotParsePacket3() {
+        [ExpectedException(typeof(FormatException))]
+        public void Test_TinyPacket_Decode_Error_03() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@""));
         }
 
+
         [TestMethod()]
-        public void Test_TinyPairPacket_EncodeDecode_SpeedTest() {
-            string product = "Example";
-            string operation = "Test";
+        public void Test_TinyPacket_EncodeDecode_SpeedTest() {
             var data = new Dictionary<string, string>();
             data.Add("Key1Text", "Value1Text");
             data.Add("Key2Text", "Value2Text");
@@ -177,7 +135,9 @@ namespace Test {
             var swEncode = new Stopwatch();
             swEncode.Start();
             for (int i = 0; i < n; i++) {
-                target = new TinyPacket(product, operation, data);
+                target = new TinyPacket("Example", "Test");
+                target.Items.Add("Key1Text", "Value1Text");
+                target.Items.Add("Key2Text", "Value2Text");
                 bytes = target.GetBytes();
             }
             swEncode.Stop();
