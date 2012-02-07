@@ -22,7 +22,8 @@ namespace Medo.Net {
     /// Sending and receiving UDP messages.
     /// Requires .NET Framework 3.5 SP1 or above.
     /// </summary>
-    public class TinyMessage : IDisposable {
+    [Obsolete()]
+    public class TinyMessage35 : IDisposable {
 
         private const int DefaultPort = 5104;
 
@@ -30,8 +31,8 @@ namespace Medo.Net {
         /// <summary>
         /// Creates new instance.
         /// </summary>
-        public TinyMessage()
-            : this(new IPEndPoint(IPAddress.Any, TinyMessage.DefaultPort)) {
+        public TinyMessage35()
+            : this(new IPEndPoint(IPAddress.Any, TinyMessage35.DefaultPort)) {
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="localEndPoint">Local end point where messages should be received at.</param>
         /// <exception cref="System.ArgumentNullException">Local IP end point is null.</exception>
-        public TinyMessage(IPEndPoint localEndPoint) {
+        public TinyMessage35(IPEndPoint localEndPoint) {
             if (localEndPoint == null) { throw new ArgumentNullException("localEndPoint", "Local IP end point is null."); }
             this.LocalEndPoint = localEndPoint;
         }
@@ -155,7 +156,7 @@ namespace Medo.Net {
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
         public static void Send(ITinyMessagePacket packet, IPAddress address) {
-            Send(packet, new IPEndPoint(address, TinyMessage.DefaultPort));
+            Send(packet, new IPEndPoint(address, TinyMessage35.DefaultPort));
         }
 
         /// <summary>
@@ -243,6 +244,7 @@ namespace Medo.Net {
     /// Encoder/decoder for TinyMessage packets.
     /// Requires .NET Framework 3.5 SP1 or above.
     /// </summary>
+    [Obsolete()]
     public class TinyMessagePacket<TData> : ITinyMessagePacket {
 
         private static readonly UTF8Encoding TextEncoding = new UTF8Encoding(false);
@@ -422,6 +424,7 @@ namespace Medo.Net {
     /// <summary>
     /// Event arguments for TinyMessagePacketReceived message.
     /// </summary>
+    [Obsolete()]
     public class TinyMessagePacketEventArgs : EventArgs {
 
         private readonly byte[] Buffer;

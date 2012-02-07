@@ -100,7 +100,6 @@
     <Compile Include="NumberDeclinationTest.cs" />
     <Compile Include="ProcessCapabilityTest.cs" />
     <Compile Include="Sha1Test.cs" />
-    <Compile Include="TinyMessageTest.cs" />
     <Compile Include="WakeOnLanTest.cs" />
   </ItemGroup>
   <ItemGroup>

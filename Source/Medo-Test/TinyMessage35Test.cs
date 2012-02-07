@@ -10,7 +10,7 @@ namespace Test {
     ///to contain all TinyMessagePacketTest Unit Tests
     ///</summary>
     [TestClass()]
-    public class TinyMessageTest {
+    public class TinyMessage35Test {
 
         private TestContext testContextInstance;
 
