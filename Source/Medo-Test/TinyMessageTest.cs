@@ -62,6 +62,40 @@ namespace Test {
 
 
         [TestMethod()]
+        public void Test_TinyPacket_Encode_NullItem_01() {
+            var target = new TinyPacket("Example", "Test");
+            target["A"] = "1";
+            target["B"] = null;
+            target["C"] = "2";
+            Assert.AreEqual(@"Tiny Example Test {""A"":""1"",""B"":null,""C"":""2""}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
+        }
+
+        [TestMethod()]
+        public void Test_TinyPacket_Decode_NullItem_01A() {
+            TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""A"":""1"",""B"":null,""C"":""2""}"));
+
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual("1", actual["A"]);
+            Assert.AreEqual(null, actual["B"]);
+            Assert.AreEqual("2", actual["C"]);
+            Assert.AreEqual(3, actual.Items.Count);
+        }
+
+        [TestMethod()]
+        public void Test_TinyPacket_Decode_NullItem_01B() {
+            TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test { ""A"":""1"", ""B"" : null, ""C"":""2"" }"));
+
+            Assert.AreEqual("Example", actual.Product);
+            Assert.AreEqual("Test", actual.Operation);
+            Assert.AreEqual("1", actual["A"]);
+            Assert.AreEqual(null, actual["B"]);
+            Assert.AreEqual("2", actual["C"]);
+            Assert.AreEqual(3, actual.Items.Count);
+        }
+
+
+        [TestMethod()]
         public void Test_TinyPacket_Encode_Empty() {
             var target = new TinyPacket("Example", "Test");
             Assert.AreEqual(@"Tiny Example Test {}", UTF8Encoding.UTF8.GetString(target.GetBytes()));

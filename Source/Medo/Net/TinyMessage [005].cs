@@ -9,6 +9,7 @@
 //2012-02-06: Renamed to TinyMessage.
 //            Removed array encoding.
 //            TinyPacket data items are accessible through indexed property.
+//            Null strings can be encoded.
 
 
 using System;
@@ -391,14 +392,19 @@ namespace Medo.Net {
                 if (this.Items != null) {
                     stream.Write(new byte[] { 0x7B }, 0, 1); //{
                     foreach (var item in this.Items) {
-                        byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
-                        byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
                         if (addComma) { stream.Write(new byte[] { 0x2C }, 0, 1); } //,
+                        byte[] keyBytes = TextEncoding.GetBytes(JsonEncode(item.Key));
                         stream.Write(new byte[] { 0x22 }, 0, 1); //"
                         stream.Write(keyBytes, 0, keyBytes.Length);
-                        stream.Write(new byte[] { 0x22, 0x3A, 0x22 }, 0, 3); //":"
-                        stream.Write(valueBytes, 0, valueBytes.Length);
-                        stream.Write(new byte[] { 0x22 }, 0, 1); //"
+                        stream.Write(new byte[] { 0x22, 0x3A }, 0, 2); //":
+                        if (item.Value != null) {
+                            byte[] valueBytes = TextEncoding.GetBytes(JsonEncode(item.Value));
+                            stream.Write(new byte[] { 0x22 }, 0, 1); //"
+                            stream.Write(valueBytes, 0, valueBytes.Length);
+                            stream.Write(new byte[] { 0x22 }, 0, 1); //"
+                        } else {
+                            stream.Write(new byte[] { 0x6E, 0x75, 0x6C, 0x6C }, 0, 4); //null
+                        }
                         addComma = true;
                     }
                     stream.Write(new byte[] { 0x7D }, 0, 1); //}
@@ -578,6 +584,7 @@ namespace Medo.Net {
                             switch (ch) {
                                 case ' ': break;
                                 case '\"': state = JsonState.LookingForValueEnd; break;
+                                case 'n': state = JsonState.LookingForNullChar2; break;
                                 default: throw new System.FormatException("Cannot find key value start.");
                             }
                         } break;
@@ -592,6 +599,33 @@ namespace Medo.Net {
                                     state = JsonState.LookingForObjectEnd;
                                     break;
                                 default: sbValue.Append(ch); break;
+                            }
+                        } break;
+
+                    case JsonState.LookingForNullChar2: {
+                            switch (ch) {
+                                case 'u': state = JsonState.LookingForNullChar3; break;
+                                default: throw new System.FormatException("Cannot find null.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForNullChar3: {
+                            switch (ch) {
+                                case 'l': state = JsonState.LookingForNullChar4; break;
+                                default: throw new System.FormatException("Cannot find null.");
+                            }
+                        } break;
+
+                    case JsonState.LookingForNullChar4: {
+                            switch (ch) {
+                                case 'l':
+                                    state = JsonState.LookingForObjectEnd;
+                                    data.Add(sbName.ToString(), null);
+                                    sbName.Length = 0;
+                                    sbValue.Length = 0;
+                                    state = JsonState.LookingForObjectEnd;
+                                    break;
+                                default: throw new System.FormatException("Cannot find null.");
                             }
                         } break;
 
@@ -708,6 +742,9 @@ namespace Medo.Net {
             LookingForValueEnd,
             LookingForObjectEnd,
             LookingForObjectSeparator,
+            LookingForNullChar2,
+            LookingForNullChar3,
+            LookingForNullChar4,
             DeadEnd,
         }
 
