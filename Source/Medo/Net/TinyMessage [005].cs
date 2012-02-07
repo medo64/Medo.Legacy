@@ -807,3 +807,38 @@ namespace Medo.Net {
 
     }
 }
+
+
+
+/*
+
+                          TinyMessage protocol                          
+
+TinyMessage is text based protocol. Each packet is encupselated in UDP
+datagram and it is of following content (each part encoded as UTF8,
+without quotes ("), <SP> denotes space):
+"Protocol<SP>Product<SP>Operation<SP>Data".
+
+Protocol
+
+   This field denotes protocol version. It is fixed to "Tiny".
+
+Product
+
+   This field denotes product which performes action. It is used to
+   segment space of available operations.
+   Product must not contain spaces and it should contain only ASCII.
+   Preferred format would be application name, at (@) sign followed by
+   IANA assigned Private Enterprise Number. E.g. Application@12345.
+
+Operation
+
+   Denotes which operation is to be performed by receiver of message.
+   Operation must not contain spaces and it should contain only ASCII.
+
+Data
+
+   JSON encoded object in form of multiple name/value pairs.
+   E.g.: {"Name1":"Value1","Name2":"Value2",...,"NameN":"ValueN"}
+
+*/
