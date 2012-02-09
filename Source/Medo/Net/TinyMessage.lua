@@ -87,10 +87,10 @@ do
         subtree:add(f.data, buffer(start, index - start))
 
 
-        subtree:append_text (", " .. valueProduct .. ":" .. valueOperation)
+        subtree:append_text (", " .. valueProduct .. " " .. valueOperation)
         
         pinfo.cols.protocol = "TINYMESSAGE"
-        pinfo.cols.info = valueProduct .. ":" .. valueOperation
+        pinfo.cols.info = valueProduct .. " " .. valueOperation
     end
 
 

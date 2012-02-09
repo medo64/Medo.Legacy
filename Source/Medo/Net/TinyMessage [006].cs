@@ -10,6 +10,7 @@
 //            Removed array encoding.
 //            TinyPacket data items are accessible through indexed property.
 //            Null strings can be encoded.
+//2012-02-08: Changed GetHashCode.
 
 
 using System;
@@ -706,16 +707,20 @@ namespace Medo.Net {
 
         /// <summary>
         /// Serves as a hash function for a particular type.
+        /// http://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-an-overridden-system-object-gethashcode
         /// </summary>
         public override int GetHashCode() {
-            return (this.Product).GetHashCode() ^ this.Operation.GetHashCode();
+            unchecked {
+                int hash = (this.Product != null) ? this.Product.GetHashCode() : 0;
+                return (hash * 31) + ((this.Operation != null) ? this.Operation.GetHashCode() : 0);
+            }
         }
 
         /// <summary>
         /// Returns a string that represents the current object.
         /// </summary>
         public override string ToString() {
-            return this.Product + ":" + this.Operation;
+            return this.Product + " " + this.Operation;
         }
 
 
@@ -824,33 +829,42 @@ namespace Medo.Net {
 
 /*
 
-                          TinyMessage protocol                          
+                              TinyMessage protocol
 
-TinyMessage is text based protocol. Each packet is encupselated in UDP
-datagram and it is of following content (each part encoded as UTF8,
-without quotes ("), <SP> denotes space):
-"Protocol<SP>Product<SP>Operation<SP>Data".
+TinyMessage is text based protocol. Each packet is encupselated in UDP datagram
+and it is of following content (each part encoded as UTF8, without quotes ("),
+<SP> denotes space):
+    "Protocol<SP>Product<SP>Operation<SP>Data".
 
-Protocol
+    Protocol
 
-   This field denotes protocol version. It is fixed to "Tiny".
+        This field denotes protocol version. It is fixed to "Tiny".
 
-Product
+    Product
 
-   This field denotes product which performes action. It is used to
-   segment space of available operations.
-   Product must not contain spaces and it should contain only ASCII.
-   Preferred format would be application name, at (@) sign followed by
-   IANA assigned Private Enterprise Number. E.g. Application@12345.
+        This field denotes product which performes action. It is used to segment
+        space of available operations.
+        Product must not contain spaces and it should contain only ASCII.
+        Preferred format would be application name, at (@) sign followed by IANA
+        assigned Private Enterprise Number. E.g. Application@12345.
 
-Operation
+    Operation
 
-   Denotes which operation is to be performed by receiver of message.
-   Operation must not contain spaces and it should contain only ASCII.
+        Denotes which operation is to be performed by receiver of message.
+        Operation must not contain spaces and it should contain only ASCII.
 
-Data
+    Data
 
-   JSON encoded object in form of multiple name/value pairs.
-   E.g.: {"Name1":"Value1","Name2":"Value2",...,"NameN":"ValueN"}
+        JSON encoded object in form of multiple name/value pairs.
+        E.g.:
+            {"Name1":"Value1","Name2":"Value2",...,"NameN":"ValueN"}
+
+
+TinyMessage has been allocated UDP port 5104.
+
+If multicast group is used, it's address should be taken from RFC 2365, IPv4
+Organization Local Scope. Preferred address would be 239.192.111.17 (with MAC
+address of 01:00:5E:40:6F:11).  In case of IPv6 multicast address should be
+FF:18::5E:40:6F:11 (with 33:33:5E:40:6F:11 as a MAC).
 
 */
