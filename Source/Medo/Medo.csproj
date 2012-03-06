@@ -142,7 +142,7 @@
     <Compile Include="MessageBox [006].cs" />
     <Compile Include="Net\KeyValuePacket [002].cs" />
     <Compile Include="Net\SyslogMessage [004].cs" />
-    <Compile Include="Net\WakeOnLan [003].cs" />
+    <Compile Include="Net\WakeOnLan [005].cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\SolutionInfo.cs" />
     <Compile Include="Random [001].cs" />
