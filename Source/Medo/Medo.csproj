@@ -128,7 +128,7 @@
     <Compile Include="Net\TinyMessage [008].cs" />
     <Compile Include="Services\Upgrade [001].cs" />
     <Compile Include="Web\GData\GDataClientLogin [002].cs" />
-    <Compile Include="Windows\Forms\AboutBox [011].cs" />
+    <Compile Include="Windows\Forms\AboutBox [012].cs" />
     <Compile Include="Windows\Forms\InputBox [001].cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="KeyValuePacket [---].cs" />
