@@ -1,6 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo", "Medo\Medo.csproj", "{4C58CA83-E0D1-4FAE-92FC-C062C13D7C28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo-20", "Medo-20\Medo-20.csproj", "{C1E4B693-E5EE-4E24-9734-0346767DCE2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo-40", "Medo-40\Medo-40.csproj", "{4C58CA83-E0D1-4FAE-92FC-C062C13D7C28}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo-Test", "Medo-Test\Medo-Test.csproj", "{1091D8E2-5CC3-4AAF-8E73-0271E302E1A0}"
 EndProject
@@ -18,6 +20,10 @@ Global
 		{1091D8E2-5CC3-4AAF-8E73-0271E302E1A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1091D8E2-5CC3-4AAF-8E73-0271E302E1A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1091D8E2-5CC3-4AAF-8E73-0271E302E1A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1E4B693-E5EE-4E24-9734-0346767DCE2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1E4B693-E5EE-4E24-9734-0346767DCE2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1E4B693-E5EE-4E24-9734-0346767DCE2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1E4B693-E5EE-4E24-9734-0346767DCE2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
