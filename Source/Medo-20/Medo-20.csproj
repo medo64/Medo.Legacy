@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Binaries\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -211,6 +211,9 @@
     </Compile>
     <Compile Include="..\medo\security\checksum\Lrc8 [002].cs">
       <Link>Security\Checksum\Lrc8 [002].cs</Link>
+    </Compile>
+    <Compile Include="..\Medo\Security\Cryptography\OpenSslAesStream [001].cs">
+      <Link>Security\Cryptography\OpenSslAesStream [001].cs</Link>
     </Compile>
     <Compile Include="..\medo\security\cryptography\Pbkdf2 [001].cs">
       <Link>Security\Cryptography\Pbkdf2 [001].cs</Link>

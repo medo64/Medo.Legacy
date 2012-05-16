@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="ABusFrameTest.cs" />
     <Compile Include="ArgsTest.cs" />
+    <Compile Include="OpenSslAesStreamTest.cs" />
     <Compile Include="Pbkdf2Test.cs" />
     <Compile Include="TinyMessageTest.cs" />
     <Compile Include="IniFileTest.cs" />
@@ -140,7 +141,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Math\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
