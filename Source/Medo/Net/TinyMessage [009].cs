@@ -12,6 +12,8 @@
 //            Null strings can be encoded.
 //2012-02-08: Changed GetHashCode.
 //2012-02-19: Added IEnumerable interface to TinyPacket.
+//2012-05-16: Fixing exception on null items.
+//            Refactoring.
 
 
 using System;
@@ -30,14 +32,14 @@ namespace Medo.Net {
 
     /// <summary>
     /// Sending and receiving UDP messages.
-    /// Supports TinyMessage with Dictionary&lt;string,string&gt; as data.
+    /// Supports TinyMessage with Dictionary&lt;String,String&gt; as data.
     /// </summary>
     public class TinyMessage : IDisposable {
 
         /// <summary>
         /// Default port for TinyMessage protocol.
         /// </summary>
-        public static int DefaultPort { get { return 5104; } }
+        public static Int32 DefaultPort { get { return 5104; } }
 
 
         /// <summary>
@@ -96,7 +98,7 @@ namespace Medo.Net {
         /// <summary>
         /// Gets whether TinyMessage is in listening state.
         /// </summary>
-        public bool IsListening {
+        public Boolean IsListening {
             get { return (this.ListenThread != null) && (this.ListenThread.IsAlive); }
         }
 
@@ -182,7 +184,7 @@ namespace Medo.Net {
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <param name="port">Port of destination for packet.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static void Send(TinyPacket packet, IPAddress address, int port) {
+        public static void Send(TinyPacket packet, IPAddress address, Int32 port) {
             Send(packet, new IPEndPoint(address, port));
         }
 
@@ -226,7 +228,7 @@ namespace Medo.Net {
         /// <param name="address">IP address of destination for packet. It can be broadcast address.</param>
         /// <param name="port">Port of destination for packet.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static TinyPacket SendAndReceive(TinyPacket packet, IPAddress address, int port) {
+        public static TinyPacket SendAndReceive(TinyPacket packet, IPAddress address, Int32 port) {
             return SendAndReceive(packet, new IPEndPoint(address, port), 250);
         }
 
@@ -238,7 +240,7 @@ namespace Medo.Net {
         /// <param name="remoteEndPoint">Address of destination for packet. It can be broadcast address.</param>
         /// <param name="receiveTimeout">Number of milliseconds to wait for receive operation to be done. If number is zero, infinite timeout will be used.</param>
         /// <exception cref="System.ArgumentNullException">Packet is null. -or- Remote IP end point is null.</exception>
-        public static TinyPacket SendAndReceive(TinyPacket packet, IPEndPoint remoteEndPoint, int receiveTimeout) {
+        public static TinyPacket SendAndReceive(TinyPacket packet, IPEndPoint remoteEndPoint, Int32 receiveTimeout) {
             if (packet == null) { throw new ArgumentNullException("packet", "Packet is null."); }
             if (remoteEndPoint == null) { throw new ArgumentNullException("remoteEndPoint", "Remote IP end point is null."); }
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)) {
@@ -287,7 +289,7 @@ namespace Medo.Net {
 
         #endregion
 
-        private static bool IsRunningOnMono { get { return (Type.GetType("Mono.Runtime") != null); } }
+        private static Boolean IsRunningOnMono { get { return (Type.GetType("Mono.Runtime") != null); } }
 
     }
 
@@ -297,7 +299,8 @@ namespace Medo.Net {
     /// Encoder/decoder for Tiny packets.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-    public class TinyPacket : IDisposable, IEnumerable<KeyValuePair<string, string>> {
+    [DebuggerDisplay(@"{Product + "":"" + Operation}")]
+    public class TinyPacket : IDisposable, IEnumerable<KeyValuePair<String, String>> {
 
         /// <summary>
         /// Creates new instance
@@ -306,7 +309,7 @@ namespace Medo.Net {
         /// <param name="operation">Message type.</param>
         /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
         /// <exception cref="System.ArgumentException">Product contains space character. -or- Operation contains space character.</exception>
-        public TinyPacket(string product, string operation) {
+        public TinyPacket(String product, String operation) {
             if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
             if (product.Contains(" ")) { throw new ArgumentException("Product contains space character.", "product"); }
             if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
@@ -325,7 +328,7 @@ namespace Medo.Net {
         /// <param name="items">Data to be encoded in JSON.</param>
         /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
         /// <exception cref="System.ArgumentException">Product contains space character. -or- Operation contains space character.</exception>
-        internal TinyPacket(string product, string operation, IDictionary<string, string> items) {
+        internal TinyPacket(String product, String operation, IDictionary<String, String> items) {
             if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
             if (product.Contains(" ")) { throw new ArgumentException("Product contains space character.", "product"); }
             if (string.IsNullOrEmpty(operation)) { throw new ArgumentNullException("operation", "Operation is null or empty."); }
@@ -333,19 +336,19 @@ namespace Medo.Net {
 
             this.Product = product;
             this.Operation = operation;
-            this.Items = items;
+            this.Items = items ?? new Dictionary<string, string>();
             this.IsReadOnly = true;
         }
 
         /// <summary>
         /// Gets name of product.
         /// </summary>
-        public string Product { get; private set; }
+        public String Product { get; private set; }
 
         /// <summary>
         /// Gets operation.
         /// </summary>
-        public string Operation { get; private set; }
+        public String Operation { get; private set; }
 
         private readonly bool IsReadOnly;
         private readonly IDictionary<string, string> Items;
@@ -355,7 +358,7 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="key">Key.</param>
         /// <exception cref="System.NotSupportedException">Data is read-only.</exception>
-        public string this[string key] {
+        public String this[String key] {
             get {
                 if (this.Items.ContainsKey(key)) {
                     return this.Items[key];
@@ -379,7 +382,7 @@ namespace Medo.Net {
         /// Converts message to it's representation in bytes.
         /// </summary>
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
-        public byte[] GetBytes() {
+        public Byte[] GetBytes() {
             using (var stream = new MemoryStream()) {
                 byte[] protocolBytes = TextEncoding.GetBytes("Tiny");
                 stream.Write(protocolBytes, 0, protocolBytes.Length);
@@ -453,7 +456,7 @@ namespace Medo.Net {
         /// <param name="buffer">Byte array.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.IO.InvalidDataException">Cannot parse packet.</exception>
-        public static TinyPacket Parse(byte[] buffer) {
+        public static TinyPacket Parse(Byte[] buffer) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
 
             return Parse(buffer, 0, buffer.Length);
@@ -468,7 +471,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        public static TinyPacket ParseHeaderOnly(byte[] buffer, int offset, int count) {
+        public static TinyPacket ParseHeaderOnly(Byte[] buffer, Int32 offset, Int32 count) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
@@ -496,7 +499,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        public static TinyPacket Parse(byte[] buffer, int offset, int count) {
+        public static TinyPacket Parse(Byte[] buffer, Int32 offset, Int32 count) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
@@ -703,22 +706,15 @@ namespace Medo.Net {
         /// Determines whether the specified object is equal to the current object.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
-        public override bool Equals(object obj) {
+        public override Boolean Equals(Object obj) {
             return base.Equals(obj);
         }
 
         /// <summary>
         /// Serves as a hash function for a particular type.
         /// </summary>
-        public override int GetHashCode() {
+        public override Int32 GetHashCode() {
             return (this.Product).GetHashCode() ^ this.Operation.GetHashCode();
-        }
-
-        /// <summary>
-        /// Returns a string that represents the current object.
-        /// </summary>
-        public override string ToString() {
-            return this.Product + ":" + this.Operation;
         }
 
 
@@ -751,7 +747,7 @@ namespace Medo.Net {
         /// <summary>
         /// Returns an enumerator.
         /// </summary>
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator() {
+        public IEnumerator<KeyValuePair<String, String>> GetEnumerator() {
             return this.Items.GetEnumerator();
         }
 
@@ -803,7 +799,7 @@ namespace Medo.Net {
         /// <param name="remoteEndPoint">Remote end point.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
-        public TinyPacketEventArgs(byte[] buffer, int offset, int count, IPEndPoint remoteEndPoint) {
+        public TinyPacketEventArgs(Byte[] buffer, Int32 offset, Int32 count, IPEndPoint remoteEndPoint) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }

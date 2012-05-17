@@ -165,6 +165,14 @@ namespace Test {
 
 
         [TestMethod()]
+        public void Test_TinyPacket_NullItems() {
+            var target = new TinyPacket("Example", "Test", null);
+            Assert.AreEqual(null, target["Key1Text"]);
+            Assert.IsNotNull(target.GetEnumerator());
+        }
+
+
+        [TestMethod()]
         public void Test_TinyPacket_EncodeDecode_SpeedTest() {
             var data = new Dictionary<string, string>();
             data.Add("Key1Text", "Value1Text");
