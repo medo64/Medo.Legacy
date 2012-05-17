@@ -4,6 +4,11 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Medo")]
+[assembly: AssemblyProduct("Medo")]
+[assembly: AssemblyVersion("4.0.*")]
+
+[assembly: AssemblyCompany("Josip Medved")]
+[assembly: AssemblyCopyright("Copyright (c) 2004 Josip Medved <jmedved@jmedved.com>")]
 [assembly: AssemblyDescription("Common functions assembly.")]
 
 [assembly: CLSCompliant(true)]
