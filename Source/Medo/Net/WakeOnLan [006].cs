@@ -5,6 +5,7 @@
 //2008-03-15: Added IsMacAddressValid and IsSecureOnPasswordValid.
 //2008-11-07: Refactored to enable testing.
 //2012-02-26: Added IPv6 support.
+//2012-05-16: GetPacketBytes are internal. 
 
 
 using System;
@@ -145,16 +146,17 @@ namespace Medo.Net {
             }
         }
 
-        private static byte[] GetPacketBytes(string macAddress, string secureOnPassword) {
+        
+        internal static byte[] GetPacketBytes(string macAddress, string secureOnPassword) {
             return GetPacketBytes(GetAddressBytes(macAddress), GetAddressBytes(secureOnPassword));
         }
 
-        private static byte[] GetPacketBytes(byte[] macAddress, byte[] secureOnPassword) {
+        internal static byte[] GetPacketBytes(byte[] macAddress, byte[] secureOnPassword) {
             byte[] packetBytes;
             if (secureOnPassword != null) {
-                packetBytes = new byte[6 + 16 * 6 + 6];            //1x(6xFF) 16x(MAC) 1x(SECUREON)
+                packetBytes = new byte[6 + 16 * 6 + 6]; //1x(6xFF) 16x(MAC) 1x(SECUREON)
             } else {
-                packetBytes = new byte[6 + 16 * 6];//1x(6xFF) 16x(MAC)
+                packetBytes = new byte[6 + 16 * 6]; //1x(6xFF) 16x(MAC)
             }
 
             for (int j = 0; j < 6; j++) { //1x(6xFF)

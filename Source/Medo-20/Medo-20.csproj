@@ -185,8 +185,8 @@
     <Compile Include="..\medo\net\TinyMessage [008].cs">
       <Link>Net\TinyMessage [008].cs</Link>
     </Compile>
-    <Compile Include="..\medo\net\WakeOnLan [005].cs">
-      <Link>Net\WakeOnLan [005].cs</Link>
+    <Compile Include="..\Medo\Net\WakeOnLan [006].cs">
+      <Link>Net\WakeOnLan [006].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Random [001].cs">
       <Link>Random [001].cs</Link>
