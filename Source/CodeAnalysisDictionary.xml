@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Dictionary>
+    <Words>
+        <Recognized>
+            <Word>Castagnoli</Word>
+            <Word>CCITT</Word>
+            <Word>Codabar</Word>
+            <Word>CRC</Word>
+            <Word>Deamons</Word>
+            <Word>Eltra</Word>
+            <Word>Endianness</Word>
+            <Word>IANA</Word>
+            <Word>Jmbg</Word>
+            <Word>LRC</Word>
+            <Word>Medo</Word>
+            <Word>NTP</Word>
+            <Word>OIB</Word>
+            <Word>SHA</Word>
+            <Word>SSPI</Word>
+            <Word>Syslog</Word>
+            <Word>Syslogd</Word>
+            <Word>UART</Word>
+            <Word>Vojvodina</Word>
+            <Word>X</Word>
+            <Word>Xfer</Word>
+            <Word>XModem</Word>
+            <Word>Y</Word>
+            <Word>ZModem</Word>
+        </Recognized>
+    </Words>
+</Dictionary>
