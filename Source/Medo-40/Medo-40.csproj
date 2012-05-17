@@ -124,6 +124,9 @@
     <Compile Include="..\Medo\Data\UpdateCommand [004].cs">
       <Link>Data\UpdateCommand [004].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Device\DS1820 [001].cs">
+      <Link>Device\DS1820 [001].cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Device\Elsidi [003].cs">
       <Link>Device\Elsidi [003].cs</Link>
     </Compile>
