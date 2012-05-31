@@ -97,9 +97,6 @@
     <Compile Include="..\Medo\Bitwise [001].cs">
       <Link>Bitwise [001].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Collections\Generic\ReadOnlyDictionary [001].cs">
-      <Link>Collections\Generic\ReadOnlyDictionary [001].cs</Link>
-    </Compile>
     <Compile Include="..\Medo\Configuration\IniFile [001].cs">
       <Link>Configuration\IniFile [001].cs</Link>
     </Compile>

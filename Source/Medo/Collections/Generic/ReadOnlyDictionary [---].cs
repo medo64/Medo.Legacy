@@ -1,6 +1,7 @@
 ﻿//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-04-07: First version.
+//2012-05-31: Obsoleted.
 
 
 using System;
@@ -13,6 +14,7 @@ namespace Medo.Collections.Generic {
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+    [Obsolete()]
     public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue> {
 
         /// <summary>
