@@ -749,5 +749,53 @@ namespace Test {
             Assert.AreEqual(9, x.Resolution);
         }
 
+        [TestMethod()]
+        public void Test_DS1820_Parse_06() {
+            var x = DS1820.Parse("104C5F450208005139004B46FFFF0410F2");
+            Assert.IsTrue(x.IsRomCodeValid);
+            Assert.AreEqual(unchecked((Int64)0x51000802455F4C10), x.RomCode);
+            Assert.AreEqual(0x10, x.Family);
+            Assert.AreEqual(0x000802455F4C, x.Serial);
+            Assert.IsTrue(x.IsScratchpadValid);
+            Assert.AreEqual(28.25, x.Temperature);
+            Assert.AreEqual(0x4B, x.UserByte1);
+            Assert.AreEqual(75, x.TemperatureHigh);
+            Assert.AreEqual(0x46, x.UserByte2);
+            Assert.AreEqual(70, x.TemperatureLow);
+            Assert.AreEqual(9, x.Resolution);
+        }
+
+        [TestMethod()]
+        public void Test_DS1820_Parse_07() {
+            var x = DS1820.Parse("108D742C0208007237004B46FFFF031025");
+            Assert.IsTrue(x.IsRomCodeValid);
+            Assert.AreEqual(unchecked((Int64)0x720008022C748D10), x.RomCode);
+            Assert.AreEqual(0x10, x.Family);
+            Assert.AreEqual(0x0008022C748D, x.Serial);
+            Assert.IsTrue(x.IsScratchpadValid);
+            Assert.AreEqual(27.25, x.Temperature);
+            Assert.AreEqual(0x4B, x.UserByte1);
+            Assert.AreEqual(75, x.TemperatureHigh);
+            Assert.AreEqual(0x46, x.UserByte2);
+            Assert.AreEqual(70, x.TemperatureLow);
+            Assert.AreEqual(9, x.Resolution);
+        }
+
+        [TestMethod()]
+        public void Test_DS1820_Parse_08() {
+            var x = DS1820.Parse("2846185F0300003DC6014B467FFF0A1017");
+            Assert.IsTrue(x.IsRomCodeValid);
+            Assert.AreEqual(unchecked((Int64)0x3D0000035F184628), x.RomCode);
+            Assert.AreEqual(0x28, x.Family);
+            Assert.AreEqual(0x0000035F1846, x.Serial);
+            Assert.IsTrue(x.IsScratchpadValid);
+            Assert.AreEqual(28.375, x.Temperature);
+            Assert.AreEqual(0x4B, x.UserByte1);
+            Assert.AreEqual(75, x.TemperatureHigh);
+            Assert.AreEqual(0x46, x.UserByte2);
+            Assert.AreEqual(70, x.TemperatureLow);
+            Assert.AreEqual(12, x.Resolution);
+        }
+
     }
 }
