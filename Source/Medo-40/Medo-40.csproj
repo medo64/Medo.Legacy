@@ -100,8 +100,8 @@
     <Compile Include="..\Medo\Configuration\IniFile [001].cs">
       <Link>Configuration\IniFile [001].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Configuration\RecentFiles [004].cs">
-      <Link>Configuration\RecentFiles [004].cs</Link>
+    <Compile Include="..\Medo\Configuration\RecentFiles [005].cs">
+      <Link>Configuration\RecentFiles [005].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Configuration\RunOnStartup [004].cs">
       <Link>Configuration\RunOnStartup [004].cs</Link>
