@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com  http://medo64.blogspot.com
+//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com/
 
 //2009-04-07: First version.
 //2009-04-30: Updated for Windows 7 release candidate.
@@ -11,6 +11,7 @@
 //2009-08-23: Added GetSize, GetIdentifier, GetVirtualStorageType and GetProviderSubtype.
 //2010-02-12: Changed generation of Win32 API exceptions.
 //2012-03-01: Added ISO image operations (experimental).
+//2012-08-27: Added ERROR_FILE_SYSTEM_LIMITATION error.
 
 
 using System;
@@ -145,7 +146,7 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        /// <exception cref="System.IO.IOException">File already exists.</exception>
+        /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void Create(long size) {
             Create(size, VirtualDiskCreateOptions.None, 0, 0, false);
@@ -160,7 +161,7 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        /// <exception cref="System.IO.IOException">File already exists.</exception>
+        /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void Create(long size, VirtualDiskCreateOptions options) {
             this.Create(size, options, 0, 0, false);
@@ -177,7 +178,7 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        /// <exception cref="System.IO.IOException">File already exists.</exception>
+        /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void Create(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize) {
             this.Create(size, options, blockSize, sectorSize, false);
@@ -191,7 +192,7 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        /// <exception cref="System.IO.IOException">File already exists.</exception>
+        /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void CreateAsync(long size) {
             Create(size, VirtualDiskCreateOptions.None, 0, 0, true);
@@ -206,7 +207,7 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        /// <exception cref="System.IO.IOException">File already exists.</exception>
+        /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void CreateAsync(long size, VirtualDiskCreateOptions options) {
             this.Create(size, options, 0, 0, true);
@@ -223,7 +224,7 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        /// <exception cref="System.IO.IOException">File already exists.</exception>
+        /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void CreateAsync(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize) {
             this.Create(size, options, blockSize, sectorSize, true);
@@ -241,7 +242,7 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
         /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
-        /// <exception cref="System.IO.IOException">File already exists.</exception>
+        /// <exception cref="System.IO.IOException">File already exists. -or- Virtual disk creation could not be completed due to a file system limitation.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         private void Create(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize, bool createAsync) {
             var parameters = new NativeMethods.CREATE_VIRTUAL_DISK_PARAMETERS();
@@ -289,6 +290,8 @@ namespace Medo.IO {
                     throw new InvalidDataException("File type not recognized.");
                 } else if (res == NativeMethods.ERROR_FILE_EXISTS) {
                     throw new IOException("File already exists.");
+                } else if (res == NativeMethods.ERROR_FILE_SYSTEM_LIMITATION) {
+                    throw new IOException("Virtual disk creation could not be completed due to a file system limitation.");
                 } else if (res == NativeMethods.ERROR_INVALID_PARAMETER) {
                     throw new ArgumentException("Invalid parameter.", "size");
                 } else {
@@ -1690,6 +1693,11 @@ namespace Medo.IO {
             /// The data area passed to a system call is too small.
             /// </summary>
             public const Int32 ERROR_INSUFFICIENT_BUFFER = 122;
+
+            /// <summary>
+            /// The requested operation could not be completed due to a file system limitation.
+            /// </summary>
+            public const Int32 ERROR_FILE_SYSTEM_LIMITATION = 665;
 
             /// <summary>
             /// Overlapped I/O operation is in progress.
