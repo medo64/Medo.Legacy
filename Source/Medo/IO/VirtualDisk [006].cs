@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2009 Josip Medved <jmedved@jmedved.com>
+//Josip Medved <jmedved@jmedved.com>  http://www.jmedved.com  http://medo64.blogspot.com
 
 //2009-04-07: First version.
 //2009-04-30: Updated for Windows 7 release candidate.
@@ -10,17 +10,16 @@
 //2009-08-20: Added pragma warning around WaitHandle.
 //2009-08-23: Added GetSize, GetIdentifier, GetVirtualStorageType and GetProviderSubtype.
 //2010-02-12: Changed generation of Win32 API exceptions.
+//2012-03-01: Added ISO image operations (experimental).
 
 
 using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
-
 
 namespace Medo.IO {
 
@@ -47,6 +46,11 @@ namespace Medo.IO {
         public string FileName { get; private set; }
 
         /// <summary>
+        /// Gets type of open virtual device. If device is not open, type will be AutoDetect. Once device is opened, type will change to either Iso or Vhd.
+        /// </summary>
+        public VirtualDiskType DiskType { get; private set; }
+
+        /// <summary>
         /// Gets whether connection to file is currently open.
         /// </summary>
         public bool IsOpen {
@@ -59,7 +63,7 @@ namespace Medo.IO {
         /// </summary>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
-        /// <exception cref="System.IO.InvalidDataException">File format not recognized.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void Open() {
             Open(VirtualDiskAccessMask.All);
@@ -71,15 +75,50 @@ namespace Medo.IO {
         /// <param name="fileAccess">Defines required access.</param>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
-        /// <exception cref="System.IO.InvalidDataException">File format not recognized.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void Open(VirtualDiskAccessMask fileAccess) {
+            this.Open(fileAccess, VirtualDiskType.AutoDetect);
+        }
+
+        /// <summary>
+        /// Opens connection to file.
+        /// </summary>
+        /// <param name="fileAccess">Defines required access.</param>
+        /// <param name="type">Disk type.</param>
+        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
+        private void Open(VirtualDiskAccessMask fileAccess, VirtualDiskType type) {
             var parameters = new NativeMethods.OPEN_VIRTUAL_DISK_PARAMETERS();
             parameters.Version = NativeMethods.OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_1;
             parameters.Version1.RWDepth = NativeMethods.OPEN_VIRTUAL_DISK_RW_DEPTH_DEFAULT;
 
             var storageType = new NativeMethods.VIRTUAL_STORAGE_TYPE();
-            storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
+            switch (type) {
+                case VirtualDiskType.AutoDetect:
+                    if (this.FileName.EndsWith(".iso", StringComparison.OrdinalIgnoreCase)) {
+                        storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_ISO;
+                        fileAccess = ((fileAccess & VirtualDiskAccessMask.GetInfo) == VirtualDiskAccessMask.GetInfo) ? VirtualDiskAccessMask.GetInfo : 0;
+                        fileAccess |= VirtualDiskAccessMask.AttachReadOnly;
+                        this.DiskType = VirtualDiskType.Iso;
+                    } else {
+                        storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
+                        this.DiskType = VirtualDiskType.Vhd;
+                    }
+                    break;
+
+                case VirtualDiskType.Vhd:
+                    storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
+                    this.DiskType = VirtualDiskType.Vhd;
+                    break;
+
+                case VirtualDiskType.Iso: storageType.DeviceId = NativeMethods.VIRTUAL_STORAGE_TYPE_DEVICE_ISO;
+                    fileAccess = ((fileAccess & VirtualDiskAccessMask.GetInfo) == VirtualDiskAccessMask.GetInfo) ? VirtualDiskAccessMask.GetInfo : 0;
+                    fileAccess |= VirtualDiskAccessMask.AttachReadOnly;
+                    this.DiskType = VirtualDiskType.Iso;
+                    break;
+            }
             storageType.VendorId = NativeMethods.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
 
             int res = NativeMethods.OpenVirtualDisk(ref storageType, this.FileName, (NativeMethods.VIRTUAL_DISK_ACCESS_MASK)fileAccess, NativeMethods.OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, ref parameters, ref _handle);
@@ -91,7 +130,7 @@ namespace Medo.IO {
                 } else if (res == NativeMethods.ERROR_ACCESS_DENIED) {
                     throw new IOException("Access is denied.");
                 } else if (res == NativeMethods.ERROR_FILE_CORRUPT) {
-                    throw new InvalidDataException("File format not recognized.");
+                    throw new InvalidDataException("File type not recognized.");
                 } else {
                     throw new Win32Exception(res);
                 }
@@ -102,6 +141,11 @@ namespace Medo.IO {
         /// Creates new virtual disk
         /// </summary>
         /// <param name="size">Size in bytes.</param>
+        /// <exception cref="System.ArgumentException">Invalid parameter.</exception>
+        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
+        /// <exception cref="System.IO.IOException">File already exists.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void Create(long size) {
             Create(size, VirtualDiskCreateOptions.None, 0, 0, false);
@@ -111,7 +155,12 @@ namespace Medo.IO {
         /// Creates new virtual disk
         /// </summary>
         /// <param name="size">Size in bytes.</param>
-        /// <param name="options">Additional options.</param>
+        /// <param name="options">Options.</param>
+        /// <exception cref="System.ArgumentException">Invalid parameter.</exception>
+        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
+        /// <exception cref="System.IO.IOException">File already exists.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void Create(long size, VirtualDiskCreateOptions options) {
             this.Create(size, options, 0, 0, false);
@@ -124,6 +173,11 @@ namespace Medo.IO {
         /// <param name="options">Additional options.</param>
         /// <param name="blockSize">Block size in bytes. If value is 0, default is used.</param>
         /// <param name="sectorSize">Sector size in bytes. If value is 0, default is used.</param>
+        /// <exception cref="System.ArgumentException">Invalid parameter.</exception>
+        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
+        /// <exception cref="System.IO.IOException">File already exists.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void Create(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize) {
             this.Create(size, options, blockSize, sectorSize, false);
@@ -133,6 +187,11 @@ namespace Medo.IO {
         /// Creates new virtual disk
         /// </summary>
         /// <param name="size">Size in bytes.</param>
+        /// <exception cref="System.ArgumentException">Invalid parameter.</exception>
+        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
+        /// <exception cref="System.IO.IOException">File already exists.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void CreateAsync(long size) {
             Create(size, VirtualDiskCreateOptions.None, 0, 0, true);
@@ -143,6 +202,11 @@ namespace Medo.IO {
         /// </summary>
         /// <param name="size">Size in bytes.</param>
         /// <param name="options">Additional options.</param>
+        /// <exception cref="System.ArgumentException">Invalid parameter.</exception>
+        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
+        /// <exception cref="System.IO.IOException">File already exists.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void CreateAsync(long size, VirtualDiskCreateOptions options) {
             this.Create(size, options, 0, 0, true);
@@ -155,6 +219,11 @@ namespace Medo.IO {
         /// <param name="options">Additional options.</param>
         /// <param name="blockSize">Block size in bytes. If value is 0, default is used.</param>
         /// <param name="sectorSize">Sector size in bytes. If value is 0, default is used.</param>
+        /// <exception cref="System.ArgumentException">Invalid parameter.</exception>
+        /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
+        /// <exception cref="System.IO.IOException">File already exists.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         public void CreateAsync(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize) {
             this.Create(size, options, blockSize, sectorSize, true);
@@ -171,7 +240,7 @@ namespace Medo.IO {
         /// <exception cref="System.ArgumentException">Invalid parameter.</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
-        /// <exception cref="System.IO.InvalidDataException">File format not recognized.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists.</exception>
         [SecurityPermission(SecurityAction.Demand)]
         private void Create(long size, VirtualDiskCreateOptions options, int blockSize, int sectorSize, bool createAsync) {
@@ -217,7 +286,7 @@ namespace Medo.IO {
                 if ((res == NativeMethods.ERROR_FILE_NOT_FOUND) || (res == NativeMethods.ERROR_PATH_NOT_FOUND)) {
                     throw new FileNotFoundException("File not found.");
                 } else if (res == NativeMethods.ERROR_FILE_CORRUPT) {
-                    throw new InvalidDataException("File format not recognized.");
+                    throw new InvalidDataException("File type not recognized.");
                 } else if (res == NativeMethods.ERROR_FILE_EXISTS) {
                     throw new IOException("File already exists.");
                 } else if (res == NativeMethods.ERROR_INVALID_PARAMETER) {
@@ -233,7 +302,7 @@ namespace Medo.IO {
         /// </summary>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.FileNotFoundException">File not found.</exception>
-        /// <exception cref="System.IO.InvalidDataException">File format not recognized.</exception>
+        /// <exception cref="System.IO.InvalidDataException">File type not recognized.</exception>
         /// <exception cref="System.IO.IOException">File already exists.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method may throw exceptions.")]
         public VirtualDiskOperationProgress GetCreateProgress() {
@@ -253,7 +322,7 @@ namespace Medo.IO {
                     if ((res == NativeMethods.ERROR_FILE_NOT_FOUND) || (res == NativeMethods.ERROR_PATH_NOT_FOUND)) {
                         throw new FileNotFoundException("File not found.");
                     } else if (res == NativeMethods.ERROR_FILE_CORRUPT) {
-                        throw new InvalidDataException("File format not recognized.");
+                        throw new InvalidDataException("File type not recognized.");
                     } else if (res == NativeMethods.ERROR_FILE_EXISTS) {
                         throw new IOException("File already exists.");
                     } else {
@@ -275,6 +344,8 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         /// <exception cref="System.IO.IOException">Access is denied.</exception>
         public void Attach(VirtualDiskAttachOptions options) {
+            if (this.DiskType == VirtualDiskType.Iso) { options |= VirtualDiskAttachOptions.ReadOnly; }
+
             var parameters = new NativeMethods.ATTACH_VIRTUAL_DISK_PARAMETERS();
             parameters.Version = NativeMethods.ATTACH_VIRTUAL_DISK_VERSION.ATTACH_VIRTUAL_DISK_VERSION_1;
 
@@ -1712,7 +1783,23 @@ namespace Medo.IO {
     }
 
 
-
+    /// <summary>
+    /// Determines type of a file.
+    /// </summary>
+    public enum VirtualDiskType {
+        /// <summary>
+        /// Tries to open file as virtual disk unless file name ends in .iso.
+        /// </summary>
+        AutoDetect = 0,
+        /// <summary>
+        /// Forces type to be VHD.
+        /// </summary>
+        Vhd = 1,
+        /// <summary>
+        /// Forces type to be ISO.
+        /// </summary>
+        Iso = 2,
+    }
 
 
     /// <summary>
