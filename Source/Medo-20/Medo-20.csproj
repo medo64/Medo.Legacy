@@ -101,8 +101,8 @@
     <Compile Include="..\medo\device\protocol\ABus [001].cs">
       <Link>Device\Protocol\ABus [001].cs</Link>
     </Compile>
-    <Compile Include="..\medo\diagnostics\ErrorReport [018].cs">
-      <Link>Diagnostics\ErrorReport [018].cs</Link>
+    <Compile Include="..\medo\diagnostics\ErrorReport [019].cs">
+      <Link>Diagnostics\ErrorReport [019].cs</Link>
     </Compile>
     <Compile Include="..\medo\diagnostics\ExceptionReport [001].cs">
       <Link>Diagnostics\ExceptionReport [001].cs</Link>
