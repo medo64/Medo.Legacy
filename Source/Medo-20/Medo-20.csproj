@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>..\..\Binaries\Medo20.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>..\..\Binaries\Medo20.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -157,6 +159,9 @@
     </Compile>
     <Compile Include="..\medo\math\ExponentialMovingAverage [006].cs">
       <Link>Math\ExponentialMovingAverage [006].cs</Link>
+    </Compile>
+    <Compile Include="..\Medo\Math\LinearCalibration [001].cs">
+      <Link>Math\LinearCalibration [001].cs</Link>
     </Compile>
     <Compile Include="..\medo\math\LinearInterpolation [002].cs">
       <Link>Math\LinearInterpolation [002].cs</Link>

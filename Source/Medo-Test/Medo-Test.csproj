@@ -45,20 +45,22 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -92,6 +94,7 @@
   <ItemGroup>
     <Compile Include="ABusFrameTest.cs" />
     <Compile Include="ArgsTest.cs" />
+    <Compile Include="LinearCalibrationTest.cs" />
     <Compile Include="HolidayTest.cs" />
     <Compile Include="RecentTest.cs" />
     <Compile Include="DS1820Test.cs" />
@@ -112,12 +115,6 @@
     <Compile Include="ProcessCapabilityTest.cs" />
     <Compile Include="Sha1Test.cs" />
     <Compile Include="WakeOnLanTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Medo-40\Medo-40.csproj">
-      <Project>{4C58CA83-E0D1-4FAE-92FC-C062C13D7C28}</Project>
-      <Name>Medo</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -146,7 +143,12 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Medo-40\Medo-40.csproj">
+      <Project>{4c58ca83-e0d1-4fae-92fc-c062c13d7c28}</Project>
+      <Name>Medo-40</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="Properties\App.snk" />
   </ItemGroup>

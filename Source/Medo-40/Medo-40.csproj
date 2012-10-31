@@ -51,8 +51,9 @@
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>Q:\Projects\My\Medo\CSharp\Binaries\Medo.xml</DocumentationFile>
+    <DocumentationFile>..\..\Binaries\Medo40.xml</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -61,8 +62,9 @@
     <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>Q:\Projects\Blueprints\CSharp\Binaries\Medo.xml</DocumentationFile>
+    <DocumentationFile>..\..\Binaries\Medo40.xml</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -222,6 +224,9 @@
     </Compile>
     <Compile Include="..\Medo\Math\ExponentialMovingAverage [006].cs">
       <Link>Math\ExponentialMovingAverage [006].cs</Link>
+    </Compile>
+    <Compile Include="..\Medo\Math\LinearCalibration [001].cs">
+      <Link>Math\LinearCalibration [001].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Math\LinearInterpolation [002].cs">
       <Link>Math\LinearInterpolation [002].cs</Link>
