@@ -100,7 +100,7 @@
     <Compile Include="DS1820Test.cs" />
     <Compile Include="OpenSslAesStreamTest.cs" />
     <Compile Include="Pbkdf2Test.cs" />
-    <Compile Include="TinyMessageTest.cs" />
+    <Compile Include="TinyPacketTest.cs" />
     <Compile Include="IniFileTest.cs" />
     <Compile Include="LinearInterpolationTest.cs" />
     <Compile Include="OibTest.cs" />

@@ -3,10 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Test {
 
-    /// <summary>
-    ///This is a test class for LinearInterpolationTest and is intended
-    ///to contain all LinearInterpolationTest Unit Tests
-    ///</summary>
     [TestClass()]
     public class LinearInterpolationTest {
 
@@ -14,7 +10,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Middle_1() {
+        public void LinearInterpolation_Middle_1() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(2, 1);
             target.Add(6, 3);
@@ -24,7 +20,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Middle_2() {
+        public void LinearInterpolation_Middle_2() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(-1, -10);
             target.Add(1, 10);
@@ -33,7 +29,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Middle_3() {
+        public void LinearInterpolation_Middle_3() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(0, 0);
             target.Add(1, 10);
@@ -41,7 +37,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Below_1() {
+        public void LinearInterpolation_Below_1() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(1, 0);
             Assert.AreEqual(1, target.GetAdjustedValue(0));
@@ -49,7 +45,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Below_2() {
+        public void LinearInterpolation_Below_2() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(2, 1);
             target.Add(4, 2);
@@ -59,7 +55,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Above_1() {
+        public void LinearInterpolation_Above_1() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(11, 10);
             Assert.AreEqual(11, target.GetAdjustedValue(10));
@@ -67,7 +63,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Above_2() {
+        public void LinearInterpolation_Above_2() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(6, 3);
             target.Add(8, 4);
@@ -77,7 +73,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_CalibratedThreePoints() {
+        public void LinearInterpolation_CalibratedThreePoints() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(1, 1.1);
             target.Add(2, 1.2);
@@ -86,7 +82,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_CalibratedValueHit() {
+        public void LinearInterpolation_CalibratedValueHit() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(1, 0);
             target.Add(2, 1);
@@ -95,14 +91,14 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_NoCalibration() {
+        public void LinearInterpolation_NoCalibration() {
             LinearInterpolation target = new LinearInterpolation();
             Assert.AreEqual(0, target.GetAdjustedValue(0));
             Assert.AreEqual(1, target.GetAdjustedValue(1));
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_OnePoint() {
+        public void LinearInterpolation_OnePoint() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(0, 1);
             Assert.AreEqual(0, target.GetAdjustedValue(1));

@@ -1,69 +1,20 @@
 ﻿using Medo.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Collections.Generic;
 
 namespace Test {
 
-
-    /// <summary>
-    ///This is a test class for IniFileTest and is intended
-    ///to contain all IniFileTest Unit Tests
-    ///</summary>
     [TestClass()]
     public class IniFileTest {
 
-
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext {
-            get {
-                return testContextInstance;
-            }
-            set {
-                testContextInstance = value;
-            }
-        }
-
-        #region Additional test attributes
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
-        #endregion
+        public TestContext TestContext { get; set; }
 
 
         [TestMethod()]
-        public void IniFile_ReadTest() {
+        public void IniFile_Read() {
             var sb = new StringBuilder();
             sb.AppendLine("; last modified 1 April 2001 by John Doe");
             sb.AppendLine("[owner]");
@@ -85,7 +36,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IniFile_ReadEscapingTest() {
+        public void IniFile_ReadEscaping() {
             var sb = new StringBuilder();
             sb.AppendLine(@"   ; testing whitespace line");
             sb.AppendLine(@"[lines]  ;comment here");
@@ -102,7 +53,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IniFile_ReadDoubleTest() {
+        public void IniFile_ReadDouble() {
             var sb = new StringBuilder();
             sb.AppendLine(@"[numbers]  ;comment here");
             sb.AppendLine(@"number-0=0.01");
@@ -118,7 +69,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IniFile_DeleteTest() {
+        public void IniFile_Delete() {
             var sb = new StringBuilder();
             sb.AppendLine("[section1]");
             sb.AppendLine("item1=A");
@@ -191,7 +142,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IniFile_SaveTest() {
+        public void IniFile_Save() {
             IniFile target = new IniFile();
             target.Write("default", "name", "john");
             Assert.AreEqual("john", target.Read("default", "name"));

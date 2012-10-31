@@ -1,189 +1,104 @@
 ﻿using Medo.Security.Checksum;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-namespace Test
-{
-    
-    
-    /// <summary>
-    ///This is a test class for Iso7064Test and is intended
-    ///to contain all Iso7064Test Unit Tests
-    ///</summary>
+
+namespace Test {
+
     [TestClass()]
     public class Iso7064Test {
 
-
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext {
-            get {
-                return testContextInstance;
-            }
-            set {
-                testContextInstance = value;
-            }
-        }
-
-        #region Additional test attributes
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
-        #endregion
+        public TestContext TestContext { get; set; }
 
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest1() {
+        public void Iso7064_01() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("0");
             char actual = actualCrc.Digest;
             Assert.AreEqual('2', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest2() {
+        public void Iso7064_02() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("1");
             char actual = actualCrc.Digest;
             Assert.AreEqual('9', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest3() {
+        public void Iso7064_03() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("6");
             char actual = actualCrc.Digest;
             Assert.AreEqual('0', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest4() {
+        public void Iso7064_04() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("9");
             char actual = actualCrc.Digest;
             Assert.AreEqual('4', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest5() {
+        public void Iso7064_05() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("0823");
             char actual = actualCrc.Digest;
             Assert.AreEqual('5', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest6() {
+        public void Iso7064_06() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("276616973212561");
             char actual = actualCrc.Digest;
             Assert.AreEqual('5', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest7() {
+        public void Iso7064_07() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("65");
             char actual = actualCrc.Digest;
             Assert.AreEqual('0', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest8() {
+        public void Iso7064_08() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("56");
             char actual = actualCrc.Digest;
             Assert.AreEqual('0', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest9() {
+        public void Iso7064_09() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("732");
             char actual = actualCrc.Digest;
             Assert.AreEqual('5', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest10() {
+        public void Iso7064_10() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("723");
             char actual = actualCrc.Digest;
             Assert.AreEqual('5', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest11() {
+        public void Iso7064_11() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("8373426074");
             char actual = actualCrc.Digest;
             Assert.AreEqual('9', actual);
         }
 
-        /// <summary>
-        ///A test for Digest property
-        ///</summary>
         [TestMethod()]
-        public void GetDigest12() {
+        public void Iso7064_12() {
             Iso7064 actualCrc = new Iso7064();
             actualCrc.Append("4428922675");
             char actual = actualCrc.Digest;

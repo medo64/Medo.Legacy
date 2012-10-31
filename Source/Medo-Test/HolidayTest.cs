@@ -1,20 +1,17 @@
 ﻿using Medo.Localization.Croatia;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+
 namespace Test {
 
-
-    /// <summary>
-    ///This is a test class for JmbgTest and is intended
-    ///to contain all JmbgTest Unit Tests
-    ///</summary>
     [TestClass()]
     public class HolidayTest {
 
         public TestContext TestContext { get; set; }
 
+
         [TestMethod()]
-        public void HolidayTest_20020216() {
+        public void Holiday_2002() {
             Assert.AreEqual(true, Holiday.IsHoliday(new DateTime(2002, 1, 1)));
             Assert.AreEqual(false, Holiday.IsHoliday(new DateTime(2002, 1, 6)));
             Assert.AreEqual(true, Holiday.IsHoliday(new DateTime(2002, 5, 1)));
@@ -32,7 +29,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void HolidayTest_2012() {
+        public void Holiday_2012() {
             Assert.AreEqual(true, Holiday.IsHoliday(new DateTime(2012, 1, 1)));
             Assert.AreEqual(true, Holiday.IsHoliday(new DateTime(2012, 1, 6)));
             Assert.AreEqual(true, Holiday.IsHoliday(new DateTime(2012, 5, 1)));

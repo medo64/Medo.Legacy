@@ -1,6 +1,5 @@
-﻿using Medo.Math;
+﻿using Medo.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace Test {
 
@@ -11,8 +10,8 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_RecentFiles_01() {
-            var x = new Medo.Configuration.RecentFiles();
+        public void RecentFiles_01() {
+            var x = new RecentFiles();
             x.Clear();
             x.Push(@"C:\test.txt");
             x.Push(@"C:\test.txt");
@@ -21,8 +20,8 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_RecentFiles_02() {
-            var x = new Medo.Configuration.RecentFiles();
+        public void RecentFiles_02() {
+            var x = new RecentFiles();
             x.Clear();
             x.Push(@"C:\testA.txt");
             x.Push(@"C:\testB.txt");
@@ -33,8 +32,8 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_RecentFiles_03() {
-            var x = new Medo.Configuration.RecentFiles(1);
+        public void RecentFiles_03() {
+            var x = new RecentFiles(1);
             x.Clear();
             x.Push(@"C:\testA.txt");
             x.Push(@"C:\testB.txt");
@@ -44,8 +43,8 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_RecentFiles_04() {
-            var x = new Medo.Configuration.RecentFiles();
+        public void RecentFiles_04() {
+            var x = new RecentFiles();
             x.Clear();
             Medo.Configuration.RecentFiles.NoRegistryWrites = true;
             x.Push(@"C:\testA.txt");

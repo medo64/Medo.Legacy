@@ -4,15 +4,10 @@ using System;
 
 namespace Test {
 
-    /// <summary>
-    ///This is a test class for LinearCalibrationTest and is intended
-    ///to contain all LinearCalibrationTest Unit Tests
-    ///</summary>
     [TestClass()]
     public class LinearCalibrationTest {
 
         public TestContext TestContext { get; set; }
-
 
 
         [TestMethod()]

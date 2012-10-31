@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Medo.Net;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using Medo.Net;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Test {
 
     [TestClass()]
-    public class TinyMessageTest {
+    public class TinyPacketTest {
 
         public TestContext TestContext { get; set; }
 
 
         [TestMethod()]
-        public void Test_TinyPacket_Encode_01() {
+        public void TinyPacket_Encode_01() {
             var target = new TinyPacket("Example", "Test");
             target["Key1Text"] = "Value1Text";
             target["Key2Text"] = "Value2Text";
@@ -22,7 +22,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_01() {
+        public void TinyPacket_Decode_01() {
             var data = new Dictionary<string, string>();
             data.Add("Key1Text", "Value1Text");
             data.Add("Key2Text", "Value2Text");
@@ -36,7 +36,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Encode_02() {
+        public void TinyPacket_Encode_02() {
             var target = new TinyPacket("Example", "Test");
             target["Key1"] = "A\n\rB";
             target["Key2"] = "\0";
@@ -45,7 +45,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_02() {
+        public void TinyPacket_Decode_02() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""Key1"":""A\n\rB"",""Key2"":""\u0000"",""Key3"":""\\""}"));
             Assert.AreEqual("Example", actual.Product);
             Assert.AreEqual("Test", actual.Operation);
@@ -56,7 +56,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_TinyPacket_Encode_NullItem_01() {
+        public void TinyPacket_Encode_NullItem_01() {
             var target = new TinyPacket("Example", "Test");
             target["A"] = "1";
             target["B"] = null;
@@ -65,7 +65,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_NullItem_01A() {
+        public void TinyPacket_Decode_NullItem_01A() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""A"":""1"",""B"":null,""C"":""2""}"));
 
             Assert.AreEqual("Example", actual.Product);
@@ -76,7 +76,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_NullItem_01B() {
+        public void TinyPacket_Decode_NullItem_01B() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test { ""A"":""1"", ""B"" : null, ""C"":""2"" }"));
 
             Assert.AreEqual("Example", actual.Product);
@@ -88,13 +88,13 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_TinyPacket_Encode_Empty() {
+        public void TinyPacket_Encode_Empty() {
             var target = new TinyPacket("Example", "Test");
             Assert.AreEqual(@"Tiny Example Test {}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_Empty() {
+        public void TinyPacket_Decode_Empty() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test  {} "));
 
             Assert.AreEqual("Example", actual.Product);
@@ -102,7 +102,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_Null() {
+        public void TinyPacket_Decode_Null() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test  null "));
 
             Assert.AreEqual("Example", actual.Product);
@@ -110,7 +110,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_MissingData_01() { //it is an error state, but we shall recognize it.
+        public void TinyPacket_Decode_MissingData_01() { //it is an error state, but we shall recognize it.
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test "));
 
             Assert.AreEqual("Example", actual.Product);
@@ -118,7 +118,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_MissingData_02() { //it is an error state, but we shall recognize it.
+        public void TinyPacket_Decode_MissingData_02() { //it is an error state, but we shall recognize it.
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test"));
 
             Assert.AreEqual("Example", actual.Product);
@@ -126,7 +126,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Encode_Indexer() {
+        public void TinyPacket_Encode_Indexer() {
             var target = new TinyPacket("Example", "Test");
             target["A"] = "0";
             target["A"] = "1";
@@ -135,7 +135,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_TinyPacket_Decode_Indexer() {
+        public void TinyPacket_Decode_Indexer() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""A"":""0"",""A"":""1"",""B"":""null"",""B"":null}"));
 
             Assert.AreEqual("Example", actual.Product);
@@ -147,25 +147,25 @@ namespace Test {
 
         [TestMethod()]
         [ExpectedException(typeof(FormatException))]
-        public void Test_TinyPacket_Decode_Error_01() {
+        public void TinyPacket_Decode_Error_01() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example "));
         }
 
         [TestMethod()]
         [ExpectedException(typeof(FormatException))]
-        public void Test_TinyPacket_Decode_Error_02() {
+        public void TinyPacket_Decode_Error_02() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny "));
         }
 
         [TestMethod()]
         [ExpectedException(typeof(FormatException))]
-        public void Test_TinyPacket_Decode_Error_03() {
+        public void TinyPacket_Decode_Error_03() {
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@""));
         }
 
 
         [TestMethod()]
-        public void Test_TinyPacket_NullItems() {
+        public void TinyPacket_NullItems() {
             var target = new TinyPacket("Example", "Test", null);
             Assert.AreEqual(null, target["Key1Text"]);
             Assert.IsNotNull(target.GetEnumerator());
@@ -173,7 +173,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_TinyPacket_EncodeDecode_SpeedTest() {
+        public void TinyPacket_EncodeDecode_SpeedTest() {
             var data = new Dictionary<string, string>();
             data.Add("Key1Text", "Value1Text");
             data.Add("Key2Text", "Value2Text");

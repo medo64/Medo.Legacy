@@ -4,63 +4,14 @@ using System;
 
 namespace Test {
 
-
-    /// <summary>
-    ///This is a test class for ProcessCapabilityTest and is intended
-    ///to contain all ProcessCapabilityTest Unit Tests
-    ///</summary>
     [TestClass()]
     public class ProcessCapabilityTest {
 
-
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext {
-            get {
-                return testContextInstance;
-            }
-            set {
-                testContextInstance = value;
-            }
-        }
-
-        #region Additional test attributes
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
-        #endregion
+        public TestContext TestContext { get; set; }
 
 
         [TestMethod()]
-        public void BasicMeanAndStDevTest1() {
+        public void ProcessCapability_MeanAndStDev_Basic_1() {
             ProcessCapability target = new ProcessCapability();
             target.UseBesselCorrection = false;
             target.Add(0);
@@ -74,7 +25,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void BasicMeanAndStDevTest2() {
+        public void ProcessCapability_MeanAndStDev_Basic_2() {
             ProcessCapability target = new ProcessCapability();
             target.UseBesselCorrection = false;
             target.Add(0);
@@ -88,7 +39,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void BasicMeanAndStDevTest3() {
+        public void ProcessCapability_MeanAndStDev_Basic_3() {
             ProcessCapability target = new ProcessCapability();
             target.UseBesselCorrection = false;
             target.Add(6);
@@ -101,8 +52,9 @@ namespace Test {
             Assert.AreEqual(8, target.Maximum);
         }
 
+
         [TestMethod()]
-        public void IndicesTest1() {
+        public void ProcessCapability_Indices_1() {
             ProcessCapability target = new ProcessCapability(0, 20, 10);
             target.Add(0);
             target.Add(0);
@@ -119,7 +71,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IndicesTest2() {
+        public void ProcessCapability_Indices_2() {
             ProcessCapability target = new ProcessCapability(5, 15, 10);
             target.Add(0);
             target.Add(0);
@@ -136,7 +88,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IndicesTest3() {
+        public void ProcessCapability_Indices_3() {
             ProcessCapability target = new ProcessCapability(2, 12, 7);
             target.Add(6);
             target.Add(6);
@@ -153,7 +105,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IncrementalIndicesTest1() {
+        public void ProcessCapability_Indices_Incremental() {
             ProcessCapability target = new ProcessCapability(0, 20, 10);
             target.Add(4);
             target.Add(6);
@@ -178,7 +130,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void IndicesNaNTest() {
+        public void ProcessCapability_Indices_NaN() {
             ProcessCapability target = new ProcessCapability();
             target.Add(0);
             target.Add(0);

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Text;
+﻿using Medo.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Medo.Security.Cryptography;
+using System;
+using System.Security.Cryptography;
 
 namespace Test {
 
-
-    /// <summary>
-    ///This is a test class for Pbkdf2Test and is intended
-    ///to contain all Pbkdf2Test Unit Tests
-    ///</summary>
     [TestClass()]
     public class Pbkdf2Test {
 
@@ -18,7 +12,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void TestSha1_1() { //RFC 6070
+        public void Pbkdf2_Sha1_1() { //RFC 6070
             using (var hmac = new HMACSHA1()) {
                 var P = "password";
                 var S = "salt";
@@ -31,7 +25,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void TestSha1_2() { //RFC 6070
+        public void Pbkdf2_Sha1_2() { //RFC 6070
             using (var hmac = new HMACSHA1()) {
                 var P = "password";
                 var S = "salt";
@@ -44,7 +38,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void TestSha1_3() { //RFC 6070
+        public void Pbkdf2_Sha1_3() { //RFC 6070
             using (var hmac = new HMACSHA1()) {
                 var P = "password";
                 var S = "salt";
@@ -56,8 +50,9 @@ namespace Test {
             }
         }
 
+        ////Too slow...
         //[TestMethod()]
-        //public void TestSha1_4() { //RFC 6070
+        //public void Pbkdf2_Sha1_4() { //RFC 6070
         //    using (var hmac = new HMACSHA1()) {
         //        var P = "password";
         //        var S = "salt";
@@ -70,7 +65,7 @@ namespace Test {
         //}
 
         [TestMethod()]
-        public void TestSha1_5() { //RFC 6070
+        public void Pbkdf2_Sha1_5() { //RFC 6070
             using (var hmac = new HMACSHA1()) {
                 var P = "passwordPASSWORDpassword";
                 var S = "saltSALTsaltSALTsaltSALTsaltSALTsalt";
@@ -83,7 +78,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void TestSha1_6() { //RFC 6070
+        public void Pbkdf2_Sha1_6() { //RFC 6070
             using (var hmac = new HMACSHA1()) {
                 var P = "pass\0word";
                 var S = "sa\0lt";
@@ -97,7 +92,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void TestSha256_1() {
+        public void Pbkdf2_Sha256_1() {
             using (var hmac = new HMACSHA256()) {
                 var P = "password";
                 var S = "salt";
@@ -110,7 +105,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void TestSha256_2() {
+        public void Pbkdf2_Sha256_2() {
             using (var hmac = new HMACSHA256()) {
                 var P = "password";
                 var S = "salt";
@@ -123,7 +118,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void TestSha256_3() {
+        public void Pbkdf2_Sha256_3() {
             using (var hmac = new HMACSHA256()) {
                 var P = "password";
                 var S = "salt";
@@ -135,8 +130,9 @@ namespace Test {
             }
         }
 
+        ////Too slow...
         //[TestMethod()]
-        //public void TestSha256_4() {
+        //public void Pbkdf2_Sha256_4() {
         //    using (var hmac = new HMACSHA256()) {
         //        var P = "password";
         //        var S = "salt";
@@ -149,7 +145,7 @@ namespace Test {
         //}
 
         [TestMethod()]
-        public void TestSha256_5() {
+        public void Pbkdf2_Sha256_5() {
             using (var hmac = new HMACSHA256()) {
                 var P = "passwordPASSWORDpassword";
                 var S = "saltSALTsaltSALTsaltSALTsaltSALTsalt";
@@ -162,7 +158,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void TestSha256_6() {
+        public void Pbkdf2_Sha256_6() {
             using (var hmac = new HMACSHA256()) {
                 var P = "pass\0word";
                 var S = "sa\0lt";

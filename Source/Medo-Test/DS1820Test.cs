@@ -11,7 +11,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_DS1820_Parse_Empty() {
+        public void DS1820_Parse_Empty() {
             var x = DS1820.Parse("");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -28,7 +28,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_17() {
+        public void DS1820_Parse_01_17() {
             var x = DS1820.Parse("109A29130000003E09000705FFFF184EC4");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -44,7 +44,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_17_ReverseRomScratch() {
+        public void DS1820_Parse_01_17_ReverseRomScratch() {
             var x = DS1820.Parse("3E00000013299A10 C44E18FFFF05070009");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -60,7 +60,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_ReverseRom() {
+        public void DS1820_Parse_01_ReverseRom() {
             var x = DS1820.Parse("3E00000013299A10 09000705FFFF184EC4");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -76,7 +76,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_17_ReverseScratch() {
+        public void DS1820_Parse_01_17_ReverseScratch() {
             var x = DS1820.Parse("109A29130000003E C44E18FFFF05070009");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -92,7 +92,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_17_CrcFailRomScratch() {
+        public void DS1820_Parse_01_17_CrcFailRomScratch() {
             var x = DS1820.Parse("109A29130000003D 09000705FFFF184EC3");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -108,7 +108,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_17_CrcFailRom() {
+        public void DS1820_Parse_01_17_CrcFailRom() {
             var x = DS1820.Parse("109A29130000003F 09000705FFFF184EC4");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -124,7 +124,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_17_CrcFailScratch() {
+        public void DS1820_Parse_01_17_CrcFailScratch() {
             var x = DS1820.Parse("109A29130000003E 09000705FFFF184EC5");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -140,7 +140,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_16() {
+        public void DS1820_Parse_01_16() {
             var x = DS1820.Parse("109A29130000003E09000705FFFF184E");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -156,7 +156,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_15() {
+        public void DS1820_Parse_01_15() {
             var x = DS1820.Parse("109A29130000003E09000705FFFF18");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -172,7 +172,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_12() {
+        public void DS1820_Parse_01_12() {
             var x = DS1820.Parse("109A29130000003E09000705");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -188,7 +188,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_11() {
+        public void DS1820_Parse_01_11() {
             var x = DS1820.Parse("109A29130000003E090007");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -204,7 +204,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_10() {
+        public void DS1820_Parse_01_10() {
             var x = DS1820.Parse("109A29130000003E0900");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -220,7 +220,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_10_ReverseRom() {
+        public void DS1820_Parse_01_10_ReverseRom() {
             var x = DS1820.Parse("3E00000013299A10 0900");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -236,7 +236,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_09() {
+        public void DS1820_Parse_01_09() {
             var x = DS1820.Parse("109A29130000003E09");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -252,7 +252,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_08() {
+        public void DS1820_Parse_01_08() {
             var x = DS1820.Parse("109A29130000003E");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -268,7 +268,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_08_ReverseRom() {
+        public void DS1820_Parse_01_08_ReverseRom() {
             var x = DS1820.Parse("3E00000013299A10 ");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(0x3E00000013299A10, x.RomCode);
@@ -284,7 +284,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_08_CrcFailRom() {
+        public void DS1820_Parse_01_08_CrcFailRom() {
             var x = DS1820.Parse("2E00000013299A10 ");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -300,7 +300,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_07() {
+        public void DS1820_Parse_01_07() {
             var x = DS1820.Parse("109A2913000000");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -316,7 +316,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_06() {
+        public void DS1820_Parse_01_06() {
             var x = DS1820.Parse("109A29130000");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -332,7 +332,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_01_01() {
+        public void DS1820_Parse_01_01() {
             var x = DS1820.Parse("10");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -349,7 +349,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_17() {
+        public void DS1820_Parse_02_17() {
             var x = DS1820.Parse("2824F76B000000872C014B467FFF041014");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -365,7 +365,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_17_ReverseRomScratch() {
+        public void DS1820_Parse_02_17_ReverseRomScratch() {
             var x = DS1820.Parse("870000006BF72428 141004FF7F464B012C");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -381,7 +381,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_17_ReverseRom() {
+        public void DS1820_Parse_02_17_ReverseRom() {
             var x = DS1820.Parse("870000006BF72428 2C014B467FFF041014");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -397,7 +397,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_17_ReverseScratch() {
+        public void DS1820_Parse_02_17_ReverseScratch() {
             var x = DS1820.Parse("2824F76B00000087 141004FF7F464B012C");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -413,7 +413,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_17_CrcFailRomScratch() {
+        public void DS1820_Parse_02_17_CrcFailRomScratch() {
             var x = DS1820.Parse("2824F76B00000086 2C014B467FFF041013");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -429,7 +429,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_17_CrcFailRom() {
+        public void DS1820_Parse_02_17_CrcFailRom() {
             var x = DS1820.Parse("2824F76B00000088 2C014B467FFF041014");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -445,7 +445,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_17_CrcFailScratch() {
+        public void DS1820_Parse_02_17_CrcFailScratch() {
             var x = DS1820.Parse("2824F76B00000087 2C014B467FFF041015");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -461,7 +461,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_16() {
+        public void DS1820_Parse_02_16() {
             var x = DS1820.Parse("2824F76B000000872C014B467FFF0410");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -477,7 +477,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_15() {
+        public void DS1820_Parse_02_15() {
             var x = DS1820.Parse("2824F76B000000872C014B467FFF04");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -493,7 +493,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_13() {
+        public void DS1820_Parse_02_13() {
             var x = DS1820.Parse("2824F76B000000872C014B467F");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -509,7 +509,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_12() {
+        public void DS1820_Parse_02_12() {
             var x = DS1820.Parse("2824F76B000000872C014B46");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -525,7 +525,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_11() {
+        public void DS1820_Parse_02_11() {
             var x = DS1820.Parse("2824F76B000000872C014B");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -541,7 +541,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_10() {
+        public void DS1820_Parse_02_10() {
             var x = DS1820.Parse("2824F76B000000872C01");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -557,7 +557,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_10_ReverseRom() {
+        public void DS1820_Parse_02_10_ReverseRom() {
             var x = DS1820.Parse("870000006BF72428 2C01");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -573,7 +573,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_09() {
+        public void DS1820_Parse_02_09() {
             var x = DS1820.Parse("2824F76B000000872C");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -589,7 +589,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_08() {
+        public void DS1820_Parse_02_08() {
             var x = DS1820.Parse("2824F76B00000087");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -605,7 +605,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_08_ReverseRom() {
+        public void DS1820_Parse_02_08_ReverseRom() {
             var x = DS1820.Parse("870000006BF72428 ");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x870000006BF72428), x.RomCode);
@@ -621,7 +621,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_08_CrcFailRom() {
+        public void DS1820_Parse_02_08_CrcFailRom() {
             var x = DS1820.Parse("970000006BF72428 ");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -637,7 +637,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_07() {
+        public void DS1820_Parse_02_07() {
             var x = DS1820.Parse("2824F76B000000");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -653,7 +653,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_06() {
+        public void DS1820_Parse_02_06() {
             var x = DS1820.Parse("2824F76B0000");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -669,7 +669,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_02_01() {
+        public void DS1820_Parse_02_01() {
             var x = DS1820.Parse("28");
             Assert.IsFalse(x.IsRomCodeValid);
             Assert.AreEqual(0, x.RomCode);
@@ -686,7 +686,7 @@ namespace Test {
 
 
         [TestMethod()]
-        public void Test_DS1820_Parse_03() {
+        public void DS1820_Parse_03() {
             var x = DS1820.Parse("108D6A45020800AF3A004B46FFFF0B102F");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0xAF000802456A8D10), x.RomCode);
@@ -702,7 +702,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_04() {
+        public void DS1820_Parse_04() {
             var x = DS1820.Parse("2846185F0300003DCA014B467FFF061065");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x3D0000035F184628), x.RomCode);
@@ -718,7 +718,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_05a() {
+        public void DS1820_Parse_05a() {
             var x = DS1820.Parse("10C8DD540108007C2E004B46FFFF0A10AA");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x7C00080154DDC810), x.RomCode);
@@ -734,7 +734,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_05b() {
+        public void DS1820_Parse_05b() {
             var x = DS1820.Parse("10C8DD540108007C2F004B46FFFF081078");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x7C00080154DDC810), x.RomCode);
@@ -750,7 +750,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_06() {
+        public void DS1820_Parse_06() {
             var x = DS1820.Parse("104C5F450208005139004B46FFFF0410F2");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x51000802455F4C10), x.RomCode);
@@ -766,7 +766,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_07() {
+        public void DS1820_Parse_07() {
             var x = DS1820.Parse("108D742C0208007237004B46FFFF031025");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x720008022C748D10), x.RomCode);
@@ -782,7 +782,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void Test_DS1820_Parse_08() {
+        public void DS1820_Parse_08() {
             var x = DS1820.Parse("2846185F0300003DC6014B467FFF0A1017");
             Assert.IsTrue(x.IsRomCodeValid);
             Assert.AreEqual(unchecked((Int64)0x3D0000035F184628), x.RomCode);
