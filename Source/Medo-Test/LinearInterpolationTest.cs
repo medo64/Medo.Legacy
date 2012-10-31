@@ -10,54 +10,11 @@ namespace Test {
     [TestClass()]
     public class LinearInterpolationTest {
 
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext {
-            get {
-                return testContextInstance;
-            }
-            set {
-                testContextInstance = value;
-            }
-        }
-
-        #region Additional test attributes
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
-        #endregion
+        public TestContext TestContext { get; set; }
 
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Middle_1_Test() {
+        public void LinearInterpolation_GetAdjustedValue_Middle_1() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(2, 1);
             target.Add(6, 3);
@@ -67,7 +24,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Middle_2_Test() {
+        public void LinearInterpolation_GetAdjustedValue_Middle_2() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(-1, -10);
             target.Add(1, 10);
@@ -76,7 +33,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Middle_3_Test() {
+        public void LinearInterpolation_GetAdjustedValue_Middle_3() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(0, 0);
             target.Add(1, 10);
@@ -84,7 +41,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Below_1_Test() {
+        public void LinearInterpolation_GetAdjustedValue_Below_1() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(1, 0);
             Assert.AreEqual(1, target.GetAdjustedValue(0));
@@ -92,7 +49,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Below_2_Test() {
+        public void LinearInterpolation_GetAdjustedValue_Below_2() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(2, 1);
             target.Add(4, 2);
@@ -102,7 +59,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Above_1_Test() {
+        public void LinearInterpolation_GetAdjustedValue_Above_1() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(11, 10);
             Assert.AreEqual(11, target.GetAdjustedValue(10));
@@ -110,7 +67,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_Above_2_Test() {
+        public void LinearInterpolation_GetAdjustedValue_Above_2() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(6, 3);
             target.Add(8, 4);
@@ -120,7 +77,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_CalibratedThreePoints_Test() {
+        public void LinearInterpolation_GetAdjustedValue_CalibratedThreePoints() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(1, 1.1);
             target.Add(2, 1.2);
@@ -129,7 +86,7 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_CalibratedValueHit_Test() {
+        public void LinearInterpolation_GetAdjustedValue_CalibratedValueHit() {
             LinearInterpolation target = new LinearInterpolation();
             target.Add(1, 0);
             target.Add(2, 1);
@@ -138,10 +95,18 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void LinearInterpolation_GetAdjustedValue_NoCalibration_Test() {
+        public void LinearInterpolation_GetAdjustedValue_NoCalibration() {
             LinearInterpolation target = new LinearInterpolation();
             Assert.AreEqual(0, target.GetAdjustedValue(0));
             Assert.AreEqual(1, target.GetAdjustedValue(1));
         }
+
+        [TestMethod()]
+        public void LinearInterpolation_GetAdjustedValue_OnePoint() {
+            LinearInterpolation target = new LinearInterpolation();
+            target.Add(0, 1);
+            Assert.AreEqual(0, target.GetAdjustedValue(1));
+        }
+
     }
 }
