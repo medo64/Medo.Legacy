@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -143,8 +143,8 @@
     <Compile Include="..\medo\io\VirtualDisk [007].cs">
       <Link>IO\VirtualDisk [007].cs</Link>
     </Compile>
-    <Compile Include="..\medo\localization\croatia\Holiday [003].cs">
-      <Link>Localization\Croatia\Holiday [003].cs</Link>
+    <Compile Include="..\Medo\Localization\Croatia\Holiday [004].cs">
+      <Link>Localization\Croatia\Holiday [004].cs</Link>
     </Compile>
     <Compile Include="..\medo\localization\croatia\Jmbg [006].cs">
       <Link>Localization\Croatia\Jmbg [006].cs</Link>

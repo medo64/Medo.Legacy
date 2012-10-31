@@ -92,6 +92,7 @@
   <ItemGroup>
     <Compile Include="ABusFrameTest.cs" />
     <Compile Include="ArgsTest.cs" />
+    <Compile Include="HolidayTest.cs" />
     <Compile Include="RecentTest.cs" />
     <Compile Include="DS1820Test.cs" />
     <Compile Include="OpenSslAesStreamTest.cs" />
