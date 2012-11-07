@@ -64,9 +64,6 @@
     <Compile Include="..\Medo\Bitwise [001].cs">
       <Link>Bitwise [001].cs</Link>
     </Compile>
-    <Compile Include="..\medo\configuration\IniFile [001].cs">
-      <Link>Configuration\IniFile [001].cs</Link>
-    </Compile>
     <Compile Include="..\Medo\Configuration\RecentFiles [005].cs">
       <Link>Configuration\RecentFiles [005].cs</Link>
     </Compile>
@@ -81,6 +78,9 @@
     </Compile>
     <Compile Include="..\medo\data\DeleteCommand [004].cs">
       <Link>Data\DeleteCommand [004].cs</Link>
+    </Compile>
+    <Compile Include="..\Medo\Data\IniFile [001].cs">
+      <Link>Data\IniFile [001].cs</Link>
     </Compile>
     <Compile Include="..\medo\data\InsertCommand [006].cs">
       <Link>Data\InsertCommand [006].cs</Link>

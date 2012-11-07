@@ -51,6 +51,9 @@ namespace Medo.Math {
         }
 
         private double _correlationCoefficient;
+        /// <summary>
+        /// Gets correlation coefficient for calibration data set (R).
+        /// </summary>
         public double CorrelationCoefficient {
             get {
                 if (this.Ready == false) { this.Prepare(); }

@@ -3,6 +3,8 @@
 //2011-03-11: Initial version.
 //2011-03-13: Added GetSections, GetKeys, ContainsSection and ContainsKey.
 //            Exceptions from code are not wrapped anymore.
+//2012-11-08: Obsoleted.
+
 
 using System;
 using System.Collections.Generic;
@@ -16,6 +18,7 @@ namespace Medo.Configuration {
     /// Class for reading and writing ini files.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ini", Justification = "This is intended naming")]
+    [Obsolete("This class is obsoleted, use Medo.Data.IniFile instead.")]
     public class IniFile {
 
         private readonly Dictionary<string, Dictionary<string, string>> Items = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
@@ -240,7 +243,7 @@ namespace Medo.Configuration {
         /// <summary>
         /// Returns all sections.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification="Method is more appropriate choice.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is more appropriate choice.")]
         public IEnumerable<string> GetSections() {
             foreach (var section in this.Items) {
                 yield return section.Key;
