@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2007 Josip Medved <jmedved@jmedved.com>
+//Copyright (c) 2007 Josip Medved <jmedved@jmedved.com>
 
 //2007-12-22: New version. 
 //2007-12-27: Fixed error when application is without icon
@@ -10,6 +10,7 @@
 //2008-04-11: Cleaned code to match FxCop 1.36 beta 2 (SpecifyMarshalingForPInvokeStringArguments).
 //2008-05-11: Fixed exception when there is no project's icon.
 //2008-08-10: Form is not topmost any more.
+//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 
 
 using System;
@@ -178,10 +179,12 @@ namespace Medo.Windows.Forms {
 
 		private static class NativeMethods {
 
-			[DllImport("user32.dll", CharSet = CharSet.Unicode)]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [DllImport("user32.dll", CharSet = CharSet.Unicode)]
 			static extern internal System.IntPtr LoadIcon(System.IntPtr hInstance, string lpIconName);
 
-			[DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
+            [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
 			static extern internal System.IntPtr LoadLibrary(string lpFileName);
 
 		}

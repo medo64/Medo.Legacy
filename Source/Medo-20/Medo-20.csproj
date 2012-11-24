@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -57,8 +57,8 @@
     <Compile Include="..\medo\application\Args [002].cs">
       <Link>Application\Args [002].cs</Link>
     </Compile>
-    <Compile Include="..\medo\application\SingleInstance [009].cs">
-      <Link>Application\SingleInstance [009].cs</Link>
+    <Compile Include="..\medo\application\SingleInstance [010].cs">
+      <Link>Application\SingleInstance [010].cs</Link>
     </Compile>
     <Compile Include="..\medo\application\UnhandledCatch [008].cs">
       <Link>Application\UnhandledCatch [008].cs</Link>
@@ -135,17 +135,17 @@
     <Compile Include="..\Medo\Endianness [001].cs">
       <Link>Endianness [001].cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\AdsFileStream [001].cs">
-      <Link>IO\AdsFileStream [001].cs</Link>
+    <Compile Include="..\medo\io\AdsFileStream [002].cs">
+      <Link>IO\AdsFileStream [002].cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\NamedPipe [002].cs">
-      <Link>IO\NamedPipe [002].cs</Link>
+    <Compile Include="..\medo\io\NamedPipe [003].cs">
+      <Link>IO\NamedPipe [003].cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\UartPort [004].cs">
-      <Link>IO\UartPort [004].cs</Link>
+    <Compile Include="..\medo\io\UartPort [005].cs">
+      <Link>IO\UartPort [005].cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\VirtualDisk [007].cs">
-      <Link>IO\VirtualDisk [007].cs</Link>
+    <Compile Include="..\medo\io\VirtualDisk [008].cs">
+      <Link>IO\VirtualDisk [008].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Localization\Croatia\Holiday [004].cs">
       <Link>Localization\Croatia\Holiday [004].cs</Link>
@@ -180,8 +180,8 @@
     <Compile Include="..\medo\math\WeightedMovingAverage [005].cs">
       <Link>Math\WeightedMovingAverage [005].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\MessageBox [006].cs">
-      <Link>MessageBox [006].cs</Link>
+    <Compile Include="..\Medo\MessageBox [007].cs">
+      <Link>MessageBox [007].cs</Link>
     </Compile>
     <Compile Include="..\medo\net\KeyValuePacket [002].cs">
       <Link>Net\KeyValuePacket [002].cs</Link>
@@ -231,8 +231,8 @@
     <Compile Include="..\medo\security\cryptography\Sha1 [001].cs">
       <Link>Security\Cryptography\Sha1 [001].cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\principal\Impersonation [001].cs">
-      <Link>Security\Principal\Impersonation [001].cs</Link>
+    <Compile Include="..\medo\security\principal\Impersonation [002].cs">
+      <Link>Security\Principal\Impersonation [002].cs</Link>
     </Compile>
     <Compile Include="..\medo\services\Upgrade [002].cs">
       <Link>Services\Upgrade [002].cs</Link>
@@ -249,8 +249,8 @@
     <Compile Include="..\medo\web\gdata\GDataClientLogin [002].cs">
       <Link>Web\GData\GDataClientLogin [002].cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\AboutBox [012].cs">
-      <Link>Windows\Forms\AboutBox [012].cs</Link>
+    <Compile Include="..\medo\windows\forms\AboutBox [013].cs">
+      <Link>Windows\Forms\AboutBox [013].cs</Link>
     </Compile>
     <Compile Include="..\medo\windows\forms\Button [001].cs">
       <Link>Windows\Forms\Button [001].cs</Link>
@@ -272,11 +272,11 @@
       <Link>Windows\Forms\DateTimePicker [001].cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\Hotkey [001].cs">
-      <Link>Windows\Forms\Hotkey [001].cs</Link>
+    <Compile Include="..\medo\windows\forms\Hotkey [002].cs">
+      <Link>Windows\Forms\Hotkey [002].cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\InputBox [001].cs">
-      <Link>Windows\Forms\InputBox [001].cs</Link>
+    <Compile Include="..\medo\windows\forms\InputBox [002].cs">
+      <Link>Windows\Forms\InputBox [002].cs</Link>
     </Compile>
     <Compile Include="..\medo\windows\forms\LoginDialog [003].cs">
       <Link>Windows\Forms\LoginDialog [003].cs</Link>
@@ -289,8 +289,8 @@
       <Link>Windows\Forms\RadioButton [001].cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\SplashBox [010].cs">
-      <Link>Windows\Forms\SplashBox [010].cs</Link>
+    <Compile Include="..\medo\windows\forms\SplashBox [011].cs">
+      <Link>Windows\Forms\SplashBox [011].cs</Link>
     </Compile>
     <Compile Include="..\medo\windows\forms\State [015].cs">
       <Link>Windows\Forms\State [015].cs</Link>

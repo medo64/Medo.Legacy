@@ -90,8 +90,8 @@
     <Compile Include="..\Medo\Application\Args [002].cs">
       <Link>Application\Args [002].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Application\SingleInstance [009].cs">
-      <Link>Application\SingleInstance [009].cs</Link>
+    <Compile Include="..\Medo\Application\SingleInstance [010].cs">
+      <Link>Application\SingleInstance [010].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Application\UnhandledCatch [008].cs">
       <Link>Application\UnhandledCatch [008].cs</Link>
@@ -195,17 +195,17 @@
     <Compile Include="..\Medo\Extensions\SIPrefixExtensions [003].cs">
       <Link>Extensions\SIPrefixExtensions [003].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\IO\AdsFileStream [001].cs">
-      <Link>IO\AdsFileStream [001].cs</Link>
+    <Compile Include="..\Medo\IO\AdsFileStream [002].cs">
+      <Link>IO\AdsFileStream [002].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\IO\NamedPipe [002].cs">
-      <Link>IO\NamedPipe [002].cs</Link>
+    <Compile Include="..\Medo\IO\NamedPipe [003].cs">
+      <Link>IO\NamedPipe [003].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\IO\UartPort [004].cs">
-      <Link>IO\UartPort [004].cs</Link>
+    <Compile Include="..\Medo\IO\UartPort [005].cs">
+      <Link>IO\UartPort [005].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\IO\VirtualDisk [007].cs">
-      <Link>IO\VirtualDisk [007].cs</Link>
+    <Compile Include="..\Medo\IO\VirtualDisk [008].cs">
+      <Link>IO\VirtualDisk [008].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Localization\Croatia\Holiday [004].cs">
       <Link>Localization\Croatia\Holiday [004].cs</Link>
@@ -243,8 +243,8 @@
     <Compile Include="..\Medo\Math\WeightedMovingAverage [005].cs">
       <Link>Math\WeightedMovingAverage [005].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\MessageBox [006].cs">
-      <Link>MessageBox [006].cs</Link>
+    <Compile Include="..\Medo\MessageBox [007].cs">
+      <Link>MessageBox [007].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Net\KeyValuePacket [002].cs">
       <Link>Net\KeyValuePacket [002].cs</Link>
@@ -297,8 +297,8 @@
     <Compile Include="..\Medo\Security\Cryptography\Sha1 [001].cs">
       <Link>Security\Cryptography\Sha1 [001].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Security\Principal\Impersonation [001].cs">
-      <Link>Security\Principal\Impersonation [001].cs</Link>
+    <Compile Include="..\Medo\Security\Principal\Impersonation [002].cs">
+      <Link>Security\Principal\Impersonation [002].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Services\Upgrade [002].cs">
       <Link>Services\Upgrade [002].cs</Link>
@@ -318,8 +318,8 @@
     <Compile Include="..\Medo\Windows\AboutWindow [003].cs">
       <Link>Windows\AboutWindow [003].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Windows\Forms\AboutBox [012].cs">
-      <Link>Windows\Forms\AboutBox [012].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\AboutBox [013].cs">
+      <Link>Windows\Forms\AboutBox [013].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Windows\Forms\Button [001].cs">
       <Link>Windows\Forms\Button [001].cs</Link>
@@ -341,11 +341,11 @@
       <Link>Windows\Forms\DateTimePicker [001].cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\Medo\Windows\Forms\Hotkey [001].cs">
-      <Link>Windows\Forms\Hotkey [001].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\Hotkey [002].cs">
+      <Link>Windows\Forms\Hotkey [002].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Windows\Forms\InputBox [001].cs">
-      <Link>Windows\Forms\InputBox [001].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\InputBox [002].cs">
+      <Link>Windows\Forms\InputBox [002].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Windows\Forms\LoginDialog [003].cs">
       <Link>Windows\Forms\LoginDialog [003].cs</Link>
@@ -358,8 +358,8 @@
       <Link>Windows\Forms\RadioButton [001].cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\Medo\Windows\Forms\SplashBox [010].cs">
-      <Link>Windows\Forms\SplashBox [010].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\SplashBox [011].cs">
+      <Link>Windows\Forms\SplashBox [011].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Windows\Forms\State [015].cs">
       <Link>Windows\Forms\State [015].cs</Link>

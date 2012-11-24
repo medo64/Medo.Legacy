@@ -1,4 +1,4 @@
-﻿//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
+//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-09-11: Initial version.
 //2011-02-16: Fixed ReadLine.
@@ -6,6 +6,7 @@
 //2011-04-02: Removed Flush from Close.
 //            Port name is not immediately prepended with \\?\.
 //2011-08-04: Compatible with Mono.
+//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 
 
 using System;
@@ -570,37 +571,46 @@ namespace Medo.IO {
             }
 
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "ClearCommError", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean ClearCommError([In()] CreateFileWHandle hFile, ref IntPtr lpErrors, ref COMSTAT lpStat);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "CloseHandle", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean CloseHandle([In()] IntPtr hObject);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "CreateFileW", SetLastError = true)]
             public static extern CreateFileWHandle CreateFileW([In()] [MarshalAs(UnmanagedType.LPWStr)] String lpFileName, UInt32 dwDesiredAccess, UInt32 dwShareMode, [In()] IntPtr lpSecuritys, UInt32 dwCreationDisposition, UInt32 dwFlagsAndAttributes, [In()] IntPtr hTemplateFile);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "FlushFileBuffers", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean FlushFileBuffers([In()] CreateFileWHandle hFile);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "PurgeComm")]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean PurgeComm([In()] CreateFileWHandle hFile, UInt32 dwFlags);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "ReadFile", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean ReadFile([In()] CreateFileWHandle hFile, Byte[] lpBuffer, Int32 nNumberOfBytesToRead, ref IntPtr lpNumberOfBytesRead, ref NativeOverlapped lpOverlapped);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "SetCommConfig", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean SetCommConfig([In()] CreateFileWHandle hCommDev, [In()] ref COMMCONFIG lpCC, Int32 dwSize);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "SetCommTimeouts", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean SetCommTimeouts([In()] CreateFileWHandle hFile, [In()] ref COMMTIMEOUTS lpCommTimeouts);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", EntryPoint = "WriteFile", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean WriteFile([In()] CreateFileWHandle hFile, [In()] Byte[] lpBuffer, Int32 nNumberOfBytesToWrite, ref IntPtr lpNumberOfBytesWritten, ref NativeOverlapped lpOverlapped);

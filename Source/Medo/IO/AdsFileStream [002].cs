@@ -1,6 +1,7 @@
-﻿//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
+//Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-02-07: Initial version.
+//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 
 
 using System;
@@ -31,7 +32,6 @@ namespace Medo.IO {
         /// <exception cref="System.NotSupportedException">Operation is not supported on current OS version (minimum is Windows Vista).</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Failed retrieving information.</exception>
         /// <remarks>Iterating NTFS Streams by Stephen Toub (http://msdn.microsoft.com/en-us/magazine/cc163677.aspx)</remarks>
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public static IEnumerable<string> GetStreamNames(string path) {
             if (path == null) throw new ArgumentNullException("path", "Parameter \"path\" cannot be null.");
 
@@ -70,7 +70,6 @@ namespace Medo.IO {
         /// <param name="streamName">Name of NTFS alternate data stream to be deleted.</param>
         /// <exception cref="System.ArgumentNullException">Parameter cannot be null.</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Function failed.</exception>
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public static void DeleteStream(string path, string streamName) {
             if (path == null) { throw new ArgumentNullException("path", "Parameter \"path\" cannot be null."); }
             if (streamName == null) { throw new ArgumentNullException("streamName", "Parameter \"streamName\" cannot be null."); }
@@ -109,7 +108,6 @@ namespace Medo.IO {
         /// <exception cref="System.UnauthorizedAccessException">The access requested is not permitted by the operating system for the specified path, such as when access is Write or ReadWrite and the file or directory is set for read-only access. -or-System.IO.FileOptions.Encrypted is specified for options, but file encryption is not supported on the current platform.</exception>
         /// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Invalid handle value.</exception>
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public AdsFileStream(string path, string streamName, FileMode mode, FileAccess access, FileShare share)
             : base() {
             if (streamName == null) { //no ADS support
@@ -329,6 +327,7 @@ namespace Medo.IO {
             public const uint FILE_FLAG_OPEN_NO_RECALL = 0x00100000;
 
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode)]
             public static extern SafeFileHandle CreateFileW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpFileName, uint dwDesiredAccess, uint dwShareMode, [InAttribute()] IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, [InAttribute()] IntPtr hTemplateFile);
 
@@ -344,7 +343,6 @@ namespace Medo.IO {
             }
 
 
-            [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
             internal sealed class SafeFindStreamHandle : SafeHandleZeroOrMinusOneIsInvalid {
                 private SafeFindStreamHandle() : base(true) { }
 
@@ -353,6 +351,7 @@ namespace Medo.IO {
                 }
 
                 //[ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+                [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
                 [DllImportAttribute("kernel32.dll", EntryPoint = "FindClose", CharSet = CharSet.Unicode)]
                 [return: MarshalAsAttribute(UnmanagedType.Bool)]
                 public static extern bool FindClose(IntPtr hFindFile);
@@ -369,15 +368,18 @@ namespace Medo.IO {
             }
 
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("Kernel32.dll", EntryPoint = "FindFirstStreamW", CharSet = CharSet.Unicode, SetLastError = true)]
             public static extern SafeFindStreamHandle FindFirstStreamW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpFileName, STREAM_INFO_LEVELS InfoLevel, ref WIN32_FIND_STREAM_DATA lpFindStreamData, uint dwFlags);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("Kernel32.dll", EntryPoint = "FindNextStreamW", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
             public static extern bool FindNextStreamW([InAttribute()] SafeFindStreamHandle hFindStream, ref WIN32_FIND_STREAM_DATA lpFindStreamData);
 
 
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("Kernel32.dll", EntryPoint = "DeleteFileW", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
             public static extern bool DeleteFileW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpFileName);

@@ -1,6 +1,7 @@
 //Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-11-29: Initial version.
+//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 
 
 using System;
@@ -190,9 +191,11 @@ namespace Medo.Windows.Forms {
 
         private static class NativeMethods {
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
             static extern internal IntPtr LoadIcon(IntPtr hInstance, string lpIconName);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
             static extern internal IntPtr LoadLibrary(string lpFileName);
 

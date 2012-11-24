@@ -13,6 +13,7 @@
             <Word>IANA</Word>
             <Word>IEEE</Word>
             <Word>Ini</Word>
+            <Word>ISO</Word>
             <Word>Jmbg</Word>
             <Word>LRC</Word>
             <Word>Medo</Word>
@@ -23,6 +24,7 @@
             <Word>Syslog</Word>
             <Word>Syslogd</Word>
             <Word>UART</Word>
+            <Word>VHD</Word>
             <Word>Vojvodina</Word>
             <Word>X</Word>
             <Word>Xfer</Word>

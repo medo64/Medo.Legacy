@@ -1,6 +1,7 @@
-﻿//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
+//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-06-24: First version.
+//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 
 
 using System;
@@ -188,12 +189,12 @@ namespace Medo.Windows.Forms
             internal const uint MOD_WIN = 8;
             internal const int WM_HOTKEY = 786;
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")] //http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical
             [DllImport("user32.dll")]
-            [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
             internal static extern int RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")] //http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical
             [DllImport("user32.dll")]
-            [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
             internal static extern int UnregisterHotKey(IntPtr hWnd, int id);
 
         }
