@@ -1,6 +1,7 @@
 //Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
-//2008-10-22: First version.
+//2008-04-12: New version.
+//2012-11-24: Removing link demands.
 
 
 using System;
@@ -13,9 +14,9 @@ using System.Windows.Forms;
 namespace Medo.Windows.Forms {
 
     /// <summary>
-    /// Represents a selection control with a drop-down list that can be shown or hidden by clicking the arrow on the control.
+    /// Enables the user to select a single option from a group of choices when paired with other RadioButton controls.
     /// </summary>
-    public class CheckedListBox : System.Windows.Forms.CheckedListBox {
+	public class RadioButton : System.Windows.Forms.RadioButton {
 
         /// <summary>
         /// Gets/sets whether next control will be selected on Enter.
@@ -31,7 +32,7 @@ namespace Medo.Windows.Forms {
         [System.ComponentModel.DefaultValue(false)]
         public bool UseFocusColor { get; set; }
 
-        private Color _focusedBackColor= SystemColors.Info;
+        private Color _focusedBackColor = SystemColors.Info;
         /// <summary>
         /// The background color when control has focus.
         /// </summary>
@@ -76,7 +77,7 @@ namespace Medo.Windows.Forms {
         /// Raises the Leave event.
         /// </summary>
         /// <param name="e">An System.EventArgs that contains the event data.</param>
-        protected override void OnLeave(EventArgs e) {
+		protected override void OnLeave(EventArgs e) {
 			this.BackColor = this._lastBackColor;
 			this.ForeColor = this._lastForeColor;
 			base.OnLeave(e);
@@ -87,7 +88,6 @@ namespace Medo.Windows.Forms {
         /// </summary>
         /// <param name="msg">A System.Windows.Forms.Message, passed by reference, that represents the Win32 message to process.</param>
         /// <param name="keyData">One of the System.Windows.Forms.Keys values that represents the key to process.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref System.Windows.Forms.Message msg, System.Windows.Forms.Keys keyData) {
 			if ((this.SelectNextControlOnReturn) && (keyData == System.Windows.Forms.Keys.Enter)) {
 				if (this.Parent != null) {

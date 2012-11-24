@@ -1,8 +1,7 @@
 ﻿//Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-04-29: Inital release.
-//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
-
+//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical); removing link demands.
 
 using System;
 using System.Collections.Generic;
@@ -31,7 +30,6 @@ namespace Medo.Security.Principal {
         /// <param name="userName">User's name.</param>
         /// <param name="domain">User's domain. If local computer is desired, "." can be used.</param>
         /// <param name="password">User's password.</param>
-        [SecurityPermission(SecurityAction.LinkDemand)]
         public static bool Impersonate(string userName, string domain, string password) {
             return Impersonate(userName, domain, password, TokenImpersonationLevel.Impersonation);
         }
@@ -46,7 +44,6 @@ namespace Medo.Security.Principal {
         /// <param name="password">User's password.</param>
         /// <param name="impersonationLevel"></param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Runtime.InteropServices.SafeHandle.DangerousGetHandle", Justification = "This method is needed in order to properly call into Win32 API.")]
-        [SecurityPermission(SecurityAction.LinkDemand)]
         public static bool Impersonate(string userName, string domain, string password, TokenImpersonationLevel impersonationLevel) {
             lock (_syncRoot) {
                 int threadID = Thread.CurrentThread.ManagedThreadId;
@@ -88,7 +85,6 @@ namespace Medo.Security.Principal {
         /// Removes impersonation from current thread.
         /// Returns true if sucessful or false if user was not impersonated.
         /// </summary>
-        [SecurityPermission(SecurityAction.LinkDemand)]
         public static bool Revert() {
             lock (_syncRoot) {
                 int threadID = Thread.CurrentThread.ManagedThreadId;
@@ -139,7 +135,6 @@ namespace Medo.Security.Principal {
 
         private class TokenHandle : SafeHandle {
 
-            [SecurityPermission(SecurityAction.LinkDemand)]
             public TokenHandle()
                 : base(IntPtr.Zero, true) {
             }

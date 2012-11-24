@@ -1,6 +1,7 @@
 //Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-04-12: New version.
+//2012-11-24: Removing link demands.
 
 
 using System;
@@ -13,12 +14,13 @@ using System.Windows.Forms;
 namespace Medo.Windows.Forms {
 
     /// <summary>
-    /// Represents a Windows System.Windows.Forms.CheckBox.
+    /// Represents a Windows text box control.
     /// </summary>
-    public class CheckBox : System.Windows.Forms.CheckBox {
+    public class TextBox : System.Windows.Forms.TextBox {
 
         /// <summary>
         /// Gets/sets whether next control will be selected on Enter.
+        /// Only valid if control is not multiline.
         /// </summary>
         [System.ComponentModel.Category("Behavior")]
         [System.ComponentModel.DefaultValue(false)]
@@ -69,6 +71,7 @@ namespace Medo.Windows.Forms {
                 this.BackColor = this.FocusedBackColor;
                 this.ForeColor = this.FocusedForeColor;
             }
+            this.SelectAll();
             base.OnEnter(e);
         }
 
@@ -87,9 +90,8 @@ namespace Medo.Windows.Forms {
         /// </summary>
         /// <param name="msg">A System.Windows.Forms.Message, passed by reference, that represents the Win32 message to process.</param>
         /// <param name="keyData">One of the System.Windows.Forms.Keys values that represents the key to process.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref System.Windows.Forms.Message msg, System.Windows.Forms.Keys keyData) {
-            if ((this.SelectNextControlOnReturn) && (keyData == System.Windows.Forms.Keys.Enter)) {
+            if ((this.SelectNextControlOnReturn) && (!this.Multiline) && (keyData == System.Windows.Forms.Keys.Enter)) {
                 if (this.Parent != null) {
                     this.Parent.SelectNextControl(this, true, true, true, true);
                     return true;

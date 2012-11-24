@@ -256,20 +256,20 @@
       <Link>Windows\Forms\Button [001].cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\CheckBox [001].cs">
-      <Link>Windows\Forms\CheckBox [001].cs</Link>
+    <Compile Include="..\medo\windows\forms\CheckBox [002].cs">
+      <Link>Windows\Forms\CheckBox [002].cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\CheckedListBox [001].cs">
-      <Link>Windows\Forms\CheckedListBox [001].cs</Link>
+    <Compile Include="..\medo\windows\forms\CheckedListBox [002].cs">
+      <Link>Windows\Forms\CheckedListBox [002].cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\ComboBox [001].cs">
-      <Link>Windows\Forms\ComboBox [001].cs</Link>
+    <Compile Include="..\medo\windows\forms\ComboBox [002].cs">
+      <Link>Windows\Forms\ComboBox [002].cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\DateTimePicker [001].cs">
-      <Link>Windows\Forms\DateTimePicker [001].cs</Link>
+    <Compile Include="..\medo\windows\forms\DateTimePicker [002].cs">
+      <Link>Windows\Forms\DateTimePicker [002].cs</Link>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\medo\windows\forms\Hotkey [002].cs">
@@ -285,8 +285,8 @@
       <Link>Windows\Forms\PrintPreviewDialog [005].cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\RadioButton [001].cs">
-      <Link>Windows\Forms\RadioButton [001].cs</Link>
+    <Compile Include="..\medo\windows\forms\RadioButton [002].cs">
+      <Link>Windows\Forms\RadioButton [002].cs</Link>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\medo\windows\forms\SplashBox [011].cs">
@@ -298,8 +298,8 @@
     <Compile Include="..\medo\windows\forms\TaskbarProgress [003].cs">
       <Link>Windows\Forms\TaskbarProgress [003].cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\TextBox [001].cs">
-      <Link>Windows\Forms\TextBox [001].cs</Link>
+    <Compile Include="..\medo\windows\forms\TextBox [002].cs">
+      <Link>Windows\Forms\TextBox [002].cs</Link>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\medo\windows\forms\WaitBox [001].cs">

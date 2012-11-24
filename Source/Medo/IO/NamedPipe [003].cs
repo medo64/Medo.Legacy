@@ -2,7 +2,7 @@
 
 //2010-01-23: Initial version.
 //2010-01-25: Exposing handle via GetHandle method.
-//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
+//2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical); removing link demands.
 
 
 using System;
@@ -43,7 +43,6 @@ namespace Medo.IO {
         /// <summary>
         /// Gets native handle.
         /// </summary>
-        [EnvironmentPermissionAttribute(SecurityAction.LinkDemand, Unrestricted = true)]
         public IntPtr GetHandle() {
             return (this.SafeHandle != null) ? this.SafeHandle.DangerousGetHandle() : IntPtr.Zero;
         }

@@ -1,6 +1,7 @@
 //Copyright (c) 2008 Josip Medved <jmedved@jmedved.com>
 
 //2008-04-12: New version.
+//2012-11-24: Removing link demands.
 
 
 using System;
@@ -88,7 +89,6 @@ namespace Medo.Windows.Forms {
         /// </summary>
         /// <param name="msg">A System.Windows.Forms.Message, passed by reference, that represents the Win32 message to process.</param>
         /// <param name="keyData">One of the System.Windows.Forms.Keys values that represents the key to process.</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref System.Windows.Forms.Message msg, System.Windows.Forms.Keys keyData) {
 			if ((this.SelectNextControlOnReturn) && (keyData == System.Windows.Forms.Keys.Enter)) {
 				if (this.Parent != null) {
