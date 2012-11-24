@@ -92,7 +92,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ABusFrameTest.cs" />
     <Compile Include="ArgsTest.cs" />
     <Compile Include="IniFileTest.cs" />
     <Compile Include="LinearCalibrationTest.cs" />

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -101,9 +101,6 @@
     </Compile>
     <Compile Include="..\medo\device\EltraEL4000 [002].cs">
       <Link>Device\EltraEL4000 [002].cs</Link>
-    </Compile>
-    <Compile Include="..\medo\device\protocol\ABus [001].cs">
-      <Link>Device\Protocol\ABus [001].cs</Link>
     </Compile>
     <Compile Include="..\medo\diagnostics\ErrorReport [019].cs">
       <Link>Diagnostics\ErrorReport [019].cs</Link>
