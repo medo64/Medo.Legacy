@@ -3,6 +3,7 @@
 //2008-12-01: New version.
 //2010-04-17: Changed namespace from Medo.IO.SerialDevices to Medo.Device.
 //2010-07-19: Compatible with Elsidi revG; not compatible with rev 3.
+//2012-11-24: Changing methods AddSwithTo*Display to AddSwitchTo*Display.
 
 
 using System;
@@ -237,7 +238,7 @@ namespace Medo.Device {
         /// All further content will be executed on primary display.
         /// </summary>
         /// <exception cref="System.InsufficientMemoryException">Maximum output buffer size exceeded.</exception>
-        public void AddSwithToPrimaryDisplay() {
+        public void AddSwitchToPrimaryDisplay() {
             AppendToOutputBuffer(new byte[] { SI });
         }
 
@@ -245,7 +246,7 @@ namespace Medo.Device {
         /// All further content will be executed on secondary display.
         /// </summary>
         /// <exception cref="System.InsufficientMemoryException">Maximum output buffer size exceeded.</exception>
-        public void AddSwithToSecondaryDisplay() {
+        public void AddSwitchToSecondaryDisplay() {
             AppendToOutputBuffer(new byte[] { SO });
         }
 

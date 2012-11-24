@@ -96,8 +96,8 @@
     <Compile Include="..\Medo\Device\DS1820 [001].cs">
       <Link>Device\DS1820 [001].cs</Link>
     </Compile>
-    <Compile Include="..\medo\device\Elsidi [003].cs">
-      <Link>Device\Elsidi [003].cs</Link>
+    <Compile Include="..\medo\device\Elsidi [004].cs">
+      <Link>Device\Elsidi [004].cs</Link>
     </Compile>
     <Compile Include="..\medo\device\EltraEL4000 [002].cs">
       <Link>Device\EltraEL4000 [002].cs</Link>
