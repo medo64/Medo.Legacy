@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <DocumentationFile>..\..\Binaries\Medo20.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <DocumentationFile>..\..\Binaries\Medo20.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -52,8 +54,8 @@
     <Compile Include="..\CodeAnalysisSuppressions.cs">
       <Link>_CodeAnalysis\CodeAnalysisSuppressions.cs</Link>
     </Compile>
-    <Compile Include="..\medo\application\Args [001].cs">
-      <Link>Application\Args [001].cs</Link>
+    <Compile Include="..\medo\application\Args [002].cs">
+      <Link>Application\Args [002].cs</Link>
     </Compile>
     <Compile Include="..\medo\application\SingleInstance [009].cs">
       <Link>Application\SingleInstance [009].cs</Link>
@@ -317,6 +319,7 @@
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\CodeAnalysisDictionary.xml">
       <Link>_CodeAnalysis\CodeAnalysisDictionary.xml</Link>
+      <SubType>Designer</SubType>
     </CodeAnalysisDictionary>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

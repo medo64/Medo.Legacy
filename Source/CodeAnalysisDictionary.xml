@@ -2,6 +2,7 @@
 <Dictionary>
     <Words>
         <Recognized>
+            <Word>ASCII</Word>
             <Word>Castagnoli</Word>
             <Word>CCITT</Word>
             <Word>Codabar</Word>
@@ -10,6 +11,7 @@
             <Word>Eltra</Word>
             <Word>Endianness</Word>
             <Word>IANA</Word>
+            <Word>IEEE</Word>
             <Word>Ini</Word>
             <Word>Jmbg</Word>
             <Word>LRC</Word>
