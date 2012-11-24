@@ -17,6 +17,7 @@ namespace Medo.Device {
     /// Management of Gigatek GP20 RFID proximity reader.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Gigatek", Justification = "Naming is as intended.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Gp", Justification = "Naming is as intended.")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Gp", Justification = "Naming is as intended.")]
     public class GigatekGp20 : IDisposable {
 

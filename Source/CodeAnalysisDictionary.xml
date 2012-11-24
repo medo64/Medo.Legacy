@@ -3,9 +3,11 @@
     <Words>
         <Recognized>
             <Word>ASCII</Word>
+            <Word>BSD</Word>
             <Word>Castagnoli</Word>
             <Word>CCITT</Word>
             <Word>Codabar</Word>
+            <Word>Cp</Word>
             <Word>CRC</Word>
             <Word>Deamons</Word>
             <Word>Eltra</Word>
@@ -13,17 +15,22 @@
             <Word>IANA</Word>
             <Word>IEEE</Word>
             <Word>Ini</Word>
+            <Word>IPv6</Word>
             <Word>ISO</Word>
             <Word>Jmbg</Word>
+            <Word>LAN</Word>
             <Word>LRC</Word>
             <Word>Medo</Word>
             <Word>NTP</Word>
             <Word>OIB</Word>
+            <Word>PLC</Word>
+            <Word>Posix</Word>
             <Word>SHA</Word>
             <Word>SSPI</Word>
             <Word>Syslog</Word>
             <Word>Syslogd</Word>
             <Word>UART</Word>
+            <Word>UUCP</Word>
             <Word>VHD</Word>
             <Word>Vojvodina</Word>
             <Word>X</Word>

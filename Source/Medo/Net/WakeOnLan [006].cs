@@ -73,6 +73,7 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="macAddress">MAC address of computer to wake up.</param>
         /// <exception cref="System.InvalidOperationException">Cannot find any IPv6 address.</exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Pv", Justification = "IPv6 is intentional spelling.")]
         public static void SendMagicPacketIPv6(string macAddress) {
             SendMagicPacketIPv6(macAddress, null, IPAddress.IPv6Any, 9);
         }
@@ -83,6 +84,7 @@ namespace Medo.Net {
         /// <param name="macAddress">MAC address of computer to wake up.</param>
         /// <param name="secureOnPassword">SecureOn password of computer to wake up.</param>
         /// <exception cref="System.InvalidOperationException">Cannot find any IPv6 address.</exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Pv", Justification = "IPv6 is intentional spelling.")]
         public static void SendMagicPacketIPv6(string macAddress, string secureOnPassword) {
             SendMagicPacketIPv6(macAddress, secureOnPassword, IPAddress.IPv6Any, 9);
         }
@@ -97,6 +99,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">IP address cannot be null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">IP address must be IPv6.</exception>
         /// <exception cref="System.InvalidOperationException">Cannot find any IPv6 address.</exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Pv", Justification = "IPv6 is intentional spelling.")]
         public static void SendMagicPacketIPv6(string macAddress, string secureOnPassword, IPAddress localIPv6Address, int port) {
             if ((macAddress == null) || (!_rxMacValid.IsMatch(macAddress))) { throw new ArgumentException(Resources.ExceptionMacAddressIsInWrongFormat); }
             if ((!string.IsNullOrEmpty(secureOnPassword)) && (!_rxMacValid.IsMatch(secureOnPassword))) { throw new ArgumentException(Resources.ExceptionSecureOnPasswordIsInWrongFormat); }
@@ -146,7 +149,7 @@ namespace Medo.Net {
             }
         }
 
-        
+
         internal static byte[] GetPacketBytes(string macAddress, string secureOnPassword) {
             return GetPacketBytes(GetAddressBytes(macAddress), GetAddressBytes(secureOnPassword));
         }
