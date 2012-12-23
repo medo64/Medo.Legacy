@@ -141,8 +141,8 @@
     <Compile Include="..\medo\io\UartPort [005].cs">
       <Link>IO\UartPort [005].cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\VirtualDisk [009].cs">
-      <Link>IO\VirtualDisk [009].cs</Link>
+    <Compile Include="..\medo\io\VirtualDisk [010].cs">
+      <Link>IO\VirtualDisk [010].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Localization\Croatia\Holiday [004].cs">
       <Link>Localization\Croatia\Holiday [004].cs</Link>
