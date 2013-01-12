@@ -1,4 +1,4 @@
-//Copyright (c) 2007 Josip Medved <jmedved@jmedved.com>
+//Josip Medved <jmedved@jmedved.com> http://www.jmedved.com
 
 //2007-10-28: Inital release.
 //2007-11-06: Added fix for OleDb DateTime.
@@ -12,6 +12,7 @@
 //            Open and Close are now public.
 //2010-11-19: ProviderName and CreateCommand are now internal protected.
 //2011-03-04: Fixed bug with null args in CreateCommand.
+//2012-01-11: Refactoring.
 
 
 using System;
@@ -19,6 +20,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
@@ -43,14 +45,14 @@ namespace Medo.Data {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public CommonConnection(string providerInvariantName) {
 #if DEBUG
-			DataTable table = DbProviderFactories.GetFactoryClasses();
-			StringBuilder sbProviders = new StringBuilder();
-			for (int i = 0; i < table.Rows.Count; i++) {
-				System.Data.DataRow row = table.Rows[i];
-				if (sbProviders.Length > 0) { sbProviders.Append(", "); }
-				sbProviders.Append(row[2]);
-			}
-            System.Diagnostics.Debug.WriteLine("I: Available providers: " + sbProviders.ToString() + ".   {{Medo.Data.CommonConnection}}");
+            DataTable table = DbProviderFactories.GetFactoryClasses();
+            StringBuilder sbProviders = new StringBuilder();
+            for (int i = 0; i < table.Rows.Count; i++) {
+                System.Data.DataRow row = table.Rows[i];
+                if (sbProviders.Length > 0) { sbProviders.Append(", "); }
+                sbProviders.Append(row[2]);
+            }
+            Debug.WriteLine("-- Available providers: " + sbProviders.ToString());
 #endif
             this.ProviderName = providerInvariantName;
             this._providerFactory = DbProviderFactories.GetFactory(providerInvariantName);
@@ -385,15 +387,18 @@ namespace Medo.Data {
                 cmd.CommandText = format;
             }
 #if DEBUG
-            System.Diagnostics.Debug.WriteLine(cmd.CommandText + "I:     {{Medo.Data.CommonConnection}}");
-			for (int i = 0; i < cmd.Parameters.Count; ++i) {
-				DbParameter curr = cmd.Parameters[i] as DbParameter;
-				if (curr != null) {
-                    System.Diagnostics.Debug.WriteLine("I:     " + curr.ParameterName + "=" + "\"" + curr.Value.ToString() + "\"    {{Medo.Data.CommonConnection}}");
-				} else {
-                    System.Diagnostics.Debug.WriteLine("I:     " + cmd.Parameters[i].ToString() + "    {{Medo.Data.CommonConnection}}");
-				}
-			}
+            var sb = new StringBuilder();
+            sb.AppendFormat(CultureInfo.InvariantCulture, "-- {0}", cmd.CommandText);
+            for (int i = 0; i < cmd.Parameters.Count; ++i) {
+                sb.AppendLine();
+                var curr = cmd.Parameters[i] as DbParameter;
+                if (curr != null) {
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}=\"{1}\" ({2})", curr.ParameterName, curr.Value, curr.DbType);
+                } else {
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}", cmd.Parameters[i].ToString());
+                }
+            }
+            Debug.WriteLine(sb.ToString());
 #endif
             return cmd;
         }

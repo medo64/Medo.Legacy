@@ -3,7 +3,8 @@
 //2008-02-21: Initial version.
 //2008-02-29: Fixed bugs in debug mode.
 //2008-04-10: Uses IFormatProvider.
-//2011-08-07: Workaround mono bug #500987.
+//2011-08-04: Workaround mono bug #500987.
+//2012-01-11: Refactoring.
 
 
 using System;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
@@ -19,10 +21,9 @@ namespace Medo.Data {
     /// <summary>
     /// Generating command objects based on SQL queries or stored procedures.
     /// </summary>
-    public class UpdateCommand : System.Data.IDbCommand {
+    public class DeleteCommand : IDbCommand {
 
         private string _tableName;
-        private string _columnsAndValuesText;
         private bool _needsMonoFix; //Mono bug #500987 / Error converting data type varchar to datetime
 
 
@@ -31,53 +32,21 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="connection">A connection object.</param>
         /// <param name="tableName">Name of table.</param>
-        /// <param name="columnsAndValues">Column names and values in alternating order (name1, value1, name2, value2).</param>
         /// <exception cref="System.ArgumentNullException">Connection cannot be null.</exception>
         /// <exception cref="System.ArgumentException">Table name cannot be empty or null.</exception>
         /// <exception cref="System.InvalidCastException">Column name should be string and non-null.</exception>
-        public UpdateCommand(IDbConnection connection, string tableName, params object[] columnsAndValues) {
-            if (connection == null) { throw new System.ArgumentNullException("connection", Resources.ExceptionConnectionCannotBeNull); }
-            if (string.IsNullOrEmpty(tableName)) { throw new System.ArgumentException(Resources.ExceptionTableNameCannotBeEmptyOrNull, "tableName"); }
-            if (columnsAndValues == null) { throw new System.ArgumentException(Resources.ExceptionNumberOfParametersMustBeMultipleOfTwo, "columnsAndValues"); }
-            if (columnsAndValues.Length % 2 != 0) { throw new System.ArgumentException(Resources.ExceptionNumberOfParametersMustBeMultipleOfTwo, "columnsAndValues"); }
+        public DeleteCommand(IDbConnection connection, string tableName) {
+            if (connection == null) { throw new ArgumentNullException("connection", Resources.ExceptionConnectionCannotBeNull); }
+            if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException(Resources.ExceptionTableNameCannotBeEmptyOrNull, "tableName"); }
 
             this._baseCommand = connection.CreateCommand();
 
             this._tableName = tableName;
 
-            this._needsMonoFix = false;
-            StringBuilder sbColumnsAndValues = new StringBuilder();
-            for (int i = 0; i < columnsAndValues.Length; i += 2) {
-                string name = columnsAndValues[i] as string;
-                if (name == null) { throw new System.InvalidCastException(Resources.ExceptionColumnNameShouldBeStringAndNonNull); }
-                object value = columnsAndValues[i + 1];
-
-                if (sbColumnsAndValues.Length > 0) { sbColumnsAndValues.Append(", "); }
-                sbColumnsAndValues.Append("[" + name + "]=");
-
-                if (value == null) {
-                    sbColumnsAndValues.Append("NULL");
-                } else {
-                    string paramName = "@P" + (i / 2).ToString(System.Globalization.CultureInfo.InvariantCulture);
-                    sbColumnsAndValues.Append(paramName);
-                    System.Data.IDbDataParameter param = this._baseCommand.CreateParameter();
-                    param.ParameterName = paramName;
-                    if ((value is DateTime) && (IsRunningOnMono)) {
-                        value = ((DateTime)value).ToString(CultureInfo.InvariantCulture);
-                        this._needsMonoFix = true;
-                    }
-                    param.Value = value;
-                    if (param.DbType == System.Data.DbType.DateTime) {
-                        System.Data.OleDb.OleDbParameter odp = param as System.Data.OleDb.OleDbParameter;
-                        if (odp != null) { odp.OleDbType = System.Data.OleDb.OleDbType.Date; }
-                    }
-                    this._baseCommand.Parameters.Add(param);
-                }
-            }
-            this._columnsAndValuesText = sbColumnsAndValues.ToString();
-
             UpdateCommandText();
         }
+
+
 
         private string _whereText;
         private List<IDbDataParameter> _whereParameters = new List<IDbDataParameter>();
@@ -103,7 +72,7 @@ namespace Medo.Data {
                     } else {
                         string paramName = string.Format(CultureInfo.InvariantCulture, "@W{0}", i);
                         argList.Add(paramName);
-                        System.Data.IDbDataParameter param = this._baseCommand.CreateParameter();
+                        var param = this._baseCommand.CreateParameter();
                         param.ParameterName = paramName;
                         if ((args[i] is DateTime) && (IsRunningOnMono)) {
                             args[i] = ((DateTime)args[i]).ToString(CultureInfo.InvariantCulture);
@@ -131,17 +100,17 @@ namespace Medo.Data {
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Proper parameterization is done in code.")]
         private void UpdateCommandText() {
-            if (this._whereText == null) {
+            if (string.IsNullOrEmpty(this._whereText)) {
                 if ((this.Connection is SqlConnection) && this._needsMonoFix) {
-                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; UPDATE {0} SET {1};", this._tableName, this._columnsAndValuesText);
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; DELETE FROM {0};", this._tableName);
                 } else {
-                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "UPDATE {0} SET {1};", this._tableName, this._columnsAndValuesText);
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0};", this._tableName);
                 }
             } else {
                 if ((this.Connection is SqlConnection) && this._needsMonoFix) {
-                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; UPDATE {0} SET {1} WHERE {2};", this._tableName, this._columnsAndValuesText, _whereText.ToString());
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; DELETE FROM {0} WHERE {1};", this._tableName, _whereText.ToString());
                 } else {
-                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "UPDATE {0} SET {1} WHERE {2};", this._tableName, this._columnsAndValuesText, _whereText.ToString());
+                    this._baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0} WHERE {1};", this._tableName, _whereText.ToString());
                 }
             }
         }
@@ -153,7 +122,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets underlying connection.
         /// </summary>
-        public System.Data.IDbCommand BaseCommand {
+        public IDbCommand BaseCommand {
             get { return this._baseCommand; }
         }
 
@@ -172,7 +141,7 @@ namespace Medo.Data {
         /// Gets or sets the text command to run against the data source.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Proper parameterization is done in code.")]
-        public string CommandText {
+        public String CommandText {
             get { return this._baseCommand.CommandText; }
             set { this._baseCommand.CommandText = value; }
         }
@@ -180,7 +149,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets or sets the wait time before terminating the attempt to execute a command and generating an error.
         /// </summary>
-        public int CommandTimeout {
+        public Int32 CommandTimeout {
             get { return this._baseCommand.CommandTimeout; }
             set { this._baseCommand.CommandTimeout = value; }
         }
@@ -188,7 +157,7 @@ namespace Medo.Data {
         /// <summary>
         /// Indicates or specifies how the System.Data.IDbCommand.CommandText property is interpreted.
         /// </summary>
-        public System.Data.CommandType CommandType {
+        public CommandType CommandType {
             get { return this._baseCommand.CommandType; }
             set { this._baseCommand.CommandType = value; }
         }
@@ -196,7 +165,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets or sets the System.Data.IDbConnection used by this instance of the System.Data.IDbCommand.
         /// </summary>
-        public System.Data.IDbConnection Connection {
+        public IDbConnection Connection {
             get { return this._baseCommand.Connection; }
             set { this._baseCommand.Connection = value; }
         }
@@ -204,14 +173,14 @@ namespace Medo.Data {
         /// <summary>
         /// Creates a new instance of an System.Data.IDbDataParameter object.
         /// </summary>
-        public System.Data.IDbDataParameter CreateParameter() {
+        public IDbDataParameter CreateParameter() {
             return this._baseCommand.CreateParameter();
         }
 
         /// <summary>
         /// Executes an SQL statement against the Connection object of a .NET Framework data provider, and returns the number of rows affected.
         /// </summary>
-        public int ExecuteNonQuery() {
+        public Int32 ExecuteNonQuery() {
 #if DEBUG
             DebugCommand();
 #endif
@@ -222,7 +191,7 @@ namespace Medo.Data {
         /// Executes the System.Data.IDbCommand.CommandText against the System.Data.IDbCommand.Connection, and builds an System.Data.IDataReader using one of the System.Data.CommandBehavior values.
         /// </summary>
         /// <param name="behavior">One of the System.Data.CommandBehavior values.</param>
-        public System.Data.IDataReader ExecuteReader(System.Data.CommandBehavior behavior) {
+        public IDataReader ExecuteReader(CommandBehavior behavior) {
 #if DEBUG
             DebugCommand();
 #endif
@@ -232,7 +201,7 @@ namespace Medo.Data {
         /// <summary>
         /// Executes the System.Data.IDbCommand.CommandText against the System.Data.IDbCommand.Connection and builds an System.Data.IDataReader.
         /// </summary>
-        public System.Data.IDataReader ExecuteReader() {
+        public IDataReader ExecuteReader() {
 #if DEBUG
             DebugCommand();
 #endif
@@ -242,7 +211,7 @@ namespace Medo.Data {
         /// <summary>
         /// Executes the query, and returns the first column of the first row in the resultset returned by the query. Extra columns or rows are ignored.
         /// </summary>
-        public object ExecuteScalar() {
+        public Object ExecuteScalar() {
 #if DEBUG
             DebugCommand();
 #endif
@@ -252,7 +221,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets the System.Data.IDataParameterCollection.
         /// </summary>
-        public System.Data.IDataParameterCollection Parameters {
+        public IDataParameterCollection Parameters {
             get { return this._baseCommand.Parameters; }
         }
 
@@ -266,7 +235,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets or sets the transaction within which the Command object of a .NET Framework data provider executes.
         /// </summary>
-        public System.Data.IDbTransaction Transaction {
+        public IDbTransaction Transaction {
             get { return this._baseCommand.Transaction; }
             set { this._baseCommand.Transaction = value; }
         }
@@ -274,7 +243,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets or sets how command results are applied to the System.Data.DataRow when used by the System.Data.IDataAdapter.Update(System.Data.DataSet) method of a System.Data.Common.DbDataAdapter.
         /// </summary>
-        public System.Data.UpdateRowSource UpdatedRowSource {
+        public UpdateRowSource UpdatedRowSource {
             get { return this._baseCommand.UpdatedRowSource; }
             set { this._baseCommand.UpdatedRowSource = value; }
         }
@@ -288,7 +257,7 @@ namespace Medo.Data {
         /// </summary>
         public void Dispose() {
             this.Dispose(true);
-            System.GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -304,18 +273,20 @@ namespace Medo.Data {
         #endregion
 
 
-
 #if DEBUG
         private void DebugCommand() {
-            System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I: {0}.    {{Medo.Data.UpdateCommand}}", this._baseCommand.CommandText));
+            var sb = new StringBuilder();
+            sb.AppendFormat(CultureInfo.InvariantCulture, "-- {0}", this._baseCommand.CommandText);
             for (int i = 0; i < this._baseCommand.Parameters.Count; ++i) {
+                sb.AppendLine();
                 System.Data.Common.DbParameter curr = this._baseCommand.Parameters[i] as System.Data.Common.DbParameter;
                 if (curr != null) {
-                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I:     {0}=\"{1}\" ({2}).    {{Medo.Data.UpdateCommand}}", curr.ParameterName, curr.Value, curr.DbType));
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}=\"{1}\" ({2})", curr.ParameterName, curr.Value, curr.DbType);
                 } else {
-                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "I:     {0}.    {{Medo.Data.UpdateCommand}}", this._baseCommand.Parameters[i].ToString()));
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}", this._baseCommand.Parameters[i].ToString());
                 }
             }
+            Debug.WriteLine(sb.ToString());
         }
 #endif
 
@@ -325,11 +296,8 @@ namespace Medo.Data {
 
             internal static string ExceptionTableNameCannotBeEmptyOrNull { get { return "Table name cannot be empty or null."; } }
 
-            internal static string ExceptionColumnNameShouldBeStringAndNonNull { get { return "Column name should be string and non-null."; } }
-
-            internal static string ExceptionNumberOfParametersMustBeMultipleOfTwo { get { return "Number of parameters must be multiple of two."; } }
-
         }
+
 
         private static bool IsRunningOnMono {
             get {

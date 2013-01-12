@@ -75,23 +75,23 @@
     <Compile Include="..\medo\configuration\Settings [012].cs">
       <Link>Configuration\Settings [012].cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\CommonConnection [009].cs">
-      <Link>Data\CommonConnection [009].cs</Link>
+    <Compile Include="..\medo\data\CommonConnection [010].cs">
+      <Link>Data\CommonConnection [010].cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\DeleteCommand [004].cs">
-      <Link>Data\DeleteCommand [004].cs</Link>
+    <Compile Include="..\medo\data\DeleteCommand [005].cs">
+      <Link>Data\DeleteCommand [005].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Data\IniFile [001].cs">
       <Link>Data\IniFile [001].cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\InsertCommand [006].cs">
-      <Link>Data\InsertCommand [006].cs</Link>
+    <Compile Include="..\medo\data\InsertCommand [007].cs">
+      <Link>Data\InsertCommand [007].cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\SelectCommand [004].cs">
-      <Link>Data\SelectCommand [004].cs</Link>
+    <Compile Include="..\medo\data\SelectCommand [005].cs">
+      <Link>Data\SelectCommand [005].cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\UpdateCommand [004].cs">
-      <Link>Data\UpdateCommand [004].cs</Link>
+    <Compile Include="..\medo\data\UpdateCommand [005].cs">
+      <Link>Data\UpdateCommand [005].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Device\DS1820 [001].cs">
       <Link>Device\DS1820 [001].cs</Link>
