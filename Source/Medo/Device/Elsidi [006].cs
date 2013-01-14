@@ -5,6 +5,7 @@
 //2010-07-19: Compatible with Elsidi revG; not compatible with rev 3.
 //2012-11-24: Changing methods AddSwithTo*Display to AddSwitchTo*Display.
 //2013-01-06: Updated for Elsidi [K].
+//2013-01-14: Updated for Elsidi [K 2013-01-14].
 
 
 using System;
@@ -24,6 +25,7 @@ namespace Medo.Device {
         private const byte BS = 0x08;
         private const byte HT = 0x09;
         private const byte LF = 0x0A;
+        private const byte VT = 0x0B;
         private const byte FF = 0x0C;
         private const byte CR = 0x0D;
         private const byte SO = 0x0E;
@@ -111,7 +113,7 @@ namespace Medo.Device {
             var buffer = new byte[] { FF, instruction };
             this._serial.Write(buffer, 0, buffer.Length);
             var ret = this._serial.ReadByte();
-            return (ret == FF);
+            return (ret == LF);
         }
 
 
@@ -122,7 +124,13 @@ namespace Medo.Device {
         /// Returns true if operation succeeded.
         /// </summary>
         public Boolean ClearDisplay() {
-            return SendInstruction(0x01);
+            this._serial.DiscardInBuffer();
+            this._serial.DiscardOutBuffer();
+
+            var buffer = new byte[] { VT };
+            this._serial.Write(buffer, 0, buffer.Length);
+            var ret = this._serial.ReadByte();
+            return (ret == LF);
         }
 
         /// <summary>
@@ -133,7 +141,13 @@ namespace Medo.Device {
         /// Returns true if operation succeeded.
         /// </summary>
         public Boolean ReturnHome() {
-            return SendInstruction(0x02);
+            this._serial.DiscardInBuffer();
+            this._serial.DiscardOutBuffer();
+
+            var buffer = new byte[] { CR };
+            this._serial.Write(buffer, 0, buffer.Length);
+            var ret = this._serial.ReadByte();
+            return (ret == LF);
         }
 
         /// <summary>
@@ -290,7 +304,7 @@ namespace Medo.Device {
             var buffer = new byte[] { HT };
             this._serial.Write(buffer, 0, buffer.Length);
             var ret = this._serial.ReadByte();
-            return (ret == HT);
+            return (ret == LF);
         }
 
         /// <summary>
@@ -304,7 +318,7 @@ namespace Medo.Device {
             var buffer = new byte[] { SO };
             this._serial.Write(buffer, 0, buffer.Length);
             var ret = this._serial.ReadByte();
-            return (ret == SO);
+            return (ret == LF);
         }
 
         /// <summary>
@@ -318,7 +332,7 @@ namespace Medo.Device {
             var buffer = new byte[] { SI };
             this._serial.Write(buffer, 0, buffer.Length);
             var ret = this._serial.ReadByte();
-            return (ret == SI);
+            return (ret == LF);
         }
 
 
