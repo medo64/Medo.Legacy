@@ -22,14 +22,14 @@ namespace Medo.Device {
     public class Elsidi : IDisposable {
 
         private SerialPort _serial;
-        private const byte BS = 0x08;
-        private const byte HT = 0x09;
-        private const byte LF = 0x0A;
-        private const byte VT = 0x0B;
-        private const byte FF = 0x0C;
-        private const byte CR = 0x0D;
-        private const byte SO = 0x0E;
-        private const byte SI = 0x0F;
+        private const byte BS = 0x08; //Return home
+        private const byte HT = 0x09; //Command mode
+        private const byte LF = 0x0A; //Next line
+        private const byte VT = 0x0B; //Clear display
+        private const byte FF = 0x0C; //LCD instruction mode
+        private const byte CR = 0x0D; //Next line
+        private const byte SO = 0x0E; //Select secondary display (E2).
+        private const byte SI = 0x0F; //Select primary display (E1).
 
         /// <summary>
         /// Creates new instance.
@@ -144,7 +144,7 @@ namespace Medo.Device {
             this._serial.DiscardInBuffer();
             this._serial.DiscardOutBuffer();
 
-            var buffer = new byte[] { CR };
+            var buffer = new byte[] { BS };
             this._serial.Write(buffer, 0, buffer.Length);
             var ret = this._serial.ReadByte();
             return (ret == LF);
@@ -260,7 +260,7 @@ namespace Medo.Device {
             this._serial.DiscardInBuffer();
             this._serial.DiscardOutBuffer();
 
-            var bufferList = new List<byte>(new byte[] { BS });
+            var bufferList = new List<byte>(new byte[] { HT });
             bufferList.AddRange(ASCIIEncoding.ASCII.GetBytes(command.ToString()));
             if (commandData != null) { bufferList.AddRange(ASCIIEncoding.ASCII.GetBytes(commandData)); }
             for (int i = bufferList.Count - 1; i >= 1; i--) {
@@ -282,7 +282,7 @@ namespace Medo.Device {
                     if (singleByte == LF) {
                         isValid = true;
                         break;
-                    } else if (singleByte == BS) {
+                    } else if (singleByte == HT) { //cancel
                         break;
                     }
                 } else {
@@ -301,7 +301,7 @@ namespace Medo.Device {
             this._serial.DiscardInBuffer();
             this._serial.DiscardOutBuffer();
 
-            var buffer = new byte[] { HT };
+            var buffer = new byte[] { LF };
             this._serial.Write(buffer, 0, buffer.Length);
             var ret = this._serial.ReadByte();
             return (ret == LF);
