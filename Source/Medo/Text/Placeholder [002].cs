@@ -1,6 +1,7 @@
 //Copyright (c) 2013 Josip Medved <jmedved@jmedved.com>
 
 //2013-03-04: Initial version.
+//2013-03-08: Bug-fixing.
 
 
 using System;
@@ -34,6 +35,7 @@ namespace Medo.Text {
         /// <param name="format">A composite format string.</param>
         /// <param name="items">Replacement items.</param>
         /// <exception cref="System.ArgumentNullException">Provider cannot be null. -or- Format string cannot be null.</exception>
+        /// <exception cref="System.ArgumentException">Invalid closing brace. -or- Cannot find placeholder item.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1719:ParameterNamesShouldNotMatchMemberNames", MessageId = "1#", Justification = "Naming kept to match string.Format.")]
         public static String Format(IFormatProvider provider, String format, IDictionary<String, Object> items) {
             if (provider == null) { throw new ArgumentNullException("provider", "Provider cannot be null."); }
@@ -73,7 +75,7 @@ namespace Medo.Text {
                                 sbFormat.Append("}}");
                                 state = State.Default;
                             } else {
-                                //exception?
+                                throw new ArgumentException("Invalid closing brace.", "format");
                             }
                         } break;
 
@@ -108,6 +110,7 @@ namespace Medo.Text {
                                 } else {
                                     throw new ArgumentException("Cannot find placeholder item '" + argName + "'.", "items");
                                 }
+                                sbArgName.Length = 0;
                                 sbArgFormat.Length = 0;
                                 argIndex += 1;
                                 state = State.Default;
@@ -179,5 +182,4 @@ namespace Medo.Text {
         }
 
     }
-
 }

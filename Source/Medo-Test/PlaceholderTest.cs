@@ -101,5 +101,10 @@ namespace Test {
             Placeholder.Format(CultureInfo.InvariantCulture, "Test: {Unknown}.", dict);
         }
 
+        [TestMethod()]
+        public void Placeholder_MultipleFormats() {
+            Assert.AreEqual("Test: 42 (Fortytwo).", Placeholder.Format(CultureInfo.InvariantCulture, "Test: {Number:0} ({Text}).", "Number", "42", "Text", "Fortytwo"));
+        }
+
     }
 }
