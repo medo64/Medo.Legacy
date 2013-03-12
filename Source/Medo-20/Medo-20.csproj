@@ -237,8 +237,8 @@
     <Compile Include="..\Medo\TagItem [004].cs">
       <Link>TagItem [004].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Text\Placeholder [002].cs">
-      <Link>Text\Placeholder [002].cs</Link>
+    <Compile Include="..\Medo\Text\Placeholder [003].cs">
+      <Link>Text\Placeholder [003].cs</Link>
     </Compile>
     <Compile Include="..\medo\text\StringAdder [002].cs">
       <Link>Text\StringAdder [002].cs</Link>

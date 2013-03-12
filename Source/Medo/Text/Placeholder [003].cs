@@ -2,6 +2,7 @@
 
 //2013-03-04: Initial version.
 //2013-03-08: Bug-fixing.
+//2013-03-11: Nulls are supported.
 
 
 using System;
@@ -82,15 +83,15 @@ namespace Medo.Text {
                     case State.ArgName: {
                             if (ch == '}') {
                                 var argName = sbArgName.ToString();
-                                var arg = GetArg(items, argName);
-                                if (arg != null) {
+                                object arg;                                
+                                if (GetArg(items, argName, out arg)) {
                                     args.Add(arg);
                                     sbFormat.AppendFormat(CultureInfo.InvariantCulture, "{{{0}}}", argIndex);
+                                    argIndex += 1;
                                 } else {
                                     throw new ArgumentException("Cannot find placeholder item '" + argName + "'.", "items");
                                 }
                                 sbArgName.Length = 0;
-                                argIndex += 1;
                                 state = State.Default;
                             } else if (ch == ':') {
                                 state = State.ArgFormat;
@@ -102,17 +103,17 @@ namespace Medo.Text {
                     case State.ArgFormat: {
                             if (ch == '}') {
                                 var argName = sbArgName.ToString();
-                                var arg = GetArg(items, argName);
-                                if (arg != null) {
+                                object arg;
+                                if (GetArg(items, argName, out arg)) {
                                     args.Add(arg);
                                     var argFormat = sbArgFormat.ToString();
                                     sbFormat.AppendFormat(CultureInfo.InvariantCulture, "{{{0}:{1}}}", argIndex, argFormat);
+                                    argIndex += 1;
                                 } else {
                                     throw new ArgumentException("Cannot find placeholder item '" + argName + "'.", "items");
                                 }
                                 sbArgName.Length = 0;
                                 sbArgFormat.Length = 0;
-                                argIndex += 1;
                                 state = State.Default;
                             } else {
                                 sbArgFormat.Append(ch);
@@ -163,12 +164,11 @@ namespace Medo.Text {
         }
 
 
-        private static Object GetArg(IDictionary<String, Object> items, string argumentName) {
-            object item;
-            if (items.TryGetValue(argumentName, out item)) {
-                return item;
+        private static bool GetArg(IDictionary<String, Object> items, string argumentName, out object value) {
+            if (items.TryGetValue(argumentName, out value)) {
+                return true;
             } else {
-                return null;
+                return false;
             }
         }
 
