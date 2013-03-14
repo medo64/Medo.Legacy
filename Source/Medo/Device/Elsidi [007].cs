@@ -6,10 +6,12 @@
 //2012-11-24: Changing methods AddSwithTo*Display to AddSwitchTo*Display.
 //2013-01-06: Updated for Elsidi [K].
 //2013-01-14: Updated for Elsidi [K 2013-01-14].
+//2013-03-13: Updated for Elsidi [L 2013-03-13].
 
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO.Ports;
 using System.Text;
@@ -343,7 +345,7 @@ namespace Medo.Device {
         public Int32 GetContrast() {
             byte[] bytes;
             if (SendTextCommand('c', "", out bytes)) {
-                var percentText = System.Text.ASCIIEncoding.ASCII.GetString(bytes);
+                var percentText = ASCIIEncoding.ASCII.GetString(bytes);
                 int percent;
                 if (int.TryParse(percentText, NumberStyles.Integer, CultureInfo.InvariantCulture, out percent)) {
                     if ((percent >= 0) && (percent <= 100)) {
@@ -384,7 +386,7 @@ namespace Medo.Device {
         public Int32 GetBacklight() {
             byte[] bytes;
             if (SendTextCommand('b', "", out bytes)) {
-                var percentText = System.Text.ASCIIEncoding.ASCII.GetString(bytes);
+                var percentText = ASCIIEncoding.ASCII.GetString(bytes);
                 int percent;
                 if (int.TryParse(percentText, NumberStyles.Integer, CultureInfo.InvariantCulture, out percent)) {
                     if ((percent >= 0) && (percent <= 100)) {
@@ -396,7 +398,7 @@ namespace Medo.Device {
         }
 
         /// <summary>
-        /// Temporarily Sets backlight.
+        /// Temporarily sets backlight.
         /// Returns true if operation succeeded.
         /// </summary>
         /// <param name="percent">Percent value.</param>
@@ -415,6 +417,99 @@ namespace Medo.Device {
         public Boolean SetBacklight(Int32 percent, Boolean save) {
             if ((percent < 0) || (percent > 100)) { throw new ArgumentOutOfRangeException("percent", "Percent value must be between 0 and 100."); }
             return SendTextCommand((save ? 'B' : 'b'), percent.ToString(CultureInfo.InvariantCulture));
+        }
+
+
+        /// <summary>
+        /// Returns display size currently set.
+        /// Available only on Elsidi revision L and above.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might be perceivably slower than the time that is required to get the value of a field.")]
+        public Size GetDisplaySize() {
+            byte[] bytesWidth, bytesHeight;
+            if (SendTextCommand('w', "", out bytesWidth) && SendTextCommand('h', "", out bytesHeight)) {
+                var widthText = ASCIIEncoding.ASCII.GetString(bytesWidth);
+                var heightText = ASCIIEncoding.ASCII.GetString(bytesHeight);
+                int width, height;
+                if (int.TryParse(widthText, NumberStyles.Integer, CultureInfo.InvariantCulture, out width) && int.TryParse(heightText, NumberStyles.Integer, CultureInfo.InvariantCulture, out height)) {
+                    return new Size(width, height);
+                }
+            }
+            return Size.Empty;
+        }
+
+        /// <summary>
+        /// Temporarily sets size.
+        /// Returns true if operation succeeded.
+        /// Available only on Elsidi revision L and above.
+        /// </summary>
+        /// <param name="size">Display size.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">Display height must be between 1 and 4 rows. -or- Display width must be between 1 and 128 columns. -or- Display cannot have more than 256 characters.</exception>
+        public Boolean SetDisplaySize(Size size) {
+            return SetDisplaySize(size, false);
+        }
+
+        /// <summary>
+        /// Sets display size.
+        /// Returns true if operation succeeded.
+        /// Available only on Elsidi revision L and above.
+        /// </summary>
+        /// <param name="size">Display size.</param>
+        /// <param name="save">If true, value should be saved as a default.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">Display height must be between 1 and 4 rows. -or- Display width must be between 1 and 128 columns. -or- Display cannot have more than 256 characters.</exception>
+        public Boolean SetDisplaySize(Size size, Boolean save) {
+            if ((size.Height < 1) || (size.Height > 4)) { throw new ArgumentOutOfRangeException("size", "Display height must be between 1 and 4 rows."); }
+            if ((size.Width < 1) || (size.Width > 128)) { throw new ArgumentOutOfRangeException("size", "Display width must be between 1 and 128 columns."); }
+            if ((size.Width * size.Height) > 256) { throw new ArgumentOutOfRangeException("size", "Display cannot have more than 256 characters."); }
+            var resW = SendTextCommand((save ? 'W' : 'w'), size.Width.ToString(CultureInfo.InvariantCulture));
+            var resH = SendTextCommand((save ? 'H' : 'h'), size.Height.ToString(CultureInfo.InvariantCulture));
+            return resW && resH;
+        }
+
+
+
+
+        /// <summary>
+        /// Returns currently set bus width.
+        /// Available only on Elsidi revision L and above.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might be perceivably slower than the time that is required to get the value of a field.")]
+        public Int32 GetDisplayBusWidth() {
+            byte[] bytes;
+            if (SendTextCommand('d', "", out bytes)) {
+                var numberText = ASCIIEncoding.ASCII.GetString(bytes);
+                int number;
+                if (int.TryParse(numberText, NumberStyles.Integer, CultureInfo.InvariantCulture, out number)) {
+                    if ((number == 4) || (number == 8)) {
+                        return number;
+                    }
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Temporarily sets display bus width.
+        /// Returns true if operation succeeded.
+        /// Available only on Elsidi revision L and above.
+        /// </summary>
+        /// <param name="busWidth">Display bus width. Must be either 4 (4-bit) or 8 (8-bit).</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">Bus width must be either 4 or 8.</exception>
+        public Boolean SetDisplayBusWidth(Int32 busWidth) {
+            return SetDisplayBusWidth(busWidth, false);
+        }
+
+        /// <summary>
+        /// Sets display bus width.
+        /// Returns true if operation succeeded.
+        /// Available only on Elsidi revision L and above.
+        /// </summary>
+        /// <param name="busWidth">Display bus width. Must be either 4 (4-bit) or 8 (8-bit).</param>
+        /// <param name="save">If true, value should be saved as a default.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">Bus width must be either 4 or 8.</exception>
+        public Boolean SetDisplayBusWidth(Int32 busWidth, Boolean save) {
+            if ((busWidth != 4) && (busWidth != 8)) { throw new ArgumentOutOfRangeException("busWidth", "Bus width must be either 4 or 8."); }
+            return SendTextCommand((save ? 'D' : 'd'), busWidth.ToString(CultureInfo.InvariantCulture));
         }
 
 
@@ -441,5 +536,4 @@ namespace Medo.Device {
         #endregion
 
     }
-
 }
