@@ -12,11 +12,16 @@ namespace Test {
 
         public TestContext TestContext { get; set; }
 
-
         [TestMethod()]
-        public void PasswordHash_Legacy_Verify() {
+        public void PasswordHash_CreateAndVerify() {
             var x = PasswordHash.EncodePassword("Pass", "User");
             Assert.AreEqual(true, PasswordHash.CheckPassword(x, "Pass", "User"));
+        }
+
+        [TestMethod()]
+        public void PasswordHash_Verify() {
+            var x = PasswordHash.EncodePassword("Pass", "User");
+            Assert.AreEqual(true, PasswordHash.CheckPassword("DRZCuiIvYaR18yS3HdgclFD+Na5ZrTtCR/yW87E6", "Pass", "User"));
         }
 
     }

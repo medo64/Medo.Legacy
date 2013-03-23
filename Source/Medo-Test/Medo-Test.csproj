@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgsTest.cs" />
+    <Compile Include="PasswordHashTest.cs" />
     <Compile Include="PlaceholderTest.cs" />
     <Compile Include="IniFileTest.cs" />
     <Compile Include="LinearCalibrationTest.cs" />
