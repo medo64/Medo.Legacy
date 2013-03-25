@@ -197,6 +197,18 @@ namespace Test {
 
         #endregion
 
+        #region Default
+
+        [TestMethod()]
+        public void Password_Default_Create() {
+            var hash = Password.Create("Test", PasswordAlgorithm.Sha512);
+            Assert.IsTrue(hash.StartsWith("$6$", StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(106, hash.Length); //total length
+            Assert.AreEqual(16, hash.Split('$')[2].Length); //default salt length
+            Assert.AreEqual(86, hash.Split('$')[3].Length); //hash length
+        }
+
+        #endregion
 
         #region Errors
 
