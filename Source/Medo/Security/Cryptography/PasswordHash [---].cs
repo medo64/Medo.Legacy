@@ -1,6 +1,7 @@
 //Copyright (c) 2010 Josip Medved <jmedved@jmedved.com>
 
 //2010-05-17: New version.
+//2013-03-23: Obsoleted in favor of Password class.
 
 
 using System;
@@ -13,6 +14,7 @@ namespace Medo.Security.Cryptography {
     /// <summary>
     /// Generates passwords based on password, username and salt.
     /// </summary>
+    [Obsolete("Use Medo.Security.Cryptography.Password instead.")]
     public static class PasswordHash {
 
         private static readonly System.Random _random = new System.Random();

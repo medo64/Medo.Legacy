@@ -93,7 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgsTest.cs" />
-    <Compile Include="PasswordHashTest.cs" />
+    <Compile Include="PasswordTest.cs" />
     <Compile Include="PlaceholderTest.cs" />
     <Compile Include="IniFileTest.cs" />
     <Compile Include="LinearCalibrationTest.cs" />
@@ -145,18 +145,18 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Medo-40\Medo-40.csproj">
-      <Project>{4c58ca83-e0d1-4fae-92fc-c062c13d7c28}</Project>
-      <Name>Medo-40</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="IniFile\Basic.ini" />
     <EmbeddedResource Include="IniFile\BasicWithComments.ini" />
     <EmbeddedResource Include="IniFile\Escaping.ini" />
     <EmbeddedResource Include="IniFile\Mixed.ini" />
     <EmbeddedResource Include="IniFile\Quoted.ini" />
     <None Include="Properties\App.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Medo-40\Medo-40.csproj">
+      <Project>{4c58ca83-e0d1-4fae-92fc-c062c13d7c28}</Project>
+      <Name>Medo-40</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

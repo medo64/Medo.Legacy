@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -285,8 +285,8 @@
     <Compile Include="..\Medo\Security\Cryptography\OpenSslAesStream [001].cs">
       <Link>Security\Cryptography\OpenSslAesStream [001].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Security\Cryptography\PasswordHash [001].cs">
-      <Link>Security\Cryptography\PasswordHash [001].cs</Link>
+    <Compile Include="..\Medo\Security\Cryptography\Password [001].cs">
+      <Link>Security\Cryptography\Password [001].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Security\Cryptography\Pbkdf2 [001].cs">
       <Link>Security\Cryptography\Pbkdf2 [001].cs</Link>
