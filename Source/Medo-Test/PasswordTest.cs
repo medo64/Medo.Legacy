@@ -224,10 +224,20 @@ namespace Test {
             var hash = Password.Create(new byte[] { }, null, PasswordAlgorithm.MD5, 5000);
         }
 
+
         [TestMethod()]
-        [ExpectedException(typeof(ArgumentException))]
         public void Password_Error_UnknownAlgorithm() {
-            Assert.AreEqual(true, Password.Verify("Test", "$XXX$SALT$8GXK57PY.bq4j7Ng3f0LF6NcPXxUXqmmseKtw1ugn8uoKXiPJWG8Ub6bxJcHAPBL2y0ppLmQJcpR8mYJbdjVF1"));
+            Assert.AreEqual(false, Password.Verify("Test", "$XXX$SALT$8GXK57PY.bq4j7Ng3f0LF6NcPXxUXqmmseKtw1ugn8uoKXiPJWG8Ub6bxJcHAPBL2y0ppLmQJcpR8mYJbdjVF1"));
+        }
+
+        [TestMethod()]
+        public void Password_Error_NullPasswordHash() {
+            Assert.AreEqual(false, Password.Verify("Test", null));
+        }
+
+        [TestMethod()]
+        public void Password_Error_EmptyPasswordHash() {
+            Assert.AreEqual(false, Password.Verify("Test", ""));
         }
 
         #endregion

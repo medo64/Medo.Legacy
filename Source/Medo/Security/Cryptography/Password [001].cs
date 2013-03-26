@@ -1,6 +1,6 @@
 //Copyright (c) 2013 Josip Medved <jmedved@jmedved.com>
 
-//2013-03-24: Initial version.
+//2013-03-26: Initial version.
 
 
 using System;
@@ -127,30 +127,29 @@ namespace Medo.Security.Cryptography {
         /// Verifies password agains hash.
         /// </summary>
         /// <param name="password">Password to check.</param>
-        /// <param name="hashedPassword">Hashed password.</param>
-        /// <exception cref="System.ArgumentNullException">Password cannot be null. -or- Hashed password cannot be null.</exception>
-        public static Boolean Verify(String password, String hashedPassword) {
+        /// <param name="passwordHash">Hashed password.</param>
+        /// <exception cref="System.ArgumentNullException">Password cannot be null.</exception>
+        public static Boolean Verify(String password, String passwordHash) {
             if (password == null) { throw new ArgumentNullException("password", "Password cannot be null."); }
-            return Verify(Password.Utf8WithoutBom.GetBytes(password), hashedPassword);
+            return Verify(Password.Utf8WithoutBom.GetBytes(password), passwordHash);
         }
 
         /// <summary>
         /// Verifies
         /// </summary>
         /// <param name="password">Password to check.</param>
-        /// <param name="hashedPassword">Hashed password.</param>
-        /// <exception cref="System.ArgumentException">Unrecognized format. -or- Unrecognized algoritm.</exception>
-        /// <exception cref="System.ArgumentNullException">Password cannot be null. -or- Hashed password cannot be null.</exception>
-        public static Boolean Verify(Byte[] password, String hashedPassword) {
+        /// <param name="passwordHash">Hashed password.</param>
+        /// <exception cref="System.ArgumentNullException">Password cannot be null.</exception>
+        public static Boolean Verify(Byte[] password, String passwordHash) {
             if (password == null) { throw new ArgumentNullException("password", "Password cannot be null."); }
-            if (hashedPassword == null) { throw new ArgumentNullException("hashedPassword", "Hashed password cannot be null."); }
+            if (passwordHash == null) { return false; }
 
             string id;
             int iterationCount;
             byte[] salt;
             string hash;
 
-            if (!(SplitHashedPassword(hashedPassword, out id, out iterationCount, out salt, out hash))) { throw new ArgumentException("Unrecognized format.", "hashedPassword"); }
+            if (!(SplitHashedPassword(passwordHash, out id, out iterationCount, out salt, out hash))) { return false; }
 
             string hashCalc;
             switch (id) { //algorithm
@@ -158,7 +157,7 @@ namespace Medo.Security.Cryptography {
                 case "apr1": SplitHashedPassword(CreateMd5Apache(password, salt, iterationCount), out hashCalc); break;
                 case "5": SplitHashedPassword(CreateSha256(password, salt, iterationCount), out hashCalc); break;
                 case "6": SplitHashedPassword(CreateSha512(password, salt, iterationCount), out hashCalc); break;
-                default: throw new ArgumentException("Unrecognized algoritm.", "hashedPassword");
+                default: return false;
             }
             return string.Equals(hash, hashCalc);
         }
@@ -294,7 +293,6 @@ namespace Medo.Security.Cryptography {
         }
 
         #endregion
-
 
         #region MD5
 
