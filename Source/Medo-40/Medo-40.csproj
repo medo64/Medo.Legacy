@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -105,8 +105,8 @@
     <Compile Include="..\Medo\Configuration\RunOnStartup [004].cs">
       <Link>Configuration\RunOnStartup [004].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Configuration\Settings [012].cs">
-      <Link>Configuration\Settings [012].cs</Link>
+    <Compile Include="..\Medo\Configuration\Settings [013].cs">
+      <Link>Configuration\Settings [013].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Data\CommonConnection [010].cs">
       <Link>Data\CommonConnection [010].cs</Link>
