@@ -2,6 +2,7 @@
 
 //2012-03-05: Initial version.
 //2012-03-13: UI adjustments.
+//2013-12-28: Message box adjustments.
 
 
 using System;
@@ -240,7 +241,7 @@ namespace Medo.Services {
                             btnCancel.Text = Resources.Close;
                         }
                     } else {
-                        MessageBox.ShowDialog(this, Resources.ErrorCannotCheck + "\n\n" + e.Error.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        System.Windows.Forms.MessageBox.Show(this, Resources.ErrorCannotCheck + "\n\n" + e.Error.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
                         this.DialogResult = DialogResult.Cancel;
                     }
                 } else {
@@ -308,7 +309,7 @@ namespace Medo.Services {
                                 System.Windows.Forms.Application.Exit();
                                 this.DialogResult = DialogResult.OK;
                             } catch (Win32Exception ex) {
-                                MessageBox.ShowDialog(this, Resources.ErrorCannotUpgrade + "\n\n" + ex.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                System.Windows.Forms.MessageBox.Show(this, Resources.ErrorCannotUpgrade + "\n\n" + ex.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
                                 this.DialogResult = DialogResult.Cancel;
                             }
                         } else {
@@ -323,7 +324,7 @@ namespace Medo.Services {
                             }
                         }
                     } else {
-                        MessageBox.ShowDialog(this, Resources.ErrorCannotDownload + "\n\n" + e.Error.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        System.Windows.Forms.MessageBox.Show(this, Resources.ErrorCannotDownload + "\n\n" + e.Error.Message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
                         this.DialogResult = DialogResult.Cancel;
                     }
                 } else {

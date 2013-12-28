@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -237,8 +237,8 @@
     <Compile Include="..\medo\security\principal\Impersonation [002].cs">
       <Link>Security\Principal\Impersonation [002].cs</Link>
     </Compile>
-    <Compile Include="..\medo\services\Upgrade [002].cs">
-      <Link>Services\Upgrade [002].cs</Link>
+    <Compile Include="..\medo\services\Upgrade [003].cs">
+      <Link>Services\Upgrade [003].cs</Link>
     </Compile>
     <Compile Include="..\Medo\TagItem [004].cs">
       <Link>TagItem [004].cs</Link>
