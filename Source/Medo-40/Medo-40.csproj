@@ -90,6 +90,9 @@
     <Compile Include="..\Medo\Application\Args [002].cs">
       <Link>Application\Args [002].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Application\Restart [001].cs">
+      <Link>Application\Restart [001].cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Application\SingleInstance [010].cs">
       <Link>Application\SingleInstance [010].cs</Link>
     </Compile>
