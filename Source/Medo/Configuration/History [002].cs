@@ -1,6 +1,7 @@
 //Copyright (c) 2014 Josip Medved <jmedved@jmedved.com>
 
 //2014-01-12: Initial version.
+//2014-12-12: Bug fixing.
 
 
 using Microsoft.Win32;
@@ -192,6 +193,7 @@ namespace Medo.Configuration {
                                     foreach (var item in array) {
                                         if (!dict.ContainsKey(item)) {
                                             if ((itemToRemove != null) && this.Comparer.Equals(item, itemToRemove)) { continue; }
+                                            items.Add(item);
                                             if (items.Count == this.MaximumCount) { break; }
                                         }
                                     }
