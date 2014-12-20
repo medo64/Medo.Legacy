@@ -327,8 +327,8 @@
     <Compile Include="..\Medo\Windows\AboutWindow [003].cs">
       <Link>Windows\AboutWindow [003].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Windows\Forms\AboutBox [013].cs">
-      <Link>Windows\Forms\AboutBox [013].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\AboutBox [014].cs">
+      <Link>Windows\Forms\AboutBox [014].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Windows\Forms\Button [001].cs">
       <Link>Windows\Forms\Button [001].cs</Link>

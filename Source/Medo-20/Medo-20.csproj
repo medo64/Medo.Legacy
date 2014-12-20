@@ -258,8 +258,8 @@
     <Compile Include="..\medo\web\gdata\GDataClientLogin [002].cs">
       <Link>Web\GData\GDataClientLogin [002].cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\AboutBox [013].cs">
-      <Link>Windows\Forms\AboutBox [013].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\AboutBox [014].cs">
+      <Link>Windows\Forms\AboutBox [014].cs</Link>
     </Compile>
     <Compile Include="..\medo\windows\forms\Button [001].cs">
       <Link>Windows\Forms\Button [001].cs</Link>
