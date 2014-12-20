@@ -1,4 +1,4 @@
-﻿using Medo.Net;
+using Medo.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,10 @@ namespace Test {
             var target = new TinyPacket("Example", "Test");
             target["Key1Text"] = "Value1Text";
             target["Key2Text"] = "Value2Text";
-            Assert.AreEqual(@"Tiny Example Test {""Key1Text"":""Value1Text"",""Key2Text"":""Value2Text""}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
+
+            var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
+
+            Assert.AreEqual(@"Tiny Example Test {""Key1Text"":""Value1Text"",""Key2Text"":""Value2Text""}", actual);
         }
 
         [TestMethod()]
@@ -41,7 +44,10 @@ namespace Test {
             target["Key1"] = "A\n\rB";
             target["Key2"] = "\0";
             target["Key3"] = "\\";
-            Assert.AreEqual(@"Tiny Example Test {""Key1"":""A\n\rB"",""Key2"":""\u0000"",""Key3"":""\\""}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
+
+            var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
+
+            Assert.AreEqual(@"Tiny Example Test {""Key1"":""A\n\rB"",""Key2"":""\u0000"",""Key3"":""\\""}", actual);
         }
 
         [TestMethod()]
@@ -61,7 +67,10 @@ namespace Test {
             target["A"] = "1";
             target["B"] = null;
             target["C"] = "2";
-            Assert.AreEqual(@"Tiny Example Test {""A"":""1"",""B"":null,""C"":""2""}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
+
+            var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
+
+            Assert.AreEqual(@"Tiny Example Test {""A"":""1"",""B"":null,""C"":""2""}", actual);
         }
 
         [TestMethod()]
@@ -90,7 +99,10 @@ namespace Test {
         [TestMethod()]
         public void TinyPacket_Encode_Empty() {
             var target = new TinyPacket("Example", "Test");
-            Assert.AreEqual(@"Tiny Example Test {}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
+
+            var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
+
+            Assert.AreEqual(@"Tiny Example Test {}", actual);
         }
 
         [TestMethod()]
@@ -131,7 +143,9 @@ namespace Test {
             target["A"] = "0";
             target["A"] = "1";
 
-            Assert.AreEqual(@"Tiny Example Test {""A"":""1""}", UTF8Encoding.UTF8.GetString(target.GetBytes()));
+            var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
+
+            Assert.AreEqual(@"Tiny Example Test {""A"":""1""}", actual);
         }
 
         [TestMethod()]
@@ -166,40 +180,144 @@ namespace Test {
 
         [TestMethod()]
         public void TinyPacket_NullItems() {
-            var target = new TinyPacket("Example", "Test", null);
+            var target = new TinyPacket("Example", "Test");
             Assert.AreEqual(null, target["Key1Text"]);
             Assert.IsNotNull(target.GetEnumerator());
+        }
+
+        [TestMethod()]
+        public void TinyPacket_Encrypted() {
+            var packet = new TinyPacket("Example", "Test");
+
+            var key = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            var bytesE1 = packet.GetBytes(key);
+            var bytesE2 = packet.GetBytes(key);
+
+            Assert.AreEqual("Tiny128 ", Encoding.UTF8.GetString(bytesE1, 0, 8));
+            Assert.AreEqual("Tiny128 ", Encoding.UTF8.GetString(bytesE2, 0, 8));
+            Assert.AreNotEqual(BitConverter.ToString(bytesE1), BitConverter.ToString(bytesE2));
+
+            var packet1a = TinyPacket.Parse(bytesE1, key);
+            var packet2a = TinyPacket.Parse(bytesE2, key);
+            Assert.IsNull(packet1a["_Id"]);
+            Assert.IsNotNull(packet1a["_Host"]);
+            Assert.IsNull(packet2a["_Id"]);
+            Assert.IsNotNull(packet2a["_Host"]);
+
+            var packet1b = packet1a.Clone();
+            var packet2b = packet2a.Clone();
+            Assert.IsNull(packet1b["_Id"]);
+            Assert.IsNull(packet1b["_Host"]);
+            Assert.IsNull(packet2b["_Id"]);
+            Assert.IsNull(packet2b["_Host"]);
+
+            var bytesP1 = packet1b.GetBytes(null, omitIdentifiers: true);
+            var bytesP2 = packet2b.GetBytes(null, omitIdentifiers: true);
+            Assert.AreEqual("Tiny ", Encoding.UTF8.GetString(bytesP1, 0, 5));
+            Assert.AreEqual("Tiny ", Encoding.UTF8.GetString(bytesP2, 0, 5));
+            Assert.AreEqual(Encoding.UTF8.GetString(bytesP1), Encoding.UTF8.GetString(bytesP2));
+        }
+
+        [TestMethod()]
+        public void TinyPacket_Cloning() {
+            var packet = new TinyPacket("Example", "Test") { { "A", "1" }, { "B", "2" } };
+
+            var key = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            var bytesE = packet.GetBytes(key);
+
+            var packetA = TinyPacket.Parse(bytesE, key);
+            Assert.IsNull(packetA["_Id"]);
+            Assert.IsNotNull(packetA["_Host"]);
+            Assert.IsNotNull(packetA["A"]);
+            Assert.IsNotNull(packetA["B"]);
+
+            var packetB = packetA.Clone();
+            Assert.IsNull(packetB["_Id"]);
+            Assert.IsNull(packetB["_Host"]);
+            Assert.IsNotNull(packetA["A"]);
+            Assert.IsNotNull(packetA["B"]);
+
+            var packetC = TinyPacket.Parse(packetB.GetBytes());
+            Assert.IsNotNull(packetC["_Id"]);
+            Assert.IsNotNull(packetC["_Host"]);
+            Assert.IsNotNull(packetA["A"]);
+            Assert.IsNotNull(packetA["B"]);
+
+            var packetD = packetC.Clone();
+
+            var bytesB = packetB.GetBytes(null, omitIdentifiers: true);
+            var bytesD = packetD.GetBytes(null, omitIdentifiers: true);
+            Assert.AreEqual(Encoding.UTF8.GetString(bytesB), Encoding.UTF8.GetString(bytesD));
+
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void TinyPacket_CannotAddSpecialProperties1() {
+            var packet = new TinyPacket("Example", "Test") { { "A", "1" }, { "B", "2" } };
+            packet.Add("_X", "X");
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void TinyPacket_CannotAddSpecialProperties2() {
+            var packet = new TinyPacket("Example", "Test") { { "A", "1" }, { "B", "2" } };
+            packet["_X"] = "X";
         }
 
 
         [TestMethod()]
         public void TinyPacket_EncodeDecode_SpeedTest() {
-            var data = new Dictionary<string, string>();
-            data.Add("Key1Text", "Value1Text");
-            data.Add("Key2Text", "Value2Text");
-
             TinyPacket target = null;
             byte[] bytes = null;
 
-            var n = 100000;
-            var swEncode = new Stopwatch();
-            swEncode.Start();
-            for (int i = 0; i < n; i++) {
-                target = new TinyPacket("Example", "Test");
-                target["Key1Text"] = "Value1Text";
-                target["Key2Text"] = "Value2Text";
+            var nEncodePlain = 0;
+            var swEncodePlain = Stopwatch.StartNew();
+            while (swEncodePlain.ElapsedMilliseconds < 500) {
+                target = new TinyPacket("Example", "Test"){
+                    {"Key1Text", "Value1Text"},
+                    {"Key2Text", "Value2Text"}
+                };
                 bytes = target.GetBytes();
+                nEncodePlain += 1;
             }
-            swEncode.Stop();
+            swEncodePlain.Stop();
+            this.TestContext.WriteLine(string.Format("TinyPacket.Encode.Plain: {0:#,##0}K packets/second", (double)nEncodePlain / swEncodePlain.ElapsedMilliseconds));
 
-            var swDecode = new Stopwatch();
-            swDecode.Start();
-            for (int i = 0; i < n; i++) {
+            var nDecodePlain = 0;
+            var swDecodePlain = Stopwatch.StartNew();
+            while (swDecodePlain.ElapsedMilliseconds < 500) {
                 var target2 = TinyPacket.Parse(bytes);
+                nDecodePlain += 1;
             }
-            swDecode.Stop();
+            swDecodePlain.Stop();
+            this.TestContext.WriteLine(string.Format("TinyPacket.Decode.Plain: {0:#,##0}K packets/second", (double)nDecodePlain / swDecodePlain.ElapsedMilliseconds));
 
-            //Assert.Inconclusive(string.Format("TinyPair (encode/decode): {0} + {1} = {2} ms", swEncode.ElapsedMilliseconds, swDecode.ElapsedMilliseconds, swEncode.ElapsedMilliseconds + swDecode.ElapsedMilliseconds));
+            var key = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+            var nEncodeAes = 0;
+            var swEncodeAes = Stopwatch.StartNew();
+            while (swEncodeAes.ElapsedMilliseconds < 500) {
+                target = new TinyPacket("Example", "Test"){
+                    {"Key1Text", "Value1Text"},
+                    {"Key2Text", "Value2Text"}
+                };
+                bytes = target.GetBytes(key);
+                nEncodeAes += 1;
+            }
+            swEncodeAes.Stop();
+            this.TestContext.WriteLine(string.Format("TinyPacket.Encode.AES: {0:#,##0}K packets/second", (double)nEncodeAes / swEncodeAes.ElapsedMilliseconds));
+
+            Assert.AreEqual("Tiny128 ", Encoding.UTF8.GetString(bytes, 0, 8));
+
+            var nDecodeAes = 0;
+            var swDecodeAes = Stopwatch.StartNew();
+            while (swDecodeAes.ElapsedMilliseconds < 500) {
+                var target2 = TinyPacket.Parse(bytes, key);
+                nDecodeAes += 1;
+            }
+            swDecodeAes.Stop();
+            this.TestContext.WriteLine(string.Format("TinyPacket.Decode.AES: {0:#,##0}K packets/second", (double)nDecodeAes / swDecodeAes.ElapsedMilliseconds));
         }
 
     }

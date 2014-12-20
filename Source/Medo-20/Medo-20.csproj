@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -192,8 +192,8 @@
     <Compile Include="..\medo\net\SyslogMessage [004].cs">
       <Link>Net\SyslogMessage [004].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Net\TinyMessage [009].cs">
-      <Link>Net\TinyMessage [009].cs</Link>
+    <Compile Include="..\Medo\Net\TinyMessage [009-v20].cs">
+      <Link>Net\TinyMessage [009-v20].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Net\WakeOnLan [006].cs">
       <Link>Net\WakeOnLan [006].cs</Link>
