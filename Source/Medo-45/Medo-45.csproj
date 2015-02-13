@@ -79,6 +79,7 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xaml" />
@@ -290,6 +291,9 @@
     </Compile>
     <Compile Include="..\Medo\Security\Checksum\Lrc8 [002].cs">
       <Link>Security\Checksum\Lrc8 [002].cs</Link>
+    </Compile>
+    <Compile Include="..\Medo\Security\Cryptography\OneTimePassword [001].cs">
+      <Link>Security\Cryptography\OneTimePassword [001].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Security\Cryptography\OpenSslAesStream [001].cs">
       <Link>Security\Cryptography\OpenSslAesStream [001].cs</Link>
