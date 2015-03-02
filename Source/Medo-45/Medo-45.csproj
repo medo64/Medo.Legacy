@@ -259,8 +259,8 @@
     <Compile Include="..\Medo\Net\SyslogMessage [004].cs">
       <Link>Net\SyslogMessage [004].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Net\TinyMessage [010].cs">
-      <Link>Net\TinyMessage [010].cs</Link>
+    <Compile Include="..\Medo\Net\TinyMessage [011].cs">
+      <Link>Net\TinyMessage [011].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Net\WakeOnLan [006].cs">
       <Link>Net\WakeOnLan [006].cs</Link>

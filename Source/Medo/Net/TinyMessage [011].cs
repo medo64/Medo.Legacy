@@ -17,6 +17,8 @@
 //2014-12-20: Adding encrypted mode.
 //            Removing static Send methods.
 //            Refactoring (not fully compatible with previous version).
+//2014-12-26: Improving multicast code (sending to all interfaces).
+//            Improving duplicate detection.
 
 
 using System;
@@ -127,7 +129,7 @@ namespace Medo.Net {
         /// <summary>
         /// Raises event when packet arrives.
         /// </summary>
-        public event EventHandler<TinyPacketEventArgs> TinyPacketReceived;
+        public event EventHandler<TinyPacketEventArgs> PacketReceived;
 
 
         #region Listen/Close
@@ -141,7 +143,6 @@ namespace Medo.Net {
             this.HasBegunListening = true;
 
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Listen (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
 
@@ -160,6 +161,7 @@ namespace Medo.Net {
                     } else {
                         tag = endpoint.ToString();
                     }
+
                     Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Setup started.", tag));
 
                     IList<object> multicastOptions = null;
@@ -171,39 +173,35 @@ namespace Medo.Net {
                         socket.Bind(new IPEndPoint(IPAddress.IPv6Any, endpoint.Port));
 
                         multicastOptions = new List<object>();
-                        foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces()) {
-                            if (netInterface.Supports(NetworkInterfaceComponent.IPv6)) {
-                                var netProperties = netInterface.GetIPProperties().GetIPv6Properties();
-                                if (netProperties != null) {
-                                    try {
-                                        var option = new IPv6MulticastOption(endpoint.Address, netProperties.Index);
-                                        socket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, option);
-                                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Added multicast membership to interface {1} ({2}).", tag, netProperties.Index, netInterface.Name));
-                                        multicastOptions.Add(option);
-                                    } catch (SocketException ex) {
-                                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Exception adding multicast membership to interface {1} ({2}): {3}", tag, netProperties.Index, netInterface.Name, ex.Message));
-                                    }
+                        foreach (var netInterface in GetApplicableNetworkInterfaces(endpoint.AddressFamily)) {
+                            var netProperties = netInterface.GetIPProperties().GetIPv6Properties();
+                            if (netProperties != null) {
+                                try {
+                                    var option = new IPv6MulticastOption(endpoint.Address, netProperties.Index);
+                                    socket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, option);
+                                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Added multicast membership to interface {1} ({2}).", tag, netProperties.Index, netInterface.Name));
+                                    multicastOptions.Add(option);
+                                } catch (SocketException ex) {
+                                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Exception adding multicast membership to interface {1} ({2}): {3}", tag, netProperties.Index, netInterface.Name, ex.Message));
                                 }
                             }
                         }
 
-                    } else if ((endpoint.Address.GetAddressBytes()[0] & 0xE0) == 0xE0) { //IPv4 multicast
+                    } else if ((endpoint.Address.AddressFamily == AddressFamily.InterNetwork) && ((endpoint.Address.GetAddressBytes()[0] & 0xE0) == 0xE0)) { //IPv4 multicast
 
                         socket.Bind(new IPEndPoint(IPAddress.Any, endpoint.Port));
 
                         multicastOptions = new List<object>();
-                        foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces()) {
-                            if (netInterface.Supports(NetworkInterfaceComponent.IPv4)) {
-                                var netProperties = netInterface.GetIPProperties().GetIPv4Properties();
-                                if (netProperties != null) {
-                                    try {
-                                        var option = new MulticastOption(endpoint.Address, netProperties.Index);
-                                        socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, option);
-                                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Added multicast membership to interface {1} ({2}).", tag, netProperties.Index, netInterface.Name));
-                                        multicastOptions.Add(option);
-                                    } catch (SocketException ex) {
-                                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Exception adding multicast membership to interface {1} ({2}): {3}", tag, netProperties.Index, netInterface.Name, ex.Message));
-                                    }
+                        foreach (var netInterface in GetApplicableNetworkInterfaces(endpoint.AddressFamily)) {
+                            var netProperties = netInterface.GetIPProperties().GetIPv4Properties();
+                            if (netProperties != null) {
+                                try {
+                                    var option = new MulticastOption(endpoint.Address, netProperties.Index);
+                                    socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, option);
+                                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Added multicast membership to interface {1} ({2}).", tag, netProperties.Index, netInterface.Name));
+                                    multicastOptions.Add(option);
+                                } catch (SocketException ex) {
+                                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Exception adding multicast membership to interface {1} ({2}): {3}", tag, netProperties.Index, netInterface.Name, ex.Message));
                                 }
                             }
                         }
@@ -232,7 +230,7 @@ namespace Medo.Net {
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Listen (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Listen completed in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
         }
 
@@ -242,11 +240,9 @@ namespace Medo.Net {
         public async Task ListenAsync() {
             if (this.HasBegunListening) { throw new InvalidOperationException("Listening in progress."); }
 
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: ListenAsync (begin)."));
             await Task.Run(() => {
                 this.Listen();
             });
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: ListenAsync (end)."));
         }
 
 
@@ -257,7 +253,6 @@ namespace Medo.Net {
             if (this.IsListening == false) { return; } //only attempt close if all listening threads are setup.
 
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Close (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
 
@@ -274,7 +269,7 @@ namespace Medo.Net {
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Close (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Close completed in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
         }
 
@@ -284,16 +279,16 @@ namespace Medo.Net {
         public async Task CloseAsync() {
             if (this.IsListening == false) { return; } //only attempt close if all listening threads are setup.
 
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: CloseAsync (begin)."));
             await Task.Run(() => {
                 this.Close();
             });
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: CloseAsync (end)."));
         }
 
 
         private static void Cleanup(IEnumerable<Tuple<IPEndPoint, Socket, IList<Object>, Thread, String>> listeningData) {
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Cleanup (begin)."));
+#if DEBUG
+            var sw = Stopwatch.StartNew();
+#endif
 
             foreach (var item in listeningData) {
                 var endpoint = (IPEndPoint)item.Item1;
@@ -312,7 +307,7 @@ namespace Medo.Net {
                             Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Exception adding multicast membership to interface {1}: {2}", tag, option.InterfaceIndex, ex.Message));
                         }
                     }
-                } else if ((endpoint.Address.GetAddressBytes()[0] & 0xE0) == 0xE0) { //IPv4 multicast
+                } else if ((endpoint.Address.AddressFamily == AddressFamily.InterNetwork) && ((endpoint.Address.GetAddressBytes()[0] & 0xE0) == 0xE0)) { //IPv4 multicast
                     foreach (var multicastOption in multicastOptions) {
                         var option = (MulticastOption)multicastOption;
                         try {
@@ -336,7 +331,10 @@ namespace Medo.Net {
                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Thread cleanup completed.", tag));
             }
 
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Cleanup (end)."));
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Cleanup completed."));
+#endif
         }
 
 
@@ -388,48 +386,38 @@ namespace Medo.Net {
                         }
                     }
 
-                    var receivedHandler = this.TinyPacketReceived;
+                    var receivedHandler = this.PacketReceived;
                     if (receivedHandler != null) {
                         var productFilter = this.ProductFilter;
                         var operationFilter = this.OperationFilter;
+                        var remoteEndpoint = remoteEP as IPEndPoint;
 
                         var newBuffer = new byte[inCount];
                         Buffer.BlockCopy(buffer, 0, newBuffer, 0, inCount);
                         var key = this.Key;
                         Task.Run(() => {
-                            TinyPacket packet = null;
-                            try {
-                                packet = TinyPacket.Parse(newBuffer, key);
-                            } catch (FormatException ex) {
-                                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Couldn't parse the packet: {1}", tag, ex.Message));
-                                return;
-                            }
+                            var packet = GetUniquePacket(tag, remoteEndpoint, newBuffer, key);
+                            if (packet == null) { return; }
 
                             if ((productFilter != null) && (packet.Product.Equals(productFilter, StringComparison.Ordinal))) {
-                                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring packet {1}/{2} from {3} due to Product filter.", tag, packet.Product, packet.Operation, remoteEP));
+                                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring packet {1}/{2} from {3} due to Product filter.", tag, packet.Product, packet.Operation, remoteEndpoint));
                                 return;
                             }
                             if ((operationFilter != null) && (packet.Operation.Equals(operationFilter, StringComparison.Ordinal))) {
-                                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring packet {1}/{2} from {3} due to Operation filter.", tag, packet.Product, packet.Operation, remoteEP));
+                                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring packet {1}/{2} from {3} due to Operation filter.", tag, packet.Product, packet.Operation, remoteEndpoint));
                                 return;
                             }
 
-                            if (IsDuplicate(packet)) {
-                                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring packet {1}/{2} from {3} due to duplication.", tag, packet.Product, packet.Operation, remoteEP));
-                                return;
-                            }
-
-                            var invokeArgs = new object[] { this, new TinyPacketEventArgs(packet, new IPEndPoint(endpoint.Address, endpoint.Port), remoteEP as IPEndPoint) };
+                            var invokeArgs = new object[] { this, new TinyPacketEventArgs(packet, new IPEndPoint(endpoint.Address, endpoint.Port), remoteEndpoint) };
+                            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Raising event for packet {1}/{2} from {3}.", tag, packet.Product, packet.Operation, remoteEndpoint));
                             foreach (Delegate iDelegate in receivedHandler.GetInvocationList()) {
                                 ISynchronizeInvoke syncer = iDelegate.Target as ISynchronizeInvoke;
                                 if (syncer == null) {
                                     try {
-                                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Using dynamic invoke to raise event for packet {1}/{2} from {3}.", tag, packet.Product, packet.Operation, remoteEP));
                                         iDelegate.DynamicInvoke(invokeArgs);
                                     } catch (MemberAccessException) { } catch (TargetInvocationException) { }
                                 } else {
                                     try {
-                                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Using invoke to raise event for packet {1}/{2} from {3}.", tag, packet.Product, packet.Operation, remoteEP));
                                         syncer.BeginInvoke(iDelegate, invokeArgs);
                                     } catch (InvalidOperationException) { }
                                 }
@@ -450,33 +438,73 @@ namespace Medo.Net {
 
         private const Int32 DuplicateBufferCount = 1024;
         private readonly Guid[] DuplicateBuffer = new Guid[DuplicateBufferCount];
+        private readonly Int64[] DuplicateBufferExpiry = new Int64[DuplicateBufferCount];
         private Int32 DuplicateBufferIndex = 0;
         private Object DuplicateBufferLock = new object();
 
-        private bool IsDuplicate(TinyPacket packet) {
-            var iv = packet.GetIV();
+        private TinyPacket GetUniquePacket(string tag, IPEndPoint remoteEndpoint, byte[] packetBuffer, byte[] key) { //returns null if there is an duplicate or error parsing.
+            TinyPacket packet = null;
+            var iv = TinyPacket.ParseIV(packetBuffer, 0, packetBuffer.Length);
 
             Guid uniqueId;
-            if (iv == null) { //not encrypted
+            if (iv != null) { //encrypted packet, use IV
+
+                uniqueId = new Guid(iv); //use full IV as unique ID
+
+            } else { //not encrypted, try using ID and host
+
+                try {
+                    packet = TinyPacket.Parse(packetBuffer, key);
+                } catch (FormatException ex) {
+                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Couldn't parse the packet from {1}: {2}", tag, remoteEndpoint, ex.Message));
+                    return null;
+                }
+
                 int id;
                 if (int.TryParse(packet["_Id"], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out id)) {
-                    uniqueId = new Guid(id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                } else { //cannot parse ID
-                    return false;
+                    var host = packet["_Host"];
+                    if (host != null) {
+                        var hostBytes = Encoding.UTF8.GetBytes(host);
+                        short b = (hostBytes.Length >= 2) ? (short)(((int)hostBytes[1] << 8) | hostBytes[0]) : (hostBytes.Length >= 1) ? hostBytes[0] : (byte)0;
+                        short c = (hostBytes.Length >= 4) ? (short)(((int)hostBytes[3] << 8) | hostBytes[2]) : (hostBytes.Length >= 3) ? hostBytes[2] : (byte)0;
+                        byte d = (hostBytes.Length >= 5) ? hostBytes[4] : (byte)0;
+                        byte e = (hostBytes.Length >= 6) ? hostBytes[5] : (byte)0;
+                        byte f = (hostBytes.Length >= 7) ? hostBytes[6] : (byte)0;
+                        byte g = (hostBytes.Length >= 8) ? hostBytes[7] : (byte)0;
+                        byte h = (hostBytes.Length >= 9) ? hostBytes[8] : (byte)0;
+                        byte i = (hostBytes.Length >= 10) ? hostBytes[9] : (byte)0;
+                        byte j = (hostBytes.Length > 12) ? hostBytes[hostBytes.Length - 2] : (hostBytes.Length >= 11) ? hostBytes[10] : (byte)0; //if longer than 12 characters, take last two characters
+                        byte k = (hostBytes.Length > 12) ? hostBytes[hostBytes.Length - 1] : (hostBytes.Length >= 12) ? hostBytes[11] : (byte)0;
+                        uniqueId = new Guid(id, b, c, d, e, f, g, h, i, j, k);
+                    } else {
+                        uniqueId = new Guid(id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); //just use ID if there is no host
+                    }
+                } else {
+                    return packet; //cannot parse ID - return packet but no duplicate check
                 }
-            } else {
-                uniqueId = new Guid(iv);
             }
 
+            var nowTicks = DateTime.UtcNow.Ticks;
             lock (this.DuplicateBufferLock) {
-                foreach (var existingId in this.DuplicateBuffer) {
-                    if (existingId == uniqueId) { return true; }
+                for (var i = 0; i < DuplicateBufferCount; i++) {
+                    if ((DuplicateBufferExpiry[i] > nowTicks) && (DuplicateBuffer[i] == uniqueId)) { //must be non-expired and duplicate
+                        Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring duplicate packet from {1}.", tag, remoteEndpoint));
+                        return null;
+                    }
                 }
                 this.DuplicateBuffer[this.DuplicateBufferIndex] = uniqueId;
+                this.DuplicateBufferExpiry[this.DuplicateBufferIndex] = nowTicks + TimeSpan.TicksPerSecond; //expires in a second
                 this.DuplicateBufferIndex = (this.DuplicateBufferIndex + 1) % TinyMessage.DuplicateBufferCount;
             }
 
-            return false;
+            try {
+                if (packet == null) { packet = TinyPacket.Parse(packetBuffer, key); } //parse packet if it wasn't parsed before (i.e. only IV was parsed)
+            } catch (FormatException ex) {
+                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Couldn't parse the packet from {1}: {2}", tag, remoteEndpoint, ex.Message));
+                return null;
+            }
+
+            return packet;
         }
 
         #endregion
@@ -496,7 +524,6 @@ namespace Medo.Net {
             if (packet == null) { throw new ArgumentNullException("packet", "Packet cannot be null."); }
 
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
 
@@ -504,7 +531,7 @@ namespace Medo.Net {
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send completed in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
         }
 
@@ -520,7 +547,6 @@ namespace Medo.Net {
             if ((key != null) && (key.Length != 16)) { throw new ArgumentOutOfRangeException("key", "Key must be 16 bytes (128 bits) in length."); }
 
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
 
@@ -528,20 +554,29 @@ namespace Medo.Net {
             var packetBytes = packet.GetBytes(this.Key);
             foreach (var endpoint in this.PrivateLocalEndpoints) {
                 if ((endpoint.AddressFamily == AddressFamily.InterNetworkV6) && endpoint.Address.IsIPv6Multicast) {
-                    TinyMessage.SendPacket(packet, packetBytes, endpoint);
-                    sentToAny = true;
+                    try {
+                        this.SendPacket(packet, packetBytes, endpoint);
+                        sentToAny = true;
+                    } catch (SocketException) { }
                 } else if ((endpoint.AddressFamily == AddressFamily.InterNetwork) && ((endpoint.Address.GetAddressBytes()[0] & 0xE0) == 0xE0)) {
-                    TinyMessage.SendPacket(packet, packetBytes, endpoint);
-                    sentToAny = true;
+                    try {
+                        this.SendPacket(packet, packetBytes, endpoint);
+                        sentToAny = true;
+                    } catch (SocketException) { }
                 }
             }
             if (!sentToAny) {
-                TinyMessage.SendPacket(packet, packetBytes, TinyMessage.DefaultIPv6MulticastEndpoint);
+                try {
+                    this.SendPacket(packet, packetBytes, TinyMessage.DefaultIPv6MulticastEndpoint);
+                } catch (SocketException) {
+                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Sending broadcast due to failure in multicast for {0}/{1}.", packet.Product, packet.Operation));
+                    this.SendPacket(packet, packetBytes, TinyMessage.DefaultIPv4BroadcastEndpoint);
+                }
             }
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send completed in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
         }
 
@@ -558,7 +593,6 @@ namespace Medo.Net {
             if ((remoteEndpoint.AddressFamily != AddressFamily.InterNetwork) && (remoteEndpoint.AddressFamily != AddressFamily.InterNetworkV6)) { throw new ArgumentOutOfRangeException("remoteEndpoint", "Only IPv4 and IPv6 endpoints are supported."); }
 
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
 
@@ -566,7 +600,7 @@ namespace Medo.Net {
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send completed in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
         }
 
@@ -586,15 +620,14 @@ namespace Medo.Net {
             if ((key != null) && (key.Length != 16)) { throw new ArgumentOutOfRangeException("key", "Key must be 16 bytes (128 bits) in length."); }
 
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
 
-            TinyMessage.SendPacket(packet, packet.GetBytes(key), remoteEndpoint);
+            this.SendPacket(packet, packet.GetBytes(key), remoteEndpoint);
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Send completed in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
         }
 
@@ -664,9 +697,8 @@ namespace Medo.Net {
         }
 
 
-        private static void SendPacket(TinyPacket packet, byte[] packetBytes, IPEndPoint remoteEndpoint) {
+        private void SendPacket(TinyPacket packet, byte[] packetBytes, IPEndPoint remoteEndpoint) {
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: SendPacket (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
 
@@ -675,64 +707,83 @@ namespace Medo.Net {
                 var totalAvailable = 0;
                 var totalFailed = 0;
                 List<Exception> exceptions = null;
-                foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces()) {
-                    Debug.WriteLine(netInterface.Name + " " + sw.ElapsedMilliseconds.ToString(CultureInfo.InvariantCulture));
-                    if (netInterface.NetworkInterfaceType != NetworkInterfaceType.Ethernet) { continue; }
-                    if (netInterface.OperationalStatus != OperationalStatus.Up) { continue; }
-                    if (netInterface.IsReceiveOnly) { continue; }
-                    if (netInterface.Supports(NetworkInterfaceComponent.IPv4)) {
-                        foreach (var unicast in netInterface.GetIPProperties().UnicastAddresses) {
-                            if (unicast.Address.AddressFamily != AddressFamily.InterNetwork) { continue; }
-                            totalAvailable += 1;
-                            var addressInt = BitConverter.ToInt32(unicast.Address.GetAddressBytes(), 0);
-                            var maskInt = BitConverter.ToInt32(unicast.IPv4Mask.GetAddressBytes(), 0);
-                            var multicastAddress = new IPAddress(BitConverter.GetBytes(addressInt | ~maskInt));
-                            var localEndpoint = new IPEndPoint(unicast.Address, remoteEndpoint.Port);
-                            var multicastEndpoint = new IPEndPoint(multicastAddress, remoteEndpoint.Port);
-                            try {
-                                using (var socket = new Socket(remoteEndpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp)) {
-                                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                                    socket.Bind(localEndpoint);
-                                    SendPacketViaSocket(packet, packetBytes, socket, multicastEndpoint, localEndpoint);
-                                }
-                            } catch (SocketException ex) { //ignore send errors in case of broadcast
-                                totalFailed += 1;
-                                if (exceptions == null) { exceptions = new List<Exception>(); } //allocate only if used
-                                exceptions.Add(ex);
-                                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Exception while sending to {0}: {1}", multicastEndpoint, ex.Message));
+                foreach (var netInterface in this.GetApplicableNetworkInterfaces(remoteEndpoint.AddressFamily)) {
+                    foreach (var unicast in netInterface.GetIPProperties().UnicastAddresses) {
+                        if (unicast.Address.AddressFamily != AddressFamily.InterNetwork) { continue; }
+                        totalAvailable += 1;
+                        var addressInt = BitConverter.ToInt32(unicast.Address.GetAddressBytes(), 0);
+                        var maskInt = BitConverter.ToInt32(unicast.IPv4Mask.GetAddressBytes(), 0);
+                        var broadcastAddress = new IPAddress(BitConverter.GetBytes(addressInt | ~maskInt));
+                        var broadcastEndpoint = new IPEndPoint(broadcastAddress, remoteEndpoint.Port);
+                        var localEndpoint = new IPEndPoint(unicast.Address, remoteEndpoint.Port);
+                        try {
+                            using (var socket = new Socket(remoteEndpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp)) {
+                                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                                socket.Bind(localEndpoint);
+                                SendPacketViaSocket(packet, packetBytes, socket, broadcastEndpoint, localEndpoint);
                             }
+                        } catch (SocketException ex) { //ignore send errors in case of broadcast
+                            totalFailed += 1;
+                            if (exceptions == null) { exceptions = new List<Exception>(); } //allocate only if used
+                            exceptions.Add(ex);
+                            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Exception while sending to {0}: {1}", broadcastEndpoint, ex.Message));
                         }
-                        if ((totalAvailable == totalFailed) && (exceptions != null)) { //we tried to send but couldn't get it through a single interface
-                            throw new AggregateException(exceptions[0].Message, exceptions);
-                        }
+                    }
+                    if ((totalAvailable == totalFailed) && (exceptions != null)) { //we tried to send but couldn't get it through a single interface
+                        throw new AggregateException(exceptions[0].Message, exceptions);
+                    }
+                }
+
+            } else if (remoteEndpoint.Address.IsIPv6Multicast) {
+
+                foreach (var unicast in GetApplicableAddressInformation(remoteEndpoint.AddressFamily)) {
+                    using (var socket = new Socket(remoteEndpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp)) {
+                        socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                        var localEndpoint = new IPEndPoint(unicast.Address, 0);
+                        socket.Bind(localEndpoint);
+                        SendPacketViaSocket(packet, packetBytes, socket, remoteEndpoint, localEndpoint);
+                    }
+                }
+
+            } else if ((remoteEndpoint.Address.AddressFamily == AddressFamily.InterNetwork) && ((remoteEndpoint.Address.GetAddressBytes()[0] & 0xE0) == 0xE0)) { //IPv4 multicast
+
+                foreach (var unicast in GetApplicableAddressInformation(remoteEndpoint.AddressFamily)) {
+                    using (var socket = new Socket(remoteEndpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp)) {
+                        socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                        var localEndpoint = new IPEndPoint(unicast.Address, 0);
+                        socket.Bind(localEndpoint);
+                        SendPacketViaSocket(packet, packetBytes, socket, remoteEndpoint, localEndpoint);
                     }
                 }
 
             } else { //not a broadcast
-                var socket = (remoteEndpoint.AddressFamily == AddressFamily.InterNetwork) ? TinyMessage.SocketIPv4.Value : TinyMessage.SocketIPv6.Value;
-                SendPacketViaSocket(packet, packetBytes, socket, remoteEndpoint, null); //let's reuse multicast socket
+
+                using (var socket = new Socket(remoteEndpoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp)) {
+                    SendPacketViaSocket(packet, packetBytes, socket, remoteEndpoint, null);
+                }
+
             }
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: SendPacket (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: SendPacket completed in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
         }
 
-        private static readonly ThreadLocal<Socket> SocketIPv4 = new ThreadLocal<Socket>(() => { return new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp); });
-        private static readonly ThreadLocal<Socket> SocketIPv6 = new ThreadLocal<Socket>(() => { return new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp); });
-
         private static void SendPacketViaSocket(TinyPacket packet, byte[] packetBytes, Socket socket, IPEndPoint remoteEndpoint, IPEndPoint localEndpoint) {
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: SendPacketViaSocket (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
             if (IsRunningOnMono == false) { socket.SetSocketOption(SocketOptionLevel.Udp, SocketOptionName.NoChecksum, false); }
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Sending {0}/{1} to {2} (from {3}).", packet.Product, packet.Operation, remoteEndpoint, localEndpoint));
-            socket.SendTo(packetBytes, remoteEndpoint);
+            try {
+                socket.SendTo(packetBytes, remoteEndpoint);
+            } catch (SocketException ex) {
+                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Exception sending {0}/{1} to {2} (from {3}): {4}", packet.Product, packet.Operation, remoteEndpoint, localEndpoint, ex.Message));
+                throw;
+            }
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: SendPacketViaSocket (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: SendPacketViaSocket completed for {0}/{1} to {2} (from {3}) in {4} milliseconds.", packet.Product, packet.Operation, remoteEndpoint, localEndpoint, sw.ElapsedMilliseconds));
 #endif
         }
 
@@ -747,6 +798,13 @@ namespace Medo.Net {
         public static Int32 DefaultPort { get { return 5104; } }
 
 
+        private static readonly IPEndPoint _defaultIPv4BroadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, TinyMessage.DefaultPort);
+        /// <summary>
+        /// Default IPv4 broadcast endpoint for TinyMessage protocol.
+        /// </summary>
+        public static IPEndPoint DefaultIPv4BroadcastEndpoint { get { return _defaultIPv4BroadcastEndpoint; } }
+
+
         private static readonly IPEndPoint _defaultIPv6MulticastEndpoint = new IPEndPoint(IPAddress.Parse("ff08:0::152"), TinyMessage.DefaultPort);
         /// <summary>
         /// Default IPv6 multicast endpoint for TinyMessage protocol.
@@ -759,6 +817,41 @@ namespace Medo.Net {
         /// Default IPv4 multicast endpoint for TinyMessage protocol.
         /// </summary>
         public static IPEndPoint DefaultIPv4MulticastEndpoint { get { return _defaultIPv4MulticastEndpoint; } }
+
+
+
+        private readonly List<NetworkInterface> CacheNetworkInterfacesIPv4 = new List<NetworkInterface>();
+        private readonly List<NetworkInterface> CacheNetworkInterfacesIPv6 = new List<NetworkInterface>();
+        private DateTime CacheNetworkInterfacesExpiry = DateTime.UtcNow;
+
+        private IEnumerable<NetworkInterface> GetApplicableNetworkInterfaces(AddressFamily family) {
+            var networkInterfaceCache = (family == AddressFamily.InterNetworkV6) ? this.CacheNetworkInterfacesIPv6 : this.CacheNetworkInterfacesIPv4;
+            if ((networkInterfaceCache.Count == 0) || (DateTime.UtcNow > this.CacheNetworkInterfacesExpiry)) {
+                var familyComponent = (family == AddressFamily.InterNetworkV6) ? NetworkInterfaceComponent.IPv6 : NetworkInterfaceComponent.IPv4;
+                foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces()) {
+                    if (netInterface.OperationalStatus != OperationalStatus.Up) { continue; }
+                    if (netInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback) { continue; }
+                    if (netInterface.NetworkInterfaceType == NetworkInterfaceType.Tunnel) { continue; }
+                    if (netInterface.IsReceiveOnly) { continue; }
+                    if (!netInterface.Supports(familyComponent)) { continue; }
+                    networkInterfaceCache.Add(netInterface);
+                }
+                this.CacheNetworkInterfacesExpiry = DateTime.UtcNow.AddMinutes(5); //refresh every N minutes
+            }
+            foreach (var netInterface in networkInterfaceCache) {
+                yield return netInterface;
+            }
+        }
+
+        private IEnumerable<UnicastIPAddressInformation> GetApplicableAddressInformation(AddressFamily family) {
+            foreach (var netInterface in this.GetApplicableNetworkInterfaces(family)) {
+                foreach (var unicast in netInterface.GetIPProperties().UnicastAddresses) {
+                    if (unicast.Address.AddressFamily == family) {
+                        yield return unicast;
+                    }
+                }
+            }
+        }
 
         #endregion
 
@@ -953,7 +1046,6 @@ namespace Medo.Net {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Nested streams in using statement are safe to dispose multiple times.")]
         public Byte[] GetBytes(Byte[] key, Boolean omitIdentifiers) {
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPacket: GetBytes (begin)."));
             var sw = Stopwatch.StartNew();
 #endif
 
@@ -964,7 +1056,7 @@ namespace Medo.Net {
 
 #if DEBUG
                     sw.Stop();
-                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPacket: GetBytes (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPacket: GetBytes completed in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
                     return stream.ToArray();
                 }
@@ -996,7 +1088,7 @@ namespace Medo.Net {
 
 #if DEBUG
                     sw.Stop();
-                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPacket: GetBytes (end) in {0} milliseconds.", sw.ElapsedMilliseconds));
+                    Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyPacket: GetBytes completed encryption in {0} milliseconds.", sw.ElapsedMilliseconds));
 #endif
                     return stream.ToArray();
                 }
@@ -1099,6 +1191,31 @@ namespace Medo.Net {
 
 
         #region Parse
+
+        /// <summary>
+        /// Returns IV if it is present in packet.
+        /// If IV is not present (i.e. packet is not encrypted), null will be returned.
+        /// </summary>
+        /// <param name="buffer">Byte array.</param>
+        /// <param name="offset">Starting offset.</param>
+        /// <param name="count">Total lenght.</param>
+        /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
+        /// <exception cref="System.FormatException">Cannot parse packet.</exception>
+        internal static byte[] ParseIV(Byte[] buffer, Int32 offset, Int32 count) {
+            if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
+            if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
+            if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
+            if (offset + count > buffer.Length) { throw new ArgumentOutOfRangeException("count", "The sum of offset and count is greater than the length of buffer."); }
+
+            if (IsMatchingPrefix(buffer, offset, BytesHeaderTiny128)) {
+                if (count < 56) { return null; } //Invalid encrypted headers.
+                var iv = new byte[16];
+                Buffer.BlockCopy(buffer, offset + 8, iv, 0, 16);
+                return iv;
+            }
+            return null;
+        }
 
         /// <summary>
         /// Returns parsed packet.
