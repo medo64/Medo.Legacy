@@ -136,9 +136,6 @@
     <Compile Include="..\Medo\Data\UpdateCommand [005].cs">
       <Link>Data\UpdateCommand [005].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Device\DS1820 [001].cs">
-      <Link>Device\DS1820 [001].cs</Link>
-    </Compile>
     <Compile Include="..\Medo\Device\Elsidi [007].cs">
       <Link>Device\Elsidi [007].cs</Link>
     </Compile>
@@ -150,6 +147,9 @@
     </Compile>
     <Compile Include="..\Medo\Device\GigatekPcr300F [001].cs">
       <Link>Device\GigatekPcr300F [001].cs</Link>
+    </Compile>
+    <Compile Include="..\Medo\Device\Hermo [001].cs">
+      <Link>Device\Hermo [001].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Diagnostics\ErrorReport [019].cs">
       <Link>Diagnostics\ErrorReport [019].cs</Link>

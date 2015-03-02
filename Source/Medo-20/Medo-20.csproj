@@ -99,14 +99,14 @@
     <Compile Include="..\medo\data\UpdateCommand [005].cs">
       <Link>Data\UpdateCommand [005].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Device\DS1820 [001].cs">
-      <Link>Device\DS1820 [001].cs</Link>
-    </Compile>
     <Compile Include="..\medo\device\Elsidi [007].cs">
       <Link>Device\Elsidi [007].cs</Link>
     </Compile>
     <Compile Include="..\medo\device\EltraEL4000 [002].cs">
       <Link>Device\EltraEL4000 [002].cs</Link>
+    </Compile>
+    <Compile Include="..\Medo\Device\Hermo [001].cs">
+      <Link>Device\Hermo [001].cs</Link>
     </Compile>
     <Compile Include="..\medo\diagnostics\ErrorReport [019].cs">
       <Link>Diagnostics\ErrorReport [019].cs</Link>

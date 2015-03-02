@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgsTest.cs" />
+    <Compile Include="HermoTests.cs" />
     <Compile Include="HistoryTest.cs" />
     <Compile Include="OneTimePasswordTests.cs" />
     <Compile Include="SettingsTest.cs" />
@@ -105,7 +106,6 @@
     <Compile Include="LinearCalibrationTest.cs" />
     <Compile Include="HolidayTest.cs" />
     <Compile Include="RecentTest.cs" />
-    <Compile Include="DS1820Test.cs" />
     <Compile Include="OpenSslAesStreamTest.cs" />
     <Compile Include="Pbkdf2Test.cs" />
     <Compile Include="TinyPacketTest.cs" />
