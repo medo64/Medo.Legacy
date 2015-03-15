@@ -1,6 +1,7 @@
 //Copyright (c) 2015 Josip Medved <jmedved@jmedved.com>
 
 //2015-03-02: Initial version.
+//2015-03-15: Works under Mono (and Linux).
 
 
 using System;
@@ -24,14 +25,22 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="portName">The port to use.</param>
         /// <exception cref="System.ArgumentNullException">Port name cannot be null.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Port name must start with COM.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Unknown port name.</exception>
         public Hermo(string portName) {
             if (portName == null) { throw new ArgumentNullException("portName", "Port name cannot be null."); }
-            if (!portName.StartsWith("COM", StringComparison.OrdinalIgnoreCase)) { throw new ArgumentOutOfRangeException("portName", "Port name must start with COM."); }
 
-            this.PortName = portName.Trim().ToUpperInvariant(); //upper-case needed for Mono
+            var foundPort = false;
+            portName = portName.Trim();
+            foreach (var systemPortName in SerialPort.GetPortNames()) { //match system casing
+                if (string.Equals(portName, systemPortName, StringComparison.OrdinalIgnoreCase)) {
+                    this.PortName = systemPortName;
+                    foundPort = true;
+                    break;
+                }
+            }
+            if (!foundPort) { throw new ArgumentOutOfRangeException("portName", "Unknown port name."); }
 
-            this.SerialPort = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);
+            this.SerialPort = new SerialPort(this.PortName, 9600, Parity.None, 8, StopBits.One);
             this.SerialPort.Encoding = ASCIIEncoding.ASCII;
             this.SerialPort.NewLine = "\n";
             this.SerialPort.ReadTimeout = 2500;

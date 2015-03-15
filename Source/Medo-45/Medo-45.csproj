@@ -148,8 +148,8 @@
     <Compile Include="..\Medo\Device\GigatekPcr300F [001].cs">
       <Link>Device\GigatekPcr300F [001].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Device\Hermo [001].cs">
-      <Link>Device\Hermo [001].cs</Link>
+    <Compile Include="..\Medo\Device\Hermo [002].cs">
+      <Link>Device\Hermo [002].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Diagnostics\ErrorReport [019].cs">
       <Link>Diagnostics\ErrorReport [019].cs</Link>
