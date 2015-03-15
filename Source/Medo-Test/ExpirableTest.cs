@@ -45,6 +45,8 @@ namespace Test {
             var v = DateTime.UtcNow;
             var x = new Expirable<DateTime>(new TimeSpan(0, 0, 0, 0, 10), v);
 
+            Assert.AreEqual(default(DateTime), x.DefaultValue);
+
             Assert.IsTrue(x.Equals(x));
             Assert.IsTrue(x.Equals(v));
             Assert.IsTrue(x.Equals(new Expirable<DateTime>(3, v)));
@@ -55,16 +57,28 @@ namespace Test {
 
             Assert.IsFalse(x.Equals(null));
 
+            DateTime v2;
+            var r2 = x.TryGet(out v2);
+            Assert.IsTrue(r2);
+            Assert.AreEqual(v, v2);
+
             x.Expire();
 
             Assert.IsTrue(x.Equals(DateTime.MinValue));
             Assert.AreEqual(DateTime.MinValue.ToString(), x.ToString());
+
+            DateTime v3;
+            var r3 = x.TryGet(out v3);
+            Assert.IsFalse(r3);
+            Assert.AreEqual(x.DefaultValue, v3);
         }
 
         [TestMethod()]
         public void Expirable_EqualsClass() {
             var v = "Test";
             var x = new Expirable<string>(new TimeSpan(0, 0, 0, 0, 10), v);
+
+            Assert.AreEqual(null, x.DefaultValue);
 
             Assert.IsTrue(x.Equals(x));
             Assert.IsTrue(x.Equals(v));
@@ -76,10 +90,20 @@ namespace Test {
 
             Assert.IsFalse(x.Equals(null));
 
+            string v2;
+            var r2 = x.TryGet(out v2);
+            Assert.IsTrue(r2);
+            Assert.AreEqual(v, v2);
+
             x.Expire();
 
             Assert.IsTrue(x.Equals(null));
             Assert.AreEqual("", x.ToString());
+
+            string v3;
+            var r3 = x.TryGet(out v3);
+            Assert.IsFalse(r3);
+            Assert.AreEqual(x.DefaultValue, v3);
         }
 
     }
