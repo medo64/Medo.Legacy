@@ -138,6 +138,9 @@
     <Compile Include="..\Medo\Endianness [001].cs">
       <Link>Endianness [001].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Expirable [001].cs">
+      <Link>Expirable [001].cs</Link>
+    </Compile>
     <Compile Include="..\medo\io\AdsFileStream [002].cs">
       <Link>IO\AdsFileStream [002].cs</Link>
     </Compile>

@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgsTest.cs" />
+    <Compile Include="ExpirableTest.cs" />
     <Compile Include="HermoTests.cs" />
     <Compile Include="HistoryTest.cs" />
     <Compile Include="OneTimePasswordTests.cs" />

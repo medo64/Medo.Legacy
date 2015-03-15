@@ -181,6 +181,9 @@
     <Compile Include="..\Medo\Endianness [001].cs">
       <Link>Endianness [001].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Expirable [001].cs">
+      <Link>Expirable [001].cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Extensions\BinaryPrefixExtensions [003].cs">
       <Link>Extensions\BinaryPrefixExtensions [003].cs</Link>
     </Compile>
