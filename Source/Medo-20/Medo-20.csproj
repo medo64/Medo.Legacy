@@ -105,8 +105,8 @@
     <Compile Include="..\medo\device\EltraEL4000 [002].cs">
       <Link>Device\EltraEL4000 [002].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Device\Hermo [002].cs">
-      <Link>Device\Hermo [002].cs</Link>
+    <Compile Include="..\Medo\Device\Hermo [003].cs">
+      <Link>Device\Hermo [003].cs</Link>
     </Compile>
     <Compile Include="..\medo\diagnostics\ErrorReport [019].cs">
       <Link>Diagnostics\ErrorReport [019].cs</Link>

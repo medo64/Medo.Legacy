@@ -2,6 +2,7 @@
 
 //2015-03-02: Initial version.
 //2015-03-15: Works under Mono (and Linux).
+//2015-03-18: Fixed error measurement mixup.
 
 
 using System;
@@ -300,7 +301,7 @@ namespace Medo.Device {
 
         private static HermoReading ParseBytesForDS18S20(long code, byte[] bytes) {
             if (bytes.Length <= 10) { return null; } //at least two temperature bytes (and CRC) are there
-            if ((bytes[8] == 0x50) && (bytes[9] == 0x05)) { return null; }  //Error measurement of 85°C
+            if ((bytes[8] == 0xAA) && (bytes[9] == 0x00)) { return null; }  //Error measurement of 85°C
 
             short temperatureCounter = BitConverter.IsLittleEndian ? BitConverter.ToInt16(bytes, 8) : BitConverter.ToInt16(new byte[] { bytes[9], bytes[8] }, 0);
             var countRemain = (bytes.Length >= 15) ? bytes[14] : 0;
@@ -319,7 +320,7 @@ namespace Medo.Device {
 
         private static HermoReading ParseBytesForDS18B20(long code, byte[] bytes) {
             if (bytes.Length <= 10) { return null; } //at least two temperature bytes (and CRC) are there
-            if ((bytes[8] == 0xAA) && (bytes[9] == 0x00)) { return null; }  //Error measurement of 85°C
+            if ((bytes[8] == 0x50) && (bytes[9] == 0x05)) { return null; }  //Error measurement of 85°C
 
             short temperatureCounter = BitConverter.IsLittleEndian ? BitConverter.ToInt16(bytes, 8) : BitConverter.ToInt16(new byte[] { bytes[9], bytes[8] }, 0);
             var temperature = temperatureCounter * 0.0625;
