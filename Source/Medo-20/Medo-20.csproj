@@ -108,6 +108,9 @@
     <Compile Include="..\Medo\Device\Hermo [003].cs">
       <Link>Device\Hermo [003].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Device\SerialGps [001].cs">
+      <Link>Device\SerialGps [001].cs</Link>
+    </Compile>
     <Compile Include="..\medo\diagnostics\ErrorReport [019].cs">
       <Link>Diagnostics\ErrorReport [019].cs</Link>
     </Compile>

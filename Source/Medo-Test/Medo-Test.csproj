@@ -100,6 +100,7 @@
     <Compile Include="HermoTests.cs" />
     <Compile Include="HistoryTest.cs" />
     <Compile Include="OneTimePasswordTests.cs" />
+    <Compile Include="SerialGpsTests.cs" />
     <Compile Include="SettingsTest.cs" />
     <Compile Include="PasswordTest.cs" />
     <Compile Include="PlaceholderTest.cs" />
