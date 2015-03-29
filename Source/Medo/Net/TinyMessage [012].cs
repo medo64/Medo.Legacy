@@ -19,6 +19,9 @@
 //            Refactoring (not fully compatible with previous version).
 //2014-12-26: Improving multicast code (sending to all interfaces).
 //            Improving duplicate detection.
+//2015-03-28: Allowing underscore (_) as key name.
+//            Fixed filtering bug.
+//            System properties start with dot (before it was underscore).
 
 
 using System;
@@ -399,11 +402,11 @@ namespace Medo.Net {
                             var packet = GetUniquePacket(tag, remoteEndpoint, newBuffer, key);
                             if (packet == null) { return; }
 
-                            if ((productFilter != null) && (packet.Product.Equals(productFilter, StringComparison.Ordinal))) {
+                            if ((productFilter != null) && !packet.Product.Equals(productFilter, StringComparison.Ordinal)) {
                                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring packet {1}/{2} from {3} due to Product filter.", tag, packet.Product, packet.Operation, remoteEndpoint));
                                 return;
                             }
-                            if ((operationFilter != null) && (packet.Operation.Equals(operationFilter, StringComparison.Ordinal))) {
+                            if ((operationFilter != null) && !packet.Operation.Equals(operationFilter, StringComparison.Ordinal)) {
                                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring packet {1}/{2} from {3} due to Operation filter.", tag, packet.Product, packet.Operation, remoteEndpoint));
                                 return;
                             }
@@ -461,8 +464,8 @@ namespace Medo.Net {
                 }
 
                 int id;
-                if (int.TryParse(packet["_Id"], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out id)) {
-                    var host = packet["_Host"];
+                if (int.TryParse(packet[".Id"], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out id)) {
+                    var host = packet[".Host"];
                     if (host != null) {
                         var hostBytes = Encoding.UTF8.GetBytes(host);
                         short b = (hostBytes.Length >= 2) ? (short)(((int)hostBytes[1] << 8) | hostBytes[0]) : (hostBytes.Length >= 1) ? hostBytes[0] : (byte)0;
@@ -969,13 +972,13 @@ namespace Medo.Net {
         /// <param name="key">The key of the element to add.</param>
         /// <param name="value">The value of the element to add.</param>
         /// <exception cref="System.ArgumentNullException">Key is null or empty.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Key length cannot be more than 32 characters. -or- Key must contain only letters and digits.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Key length cannot be more than 32 characters. -or- Key must contain only letters, digits, and underscore.</exception>
         public void Add(string key, string value) {
             if (this.WasParsed) { throw new NotSupportedException("Data is read-only."); }
 
             if (string.IsNullOrEmpty(key)) { throw new ArgumentNullException("key", "Key is null or empty."); }
             if (key.Length > 32) { throw new ArgumentOutOfRangeException("key", "Key length cannot be more than 32 characters."); }
-            foreach (var ch in key) { if (!char.IsLetterOrDigit(ch)) { throw new ArgumentOutOfRangeException("key", "Key must contain only letters and digits"); } }
+            foreach (var ch in key) { if (!char.IsLetterOrDigit(ch) && (ch != '_')) { throw new ArgumentOutOfRangeException("key", "Key must contain only letters, digits, and underscore."); } }
 
             this.Items.Add(key, value);
         }
@@ -986,7 +989,7 @@ namespace Medo.Net {
         /// <param name="key">Key.</param>
         /// <exception cref="System.NotSupportedException">Data is read-only.</exception>
         /// <exception cref="System.ArgumentNullException">Key is null or empty.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Key length cannot be more than 32 characters. -or- Key must contain only letters and digits.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">Key length cannot be more than 32 characters. -or- Key must contain only letters, digits, and underscore.</exception>
         public String this[String key] {
             get {
                 if (this.Items == null) { return null; }
@@ -1001,7 +1004,7 @@ namespace Medo.Net {
 
                 if (string.IsNullOrEmpty(key)) { throw new ArgumentNullException("key", "Key is null or empty."); }
                 if (key.Length > 32) { throw new ArgumentOutOfRangeException("key", "Key length cannot be more than 32 characters."); }
-                foreach (var ch in key) { if (!char.IsLetterOrDigit(ch)) { throw new ArgumentOutOfRangeException("key", "Key must contain only letters and digits"); } }
+                foreach (var ch in key) { if (!char.IsLetterOrDigit(ch) && (ch != '_')) { throw new ArgumentOutOfRangeException("key", "Key must contain only letters, digits, and underscore."); } }
 
                 if (this.Items.ContainsKey(key)) {
                     this.Items[key] = value;
@@ -1016,7 +1019,7 @@ namespace Medo.Net {
 
         /// <summary>
         /// Converts message to its byte representation.
-        /// Notice that _Id entry will be added in non-encrypted packets in order to facilitate duplicate discovery.
+        /// Notice that .Id and .Host entries will be added in non-encrypted packets in order to facilitate duplicate discovery.
         /// </summary>
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
         public Byte[] GetBytes() {
@@ -1025,22 +1028,22 @@ namespace Medo.Net {
 
         /// <summary>
         /// Converts message to its bytes byte representation. If key is not null, content will be encrypted using 128-bit AES in CBC mode with a SHA-256 hash.
-        /// Notice that _Id entry will be added in non-encrypted packets in order to facilitate duplicate discovery.
+        /// Notice that .Id and .Host entries will be added in non-encrypted packets in order to facilitate duplicate discovery.
         /// </summary>
         /// <param name="key">AES 128-bit key.</param>
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Key must be 16 bytes (128 bits) in length.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Nested streams in using statement are safe to dispose multiple times.")]
         public Byte[] GetBytes(Byte[] key) {
-            return GetBytes(key, omitIdentifiers: false);
+            return GetBytes(key, omitIdentifiers: (key != null));
         }
 
         /// <summary>
         /// Converts message to its bytes byte representation. If key is not null, content will be encrypted using 128-bit AES in CBC mode with a SHA-256 hash.
-        /// Notice that _Id entry will be added in non-encrypted packets in order to facilitate duplicate discovery.
+        /// Notice that .Id and .Host entries will be added in non-encrypted packets in order to facilitate duplicate discovery.
         /// </summary>
         /// <param name="key">AES 128-bit key.</param>
-        /// <param name="omitIdentifiers">If true, _Id and _Host are going to be omitted.</param>
+        /// <param name="omitIdentifiers">If true, .Id and .Host are going to be omitted.</param>
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Key must be 16 bytes (128 bits) in length.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Nested streams in using statement are safe to dispose multiple times.")]
@@ -1113,11 +1116,11 @@ namespace Medo.Net {
             if (this.Items != null) {
                 stream.WriteByte(0x7B); //{
                 if (!omitIdentifiers) {
-                    if (!isEncrypted && !this.Items.ContainsKey("_Id")) { //IV can be ID for encrypted packets
+                    if (!isEncrypted && !this.Items.ContainsKey(".Id")) { //IV can be ID for encrypted packets
                         var idBytes = new byte[4];
                         TinyPacket.Random.Value.GetBytes(idBytes);
                         stream.WriteByte(0x22); //"
-                        WriteText(stream, "_Id");
+                        WriteText(stream, ".Id");
                         stream.WriteByte(0x22); //"
                         stream.WriteByte(0x3A); //:
                         stream.WriteByte(0x22); //"
@@ -1125,10 +1128,10 @@ namespace Medo.Net {
                         stream.WriteByte(0x22); //"
                         addComma = true;
                     }
-                    if (!this.Items.ContainsKey("_Host")) {
+                    if (!this.Items.ContainsKey(".Host")) {
                         if (addComma) { stream.WriteByte(0x2C); } //,
                         stream.WriteByte(0x22); //"
-                        WriteText(stream, "_Host");
+                        WriteText(stream, ".Host");
                         stream.WriteByte(0x22); //"
                         stream.WriteByte(0x3A); //:
                         stream.WriteByte(0x22); //"
@@ -1563,13 +1566,13 @@ namespace Medo.Net {
 
         /// <summary>
         /// Returns cloned packet.
-        /// All identifiers are removed in process.
+        /// All system identifiers are removed in process.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Object is intentionally not disposed.")]
         public TinyPacket Clone() {
             var clone = new TinyPacket(this.Product, this.Operation);
             foreach (var item in this.Items) {
-                if (!item.Key.StartsWith("_", StringComparison.Ordinal)) {
+                if (!item.Key.StartsWith(".", StringComparison.Ordinal)) {
                     clone.Add(item.Key, item.Value);
                 }
             }
@@ -1628,7 +1631,11 @@ namespace Medo.Net {
         /// Returns an enumerator.
         /// </summary>
         public IEnumerator<KeyValuePair<String, String>> GetEnumerator() {
-            return this.Items.GetEnumerator();
+            foreach (var item in this.Items) {
+                if (!item.Key.StartsWith(".", StringComparison.Ordinal)) {
+                    yield return item;
+                }
+            }
         }
 
         /// <summary>
@@ -1698,7 +1705,7 @@ the space character):
 
 *Protocol*:   This field denotes protocol version. It is fixed to "Tiny".
 
-*Product*:    This field denotes product which performes action. It is used to
+*Product*:    This field denotes product which performs action. It is used to
               segment space of available operations. Product must not contain
               spaces and it should contain only ASCII. Preferred format would
               be application name, at (@) sign followed by IANA assigned
@@ -1710,10 +1717,10 @@ the space character):
 
 *Data*:      JSON encoded object in form of multiple name/value pairs. E.g.:
             `{"Name1":"Value1","Name2":"Value2",...,"NameN":"ValueN"}`
-             User property names are restricted to only letters and numbers.
-             System properties will start with underscore (_). Currently
-             defined system properties are _Id (hexadecimal 32-bit integer)
-             and _Host (name of a machine).
+             User property names are restricted to letters, numbers, and
+             underscore character (_). System properties will start with dot
+             (.). Currently defined system properties are .Id (hexadecimal
+             32-bit integer) and .Host (name of a machine).
 
 
 Shared-key Encryption

@@ -199,17 +199,50 @@ namespace Test {
 
             var packet1a = TinyPacket.Parse(bytesE1, key);
             var packet2a = TinyPacket.Parse(bytesE2, key);
-            Assert.IsNull(packet1a["_Id"]);
-            Assert.IsNotNull(packet1a["_Host"]);
-            Assert.IsNull(packet2a["_Id"]);
-            Assert.IsNotNull(packet2a["_Host"]);
+            Assert.IsNull(packet1a[".Id"]);
+            Assert.IsNull(packet1a[".Host"]);
+            Assert.IsNull(packet2a[".Id"]);
+            Assert.IsNull(packet2a[".Host"]);
 
             var packet1b = packet1a.Clone();
             var packet2b = packet2a.Clone();
-            Assert.IsNull(packet1b["_Id"]);
-            Assert.IsNull(packet1b["_Host"]);
-            Assert.IsNull(packet2b["_Id"]);
-            Assert.IsNull(packet2b["_Host"]);
+            Assert.IsNull(packet1b[".Id"]);
+            Assert.IsNull(packet1b[".Host"]);
+            Assert.IsNull(packet2b[".Id"]);
+            Assert.IsNull(packet2b[".Host"]);
+
+            var bytesP1 = packet1b.GetBytes(null, omitIdentifiers: true);
+            var bytesP2 = packet2b.GetBytes(null, omitIdentifiers: true);
+            Assert.AreEqual("Tiny ", Encoding.UTF8.GetString(bytesP1, 0, 5));
+            Assert.AreEqual("Tiny ", Encoding.UTF8.GetString(bytesP2, 0, 5));
+            Assert.AreEqual(Encoding.UTF8.GetString(bytesP1), Encoding.UTF8.GetString(bytesP2));
+        }
+
+        [TestMethod()]
+        public void TinyPacket_EncryptedWithIdentifiers() {
+            var packet = new TinyPacket("Example", "Test");
+
+            var key = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            var bytesE1 = packet.GetBytes(key, omitIdentifiers: false);
+            var bytesE2 = packet.GetBytes(key, omitIdentifiers: false);
+
+            Assert.AreEqual("Tiny128 ", Encoding.UTF8.GetString(bytesE1, 0, 8));
+            Assert.AreEqual("Tiny128 ", Encoding.UTF8.GetString(bytesE2, 0, 8));
+            Assert.AreNotEqual(BitConverter.ToString(bytesE1), BitConverter.ToString(bytesE2));
+
+            var packet1a = TinyPacket.Parse(bytesE1, key);
+            var packet2a = TinyPacket.Parse(bytesE2, key);
+            Assert.IsNull(packet1a[".Id"]);
+            Assert.IsNotNull(packet1a[".Host"]);
+            Assert.IsNull(packet2a[".Id"]);
+            Assert.IsNotNull(packet2a[".Host"]);
+
+            var packet1b = packet1a.Clone();
+            var packet2b = packet2a.Clone();
+            Assert.IsNull(packet1b[".Id"]);
+            Assert.IsNull(packet1b[".Host"]);
+            Assert.IsNull(packet2b[".Id"]);
+            Assert.IsNull(packet2b[".Host"]);
 
             var bytesP1 = packet1b.GetBytes(null, omitIdentifiers: true);
             var bytesP2 = packet2b.GetBytes(null, omitIdentifiers: true);
@@ -223,23 +256,23 @@ namespace Test {
             var packet = new TinyPacket("Example", "Test") { { "A", "1" }, { "B", "2" } };
 
             var key = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-            var bytesE = packet.GetBytes(key);
+            var bytesE = packet.GetBytes(key, omitIdentifiers: false);
 
             var packetA = TinyPacket.Parse(bytesE, key);
-            Assert.IsNull(packetA["_Id"]);
-            Assert.IsNotNull(packetA["_Host"]);
+            Assert.IsNull(packetA[".Id"]);
+            Assert.IsNotNull(packetA[".Host"]);
             Assert.IsNotNull(packetA["A"]);
             Assert.IsNotNull(packetA["B"]);
 
             var packetB = packetA.Clone();
-            Assert.IsNull(packetB["_Id"]);
-            Assert.IsNull(packetB["_Host"]);
+            Assert.IsNull(packetB[".Id"]);
+            Assert.IsNull(packetB[".Host"]);
             Assert.IsNotNull(packetA["A"]);
             Assert.IsNotNull(packetA["B"]);
 
             var packetC = TinyPacket.Parse(packetB.GetBytes());
-            Assert.IsNotNull(packetC["_Id"]);
-            Assert.IsNotNull(packetC["_Host"]);
+            Assert.IsNotNull(packetC[".Id"]);
+            Assert.IsNotNull(packetC[".Host"]);
             Assert.IsNotNull(packetA["A"]);
             Assert.IsNotNull(packetA["B"]);
 
@@ -255,14 +288,14 @@ namespace Test {
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TinyPacket_CannotAddSpecialProperties1() {
             var packet = new TinyPacket("Example", "Test") { { "A", "1" }, { "B", "2" } };
-            packet.Add("_X", "X");
+            packet.Add(".X", "X");
         }
 
         [TestMethod()]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TinyPacket_CannotAddSpecialProperties2() {
             var packet = new TinyPacket("Example", "Test") { { "A", "1" }, { "B", "2" } };
-            packet["_X"] = "X";
+            packet[".X"] = "X";
         }
 
 
