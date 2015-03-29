@@ -22,6 +22,7 @@
 //2015-03-28: Allowing underscore (_) as key name.
 //            Fixed filtering bug.
 //            System properties start with dot (before it was underscore).
+//2015-03-29: System property .Host is sent even in encrypted messages.
 
 
 using System;
@@ -1035,7 +1036,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentOutOfRangeException">Key must be 16 bytes (128 bits) in length.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Nested streams in using statement are safe to dispose multiple times.")]
         public Byte[] GetBytes(Byte[] key) {
-            return GetBytes(key, omitIdentifiers: (key != null));
+            return GetBytes(key, omitIdentifiers: false);
         }
 
         /// <summary>

@@ -200,9 +200,9 @@ namespace Test {
             var packet1a = TinyPacket.Parse(bytesE1, key);
             var packet2a = TinyPacket.Parse(bytesE2, key);
             Assert.IsNull(packet1a[".Id"]);
-            Assert.IsNull(packet1a[".Host"]);
+            Assert.IsNotNull(packet1a[".Host"]);
             Assert.IsNull(packet2a[".Id"]);
-            Assert.IsNull(packet2a[".Host"]);
+            Assert.IsNotNull(packet2a[".Host"]);
 
             var packet1b = packet1a.Clone();
             var packet2b = packet2a.Clone();
@@ -219,12 +219,12 @@ namespace Test {
         }
 
         [TestMethod()]
-        public void TinyPacket_EncryptedWithIdentifiers() {
+        public void TinyPacket_EncryptedWithoutIdentifiers() {
             var packet = new TinyPacket("Example", "Test");
 
             var key = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-            var bytesE1 = packet.GetBytes(key, omitIdentifiers: false);
-            var bytesE2 = packet.GetBytes(key, omitIdentifiers: false);
+            var bytesE1 = packet.GetBytes(key, omitIdentifiers: true);
+            var bytesE2 = packet.GetBytes(key, omitIdentifiers: true);
 
             Assert.AreEqual("Tiny128 ", Encoding.UTF8.GetString(bytesE1, 0, 8));
             Assert.AreEqual("Tiny128 ", Encoding.UTF8.GetString(bytesE2, 0, 8));
@@ -233,9 +233,9 @@ namespace Test {
             var packet1a = TinyPacket.Parse(bytesE1, key);
             var packet2a = TinyPacket.Parse(bytesE2, key);
             Assert.IsNull(packet1a[".Id"]);
-            Assert.IsNotNull(packet1a[".Host"]);
+            Assert.IsNull(packet1a[".Host"]);
             Assert.IsNull(packet2a[".Id"]);
-            Assert.IsNotNull(packet2a[".Host"]);
+            Assert.IsNull(packet2a[".Host"]);
 
             var packet1b = packet1a.Clone();
             var packet2b = packet2a.Clone();
