@@ -23,6 +23,7 @@
 //            Fixed filtering bug.
 //            System properties start with dot (before it was underscore).
 //2015-03-29: System property .Host is sent even in encrypted messages.
+//2015-03-30: Added option to disable all non-IPv6 traffic.
 
 
 using System;
@@ -131,6 +132,13 @@ namespace Medo.Net {
 
 
         /// <summary>
+        /// Gets/sets whether packets will be sent and received only on IPv6 interfaces.
+        /// Any address not IPv6 will be ignored.
+        /// Needs to be set before using Send or Listen.
+        /// </summary>
+        public Boolean UseOnlyIPv6 { get; set; }
+
+        /// <summary>
         /// Raises event when packet arrives.
         /// </summary>
         public event EventHandler<TinyPacketEventArgs> PacketReceived;
@@ -157,6 +165,8 @@ namespace Medo.Net {
 
             try {
                 foreach (var endpoint in endpoints) {
+                    if (this.UseOnlyIPv6 && (endpoint.AddressFamily != AddressFamily.InterNetworkV6)) { continue; } //skip all not IPv6
+
                     string tag;
                     if (endpoint.Address == IPAddress.IPv6Any) {
                         tag = "IPV6Any:" + endpoint.Port.ToString(CultureInfo.InvariantCulture);
@@ -557,6 +567,8 @@ namespace Medo.Net {
             var sentToAny = false;
             var packetBytes = packet.GetBytes(this.Key);
             foreach (var endpoint in this.PrivateLocalEndpoints) {
+                if (this.UseOnlyIPv6 && (endpoint.AddressFamily != AddressFamily.InterNetworkV6)) { continue; } //skip all not IPv6
+
                 if ((endpoint.AddressFamily == AddressFamily.InterNetworkV6) && endpoint.Address.IsIPv6Multicast) {
                     try {
                         this.SendPacket(packet, packetBytes, endpoint);
