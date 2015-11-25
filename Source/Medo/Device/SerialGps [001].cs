@@ -1152,8 +1152,6 @@ namespace Medo.Device {
         /// <param name="horizontalDilution">Horizontal dilution value.</param>
         /// <param name="verticalDilution">Vertical dilution value.</param>
         /// <param name="positionDilution">Position (3D) dilution value.</param>
-        /// <param name="satellitesInUse">Number of satellites in use.</param>
-        /// <param name="satellitesInView">Number of satellites in view.</param>
         public GpsGeometry(double horizontalDilution, double verticalDilution, double positionDilution)
             : this(horizontalDilution, verticalDilution, positionDilution, 0, 0) {
         }
