@@ -99,6 +99,7 @@
     <Compile Include="ExpirableTest.cs" />
     <Compile Include="HermoTests.cs" />
     <Compile Include="HistoryTest.cs" />
+    <Compile Include="TwofishTest.cs" />
     <Compile Include="OneTimePasswordTests.cs" />
     <Compile Include="SerialGpsTests.cs" />
     <Compile Include="SettingsTest.cs" />
@@ -165,6 +166,15 @@
       <Project>{4c58ca83-e0d1-4fae-92fc-c062c13d7c28}</Project>
       <Name>Medo-45</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Twofish\CBC_D_M.TXT" />
+    <EmbeddedResource Include="Twofish\CBC_E_M.TXT" />
+    <EmbeddedResource Include="Twofish\ECB_D_M.TXT" />
+    <EmbeddedResource Include="Twofish\ECB_E_M.TXT" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Twofish\ECB_TBL.TXT" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
