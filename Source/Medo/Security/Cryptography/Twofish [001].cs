@@ -1,9 +1,10 @@
 //Josip Medved <jmedved@jmedved.com>
 
-//2015-12-26: Initial version.
+//2015-12-27: Initial version.
 
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
@@ -556,11 +557,11 @@ namespace Medo.Security.Cryptography {
 
 
             private static DWord ROL(DWord x, int n) {
-                return ((x << (n & 0x1F)) | x >> (32 - (n & 0x1F)));
+                return ((x << n) | (x >> (32 - n)));
             }
 
             private static DWord ROR(DWord x, int n) {
-                return ((x >> (n & 0x1F)) | (x << (32 - (n & 0x1F))));
+                return ((x >> n) | (x << (32 - n)));
             }
 
 
@@ -677,9 +678,12 @@ namespace Medo.Security.Cryptography {
                     r ^= (i > 0) ? k0 : k1; //merge in 32 more key bits
                     for (var j = 0; j < 4; j++) { //shift one byte at a time 
                         var b = (byte)(r >> 24);
-                        var g2 = (uint)(((b << 1) ^ (((b & 0x80) > 0) ? RS_GF_FDBK : 0)) & 0xFF);
-                        var g3 = (uint)(((b >> 1) & 0x7F) ^ (((b & 1) > 0) ? RS_GF_FDBK >> 1 : 0) ^ g2);
-                        r = (DWord)(((uint)r << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
+                        var g2 = (byte)((b << 1) ^ (((b & 0x80) > 0) ? RS_GF_FDBK : 0));
+                        var g3 = (byte)(((b >> 1) & 0x7F) ^ (((b & 1) > 0) ? RS_GF_FDBK >> 1 : 0) ^ g2);
+                        r.B3 = (byte)(r.B2 ^ g3);
+                        r.B2 = (byte)(r.B1 ^ g2);
+                        r.B1 = (byte)(r.B0 ^ g3);
+                        r.B0 = b;
                     }
                 }
                 return r;
@@ -789,6 +793,7 @@ namespace Medo.Security.Cryptography {
             #endregion
 
 
+            [DebuggerDisplay("{Value}")]
             [StructLayout(LayoutKind.Explicit)]
             private struct DWord { //makes extracting bytes from uint faster and looks better
                 [FieldOffset(0)]
