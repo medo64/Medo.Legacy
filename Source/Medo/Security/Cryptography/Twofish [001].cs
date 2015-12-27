@@ -219,11 +219,8 @@ namespace Medo.Security.Cryptography {
 
                 #region Encrypt
 
-                var buffer32 = new uint[4];
                 for (var i = 0; i < inputCount; i += 16) {
-                    Buffer.BlockCopy(inputBuffer, inputOffset + i, buffer32, 0, 16);
-                    var outputBuffer32 = this.Implementation.blockEncrypt(buffer32);
-                    Buffer.BlockCopy(outputBuffer32, 0, outputBuffer, outputOffset + i, 16);
+                    this.Implementation.blockEncrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset + i);
                 }
                 return inputCount;
 
@@ -236,23 +233,17 @@ namespace Medo.Security.Cryptography {
                 var buffer32 = new uint[4];
 
                 if (this.PaddingBuffer != null) {
-                    Buffer.BlockCopy(this.PaddingBuffer, 0, buffer32, 0, 16);
-                    var outputBuffer32 = this.Implementation.blockDecrypt(buffer32);
-                    Buffer.BlockCopy(outputBuffer32, 0, outputBuffer, outputOffset, 16);
+                    this.Implementation.blockDecrypt(this.PaddingBuffer, 0, outputBuffer, outputOffset);
                     outputOffset += 16;
                 }
 
                 for (var i = 0; i < inputCount - 16; i += 16) {
-                    Buffer.BlockCopy(inputBuffer, inputOffset + i, buffer32, 0, 16);
-                    var outputBuffer32 = this.Implementation.blockDecrypt(buffer32);
-                    Buffer.BlockCopy(outputBuffer32, 0, outputBuffer, outputOffset, 16);
+                    this.Implementation.blockDecrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset);
                     outputOffset += 16;
                 }
 
                 if (this.PaddingMode == PaddingMode.None) {
-                    Buffer.BlockCopy(inputBuffer, inputOffset + inputCount - 16, buffer32, 0, 16);
-                    var outputBuffer32 = this.Implementation.blockDecrypt(buffer32);
-                    Buffer.BlockCopy(outputBuffer32, 0, outputBuffer, outputOffset, 16);
+                    this.Implementation.blockDecrypt(inputBuffer, inputOffset + inputCount - 16, outputBuffer, outputOffset);
                     outputOffset += 16;
                 } else { //save last block without processing because decryption otherwise cannot detect padding in CryptoStream
                     if (this.PaddingBuffer == null) { this.PaddingBuffer = new byte[16]; }
@@ -308,11 +299,8 @@ namespace Medo.Security.Cryptography {
 
                 var outputBuffer = new byte[paddedLength];
 
-                var buffer32 = new uint[4];
                 for (var i = 0; i < paddedLength; i += 16) {
-                    Buffer.BlockCopy(paddedInputBuffer, paddedInputOffset + i, buffer32, 0, 16);
-                    var outputBuffer32 = this.Implementation.blockEncrypt(buffer32);
-                    Buffer.BlockCopy(outputBuffer32, 0, outputBuffer, i, 16);
+                    this.Implementation.blockEncrypt(paddedInputBuffer, paddedInputOffset + i, outputBuffer, i);
                 }
 
                 return outputBuffer;
@@ -331,16 +319,12 @@ namespace Medo.Security.Cryptography {
                 var buffer32 = new uint[4];
 
                 if (this.PaddingBuffer != null) { //process leftover padding buffer to keep CryptoStream happy
-                    Buffer.BlockCopy(this.PaddingBuffer, 0, buffer32, 0, 16);
-                    var outputBuffer32 = this.Implementation.blockDecrypt(buffer32);
-                    Buffer.BlockCopy(outputBuffer32, 0, outputBuffer, 0, 16);
+                    this.Implementation.blockDecrypt(this.PaddingBuffer, 0, outputBuffer, 0);
                     outputOffset = 16;
                 }
 
                 for (var i = 0; i < inputCount; i += 16) {
-                    Buffer.BlockCopy(inputBuffer, inputOffset + i, buffer32, 0, 16);
-                    var outputBuffer32 = this.Implementation.blockDecrypt(buffer32);
-                    Buffer.BlockCopy(outputBuffer32, 0, outputBuffer, outputOffset + i, 16);
+                    this.Implementation.blockDecrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset + i);
                 }
 
                 if (this.PaddingMode == PaddingMode.PKCS7) {
@@ -461,10 +445,10 @@ namespace Medo.Security.Cryptography {
             /// <summary>
             /// Encrypt block(s) of data using Twofish.
             /// </summary>
-            internal uint[] blockEncrypt(uint[] input) {
-                var x = new DWord[input.Length];
+            internal void blockEncrypt(byte[] inputBuffer, int inputOffset, byte[] outputBuffer, int outputBufferOffset) {
+                var x = new DWord[BlockSize / 32];
                 for (var i = 0; i < BlockSize / 32; i++) { //copy in the block, add whitening
-                    x[i] = (DWord)input[i] ^ this.SubKeys[InputWhiten + i];
+                    x[i] = new DWord(inputBuffer, inputOffset + i * 4) ^ this.SubKeys[InputWhiten + i];
                     if (this.CipherMode == CipherMode.CBC) { x[i] ^= this.IV[i]; }
                 }
 
@@ -484,22 +468,25 @@ namespace Medo.Security.Cryptography {
                     }
                 }
 
-                var outBuffer = new uint[input.Length];
                 for (var i = 0; i < BlockSize / 32; i++) { //copy out, with whitening
                     var outValue = x[i] ^ this.SubKeys[OutputWhiten + i];
-                    outBuffer[i] = (uint)outValue;
+                    outputBuffer[outputBufferOffset + i * 4 + 0] = outValue.B0;
+                    outputBuffer[outputBufferOffset + i * 4 + 1] = outValue.B1;
+                    outputBuffer[outputBufferOffset + i * 4 + 2] = outValue.B2;
+                    outputBuffer[outputBufferOffset + i * 4 + 3] = outValue.B3;
                     if (CipherMode == CipherMode.CBC) { this.IV[i] = outValue; }
                 }
-                return outBuffer;
             }
 
             /// <summary>
             /// Decrypt block(s) of data using Twofish.
             /// </summary>
-            internal uint[] blockDecrypt(uint[] input) {
-                var x = new DWord[input.Length];
+            internal void blockDecrypt(byte[] inputBuffer, int inputOffset, byte[] outputBuffer, int outputBufferOffset) {
+                var x = new DWord[BlockSize / 32];
+                var input = new DWord[BlockSize / 32];
                 for (var i = 0; i < BlockSize / 32; i++) { //copy in the block, add whitening
-                    x[i] = (DWord)input[i] ^ this.SubKeys[OutputWhiten + i];
+                    input[i] = new DWord(inputBuffer, inputOffset + i * 4);
+                    x[i] = input[i] ^ this.SubKeys[OutputWhiten + i];
                 }
 
                 var keyLen = this.Key.Length * 4 * 8;
@@ -518,16 +505,17 @@ namespace Medo.Security.Cryptography {
                     }
                 }
 
-                var outBuffer = new uint[input.Length];
                 for (var i = 0; i < BlockSize / 32; i++) { //copy out, with whitening
                     x[i] ^= this.SubKeys[InputWhiten + i];
                     if (CipherMode == CipherMode.CBC) {
                         x[i] ^= IV[i];
-                        IV[i] = (DWord)input[i];
+                        IV[i] = input[i];
                     }
-                    outBuffer[i] = (uint)x[i];
+                    outputBuffer[outputBufferOffset + i * 4 + 0] = x[i].B0;
+                    outputBuffer[outputBufferOffset + i * 4 + 1] = x[i].B1;
+                    outputBuffer[outputBufferOffset + i * 4 + 2] = x[i].B2;
+                    outputBuffer[outputBufferOffset + i * 4 + 3] = x[i].B3;
                 }
-                return outBuffer;
             }
 
             #endregion
@@ -817,6 +805,13 @@ namespace Medo.Security.Cryptography {
 
                 private DWord(uint value) : this() {
                     this.Value = value;
+                }
+
+                internal DWord(byte[] buffer, int offset) : this() {
+                    this.B0 = buffer[offset + 0];
+                    this.B1 = buffer[offset + 1];
+                    this.B2 = buffer[offset + 2];
+                    this.B3 = buffer[offset + 3];
                 }
 
 
