@@ -231,25 +231,29 @@ namespace Medo.Security.Cryptography {
 
                 #region Decrypt
 
+                var bytesWritten = 0;
+
                 if (this.PaddingBuffer != null) {
                     this.Implementation.BlockDecrypt(this.PaddingBuffer, 0, outputBuffer, outputOffset);
                     outputOffset += 16;
+                    bytesWritten += 16;
                 }
 
                 for (var i = 0; i < inputCount - 16; i += 16) {
                     this.Implementation.BlockDecrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset);
                     outputOffset += 16;
+                    bytesWritten += 16;
                 }
 
                 if (this.PaddingMode == PaddingMode.None) {
                     this.Implementation.BlockDecrypt(inputBuffer, inputOffset + inputCount - 16, outputBuffer, outputOffset);
-                    outputOffset += 16;
+                    bytesWritten += 16;
                 } else { //save last block without processing because decryption otherwise cannot detect padding in CryptoStream
                     if (this.PaddingBuffer == null) { this.PaddingBuffer = new byte[16]; }
                     Buffer.BlockCopy(inputBuffer, inputOffset + inputCount - 16, this.PaddingBuffer, 0, 16);
                 }
 
-                return outputOffset;
+                return bytesWritten;
 
                 #endregion
 
