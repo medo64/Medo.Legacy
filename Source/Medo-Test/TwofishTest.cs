@@ -554,49 +554,29 @@ namespace Test {
         #region Other
 
         [TestMethod()]
-        public void Twofish_TransformBlock_Encrypt_CorrectWrittenBytes() {
+        public void Twofish_TransformBlock_Encrypt_UseSameArray() {
             var key = ParseBytes("00000000000000000000000000000000");
-            var pt = Encoding.UTF8.GetBytes("The quick brown fox jumps over the lazy dog once");
-            var ct = new byte[48];
-            using (var twofish = new TwofishManaged() { Mode = CipherMode.ECB, Padding = PaddingMode.None, KeySize = 128, Key = key }) {
+            var iv = ParseBytes("00000000000000000000000000000000");
+            var ctpt = Encoding.UTF8.GetBytes("The quick brown fox jumps over the lazy dog once");
+            using (var twofish = new TwofishManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.None, KeySize = 128, Key = key, IV = iv }) {
                 using (var transform = twofish.CreateEncryptor()) {
-                    Assert.AreEqual(16, transform.TransformBlock(pt, 0, 16, ct, 0));
+                    transform.TransformBlock(ctpt, 0, 48, ctpt, 0);
                 }
             }
-            using (var twofish = new TwofishManaged() { Mode = CipherMode.ECB, Padding = PaddingMode.None, KeySize = 128, Key = key }) {
-                using (var transform = twofish.CreateEncryptor()) {
-                    Assert.AreEqual(16, transform.TransformBlock(pt, 16, 16, ct, 16));
-                }
-            }
-            using (var twofish = new TwofishManaged() { Mode = CipherMode.ECB, Padding = PaddingMode.None, KeySize = 128, Key = key }) {
-                using (var transform = twofish.CreateEncryptor()) {
-                    Assert.AreEqual(16, transform.TransformBlock(pt, 32, 16, ct, 32));
-                }
-            }
-            Assert.AreEqual("B0DD30E9AB1F1329C1BEE154DDBE88AF1194B36D8E0BDD5AC10842B549230BB36D66FC3AFE1F40216590079AF862AB59", BitConverter.ToString(ct).Replace("-", ""));
+            Assert.AreEqual("B0DD30E9AB1F1329C1BEE154DDBE88AF8C47A4FE24D56DC027ED503652C9D164CE26E0C6E32BCA8756482B99988E8C79", BitConverter.ToString(ctpt).Replace("-", ""));
         }
 
         [TestMethod()]
-        public void Twofish_TransformBlock_Decrypt_CorrectWrittenBytes() {
+        public void Twofish_TransformBlock_Decrypt_UseSameArray() {
             var key = ParseBytes("00000000000000000000000000000000");
-            var ct = ParseBytes("B0DD30E9AB1F1329C1BEE154DDBE88AF1194B36D8E0BDD5AC10842B549230BB36D66FC3AFE1F40216590079AF862AB59");
-            var pt = new byte[48];
-            using (var twofish = new TwofishManaged() { Mode = CipherMode.ECB, Padding = PaddingMode.None, KeySize = 128, Key = key }) {
+            var iv = ParseBytes("00000000000000000000000000000000");
+            var ctpt = ParseBytes("B0DD30E9AB1F1329C1BEE154DDBE88AF8C47A4FE24D56DC027ED503652C9D164CE26E0C6E32BCA8756482B99988E8C79");
+            using (var twofish = new TwofishManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.None, KeySize = 128, Key = key, IV = iv }) {
                 using (var transform = twofish.CreateDecryptor()) {
-                    Assert.AreEqual(16, transform.TransformBlock(ct, 0, 16, pt, 0)); //no caching last block if Padding is none
+                    transform.TransformBlock(ctpt, 0, 48, ctpt, 0); //no caching last block if Padding is none
                 }
             }
-            using (var twofish = new TwofishManaged() { Mode = CipherMode.ECB, Padding = PaddingMode.None, KeySize = 128, Key = key }) {
-                using (var transform = twofish.CreateDecryptor()) {
-                    Assert.AreEqual(16, transform.TransformBlock(ct, 16, 16, pt, 16));
-                }
-            }
-            using (var twofish = new TwofishManaged() { Mode = CipherMode.ECB, Padding = PaddingMode.None, KeySize = 128, Key = key }) {
-                using (var transform = twofish.CreateDecryptor()) {
-                    Assert.AreEqual(16, transform.TransformBlock(ct, 32, 16, pt, 32));
-                }
-            }
-            Assert.AreEqual("The quick brown fox jumps over the lazy dog once", Encoding.UTF8.GetString(pt));
+            Assert.AreEqual("The quick brown fox jumps over the lazy dog once", Encoding.UTF8.GetString(ctpt));
         }
 
         #endregion
