@@ -249,8 +249,8 @@
     <Compile Include="..\medo\security\principal\Impersonation [002].cs">
       <Link>Security\Principal\Impersonation [002].cs</Link>
     </Compile>
-    <Compile Include="..\medo\services\Upgrade [003].cs">
-      <Link>Services\Upgrade [003].cs</Link>
+    <Compile Include="..\medo\services\Upgrade [004].cs">
+      <Link>Services\Upgrade [004].cs</Link>
     </Compile>
     <Compile Include="..\Medo\TagItem [004].cs">
       <Link>TagItem [004].cs</Link>
