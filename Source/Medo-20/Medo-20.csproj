@@ -54,280 +54,280 @@
     <Compile Include="..\CodeAnalysisSuppressions.cs">
       <Link>_CodeAnalysis\CodeAnalysisSuppressions.cs</Link>
     </Compile>
-    <Compile Include="..\medo\application\Args [002].cs">
-      <Link>Application\Args [002].cs</Link>
+    <Compile Include="..\Medo\Application\Args.cs">
+      <Link>Application\Args.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Application\Restart [001].cs">
-      <Link>Application\Restart [001].cs</Link>
+    <Compile Include="..\Medo\Application\Restart.cs">
+      <Link>Application\Restart.cs</Link>
     </Compile>
-    <Compile Include="..\medo\application\SingleInstance [010].cs">
-      <Link>Application\SingleInstance [010].cs</Link>
+    <Compile Include="..\Medo\Application\SingleInstance.cs">
+      <Link>Application\SingleInstance.cs</Link>
     </Compile>
-    <Compile Include="..\medo\application\UnhandledCatch [008].cs">
-      <Link>Application\UnhandledCatch [008].cs</Link>
+    <Compile Include="..\Medo\Application\UnhandledCatch.cs">
+      <Link>Application\UnhandledCatch.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Bitwise [001].cs">
-      <Link>Bitwise [001].cs</Link>
+    <Compile Include="..\Medo\Bitwise.cs">
+      <Link>Bitwise.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Configuration\History [002].cs">
-      <Link>Configuration\History [002].cs</Link>
+    <Compile Include="..\Medo\Configuration\History.cs">
+      <Link>Configuration\History.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Configuration\RecentFiles [005].cs">
-      <Link>Configuration\RecentFiles [005].cs</Link>
+    <Compile Include="..\Medo\Configuration\RecentFiles.cs">
+      <Link>Configuration\RecentFiles.cs</Link>
     </Compile>
-    <Compile Include="..\medo\configuration\RunOnStartup [004].cs">
-      <Link>Configuration\RunOnStartup [004].cs</Link>
+    <Compile Include="..\Medo\Configuration\RunOnStartup.cs">
+      <Link>Configuration\RunOnStartup.cs</Link>
     </Compile>
-    <Compile Include="..\medo\configuration\Settings [013].cs">
-      <Link>Configuration\Settings [013].cs</Link>
+    <Compile Include="..\Medo\Configuration\Settings.cs">
+      <Link>Configuration\Settings.cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\CommonConnection [010].cs">
-      <Link>Data\CommonConnection [010].cs</Link>
+    <Compile Include="..\Medo\Data\CommonConnection.cs">
+      <Link>Data\CommonConnection.cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\DeleteCommand [005].cs">
-      <Link>Data\DeleteCommand [005].cs</Link>
+    <Compile Include="..\Medo\Data\DeleteCommand.cs">
+      <Link>Data\DeleteCommand.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Data\IniFile [001].cs">
-      <Link>Data\IniFile [001].cs</Link>
+    <Compile Include="..\Medo\Data\IniFile.cs">
+      <Link>Data\IniFile.cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\InsertCommand [007].cs">
-      <Link>Data\InsertCommand [007].cs</Link>
+    <Compile Include="..\Medo\Data\InsertCommand.cs">
+      <Link>Data\InsertCommand.cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\SelectCommand [005].cs">
-      <Link>Data\SelectCommand [005].cs</Link>
+    <Compile Include="..\Medo\Data\SelectCommand.cs">
+      <Link>Data\SelectCommand.cs</Link>
     </Compile>
-    <Compile Include="..\medo\data\UpdateCommand [005].cs">
-      <Link>Data\UpdateCommand [005].cs</Link>
+    <Compile Include="..\Medo\Data\UpdateCommand.cs">
+      <Link>Data\UpdateCommand.cs</Link>
     </Compile>
-    <Compile Include="..\medo\device\Elsidi [007].cs">
-      <Link>Device\Elsidi [007].cs</Link>
+    <Compile Include="..\Medo\Device\Elsidi.cs">
+      <Link>Device\Elsidi.cs</Link>
     </Compile>
-    <Compile Include="..\medo\device\EltraEL4000 [002].cs">
-      <Link>Device\EltraEL4000 [002].cs</Link>
+    <Compile Include="..\Medo\Device\EltraEL4000.cs">
+      <Link>Device\EltraEL4000.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Device\Hermo [003].cs">
-      <Link>Device\Hermo [003].cs</Link>
+    <Compile Include="..\Medo\Device\Hermo.cs">
+      <Link>Device\Hermo.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Device\SerialGps [001].cs">
-      <Link>Device\SerialGps [001].cs</Link>
+    <Compile Include="..\Medo\Device\SerialGps.cs">
+      <Link>Device\SerialGps.cs</Link>
     </Compile>
-    <Compile Include="..\medo\diagnostics\ErrorReport [019].cs">
-      <Link>Diagnostics\ErrorReport [019].cs</Link>
+    <Compile Include="..\Medo\Diagnostics\ErrorReport.cs">
+      <Link>Diagnostics\ErrorReport.cs</Link>
     </Compile>
-    <Compile Include="..\medo\diagnostics\ExceptionReport [001].cs">
-      <Link>Diagnostics\ExceptionReport [001].cs</Link>
+    <Compile Include="..\Medo\Diagnostics\ExceptionReport.cs">
+      <Link>Diagnostics\ExceptionReport.cs</Link>
     </Compile>
-    <Compile Include="..\medo\diagnostics\ExceptionReportWindow [001].cs">
-      <Link>Diagnostics\ExceptionReportWindow [001].cs</Link>
+    <Compile Include="..\Medo\Diagnostics\ExceptionReportWindow.cs">
+      <Link>Diagnostics\ExceptionReportWindow.cs</Link>
     </Compile>
-    <Compile Include="..\medo\diagnostics\LifetimeWatch [001].cs">
-      <Link>Diagnostics\LifetimeWatch [001].cs</Link>
+    <Compile Include="..\Medo\Diagnostics\LifetimeWatch.cs">
+      <Link>Diagnostics\LifetimeWatch.cs</Link>
     </Compile>
-    <Compile Include="..\medo\drawing\AreaSplitter [001].cs">
-      <Link>Drawing\AreaSplitter [001].cs</Link>
+    <Compile Include="..\Medo\Drawing\AreaSplitter.cs">
+      <Link>Drawing\AreaSplitter.cs</Link>
     </Compile>
-    <Compile Include="..\medo\drawing\BarcodeImage [004].cs">
-      <Link>Drawing\BarcodeImage [004].cs</Link>
+    <Compile Include="..\Medo\Drawing\BarcodeImage.cs">
+      <Link>Drawing\BarcodeImage.cs</Link>
     </Compile>
-    <Compile Include="..\medo\drawing\printing\FullText [003].cs">
-      <Link>Drawing\Printing\FullText [003].cs</Link>
+    <Compile Include="..\Medo\Drawing\printing\FullText.cs">
+      <Link>Drawing\Printing\FullText.cs</Link>
     </Compile>
-    <Compile Include="..\medo\drawing\printing\LinePrinter [002].cs">
-      <Link>Drawing\Printing\LinePrinter [002].cs</Link>
+    <Compile Include="..\Medo\Drawing\printing\LinePrinter.cs">
+      <Link>Drawing\Printing\LinePrinter.cs</Link>
     </Compile>
-    <Compile Include="..\medo\drawing\TextLayout [001].cs">
-      <Link>Drawing\TextLayout [001].cs</Link>
+    <Compile Include="..\Medo\Drawing\TextLayout.cs">
+      <Link>Drawing\TextLayout.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Endianness [001].cs">
-      <Link>Endianness [001].cs</Link>
+    <Compile Include="..\Medo\Endianness.cs">
+      <Link>Endianness.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Expirable [001].cs">
-      <Link>Expirable [001].cs</Link>
+    <Compile Include="..\Medo\Expirable.cs">
+      <Link>Expirable.cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\AdsFileStream [002].cs">
-      <Link>IO\AdsFileStream [002].cs</Link>
+    <Compile Include="..\Medo\IO\AdsFileStream.cs">
+      <Link>IO\AdsFileStream.cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\NamedPipe [003].cs">
-      <Link>IO\NamedPipe [003].cs</Link>
+    <Compile Include="..\Medo\IO\NamedPipe.cs">
+      <Link>IO\NamedPipe.cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\UartPort [005].cs">
-      <Link>IO\UartPort [005].cs</Link>
+    <Compile Include="..\Medo\IO\UartPort.cs">
+      <Link>IO\UartPort.cs</Link>
     </Compile>
-    <Compile Include="..\medo\io\VirtualDisk [010].cs">
-      <Link>IO\VirtualDisk [010].cs</Link>
+    <Compile Include="..\Medo\IO\VirtualDisk.cs">
+      <Link>IO\VirtualDisk.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Localization\Croatia\Holiday [004].cs">
-      <Link>Localization\Croatia\Holiday [004].cs</Link>
+    <Compile Include="..\Medo\Localization\Croatia\Holiday.cs">
+      <Link>Localization\Croatia\Holiday.cs</Link>
     </Compile>
-    <Compile Include="..\medo\localization\croatia\Jmbg [006].cs">
-      <Link>Localization\Croatia\Jmbg [006].cs</Link>
+    <Compile Include="..\Medo\Localization\Croatia\Jmbg.cs">
+      <Link>Localization\Croatia\Jmbg.cs</Link>
     </Compile>
-    <Compile Include="..\medo\localization\croatia\NumberDeclination [001].cs">
-      <Link>Localization\Croatia\NumberDeclination [001].cs</Link>
+    <Compile Include="..\Medo\Localization\Croatia\NumberDeclination.cs">
+      <Link>Localization\Croatia\NumberDeclination.cs</Link>
     </Compile>
-    <Compile Include="..\medo\localization\croatia\Oib [002].cs">
-      <Link>Localization\Croatia\Oib [002].cs</Link>
+    <Compile Include="..\Medo\Localization\Croatia\Oib.cs">
+      <Link>Localization\Croatia\Oib.cs</Link>
     </Compile>
-    <Compile Include="..\medo\math\ExponentialMovingAverage [006].cs">
-      <Link>Math\ExponentialMovingAverage [006].cs</Link>
+    <Compile Include="..\Medo\Math\ExponentialMovingAverage.cs">
+      <Link>Math\ExponentialMovingAverage.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Math\LinearCalibration [001].cs">
-      <Link>Math\LinearCalibration [001].cs</Link>
+    <Compile Include="..\Medo\Math\LinearCalibration.cs">
+      <Link>Math\LinearCalibration.cs</Link>
     </Compile>
-    <Compile Include="..\medo\math\LinearInterpolation [002].cs">
-      <Link>Math\LinearInterpolation [002].cs</Link>
+    <Compile Include="..\Medo\Math\LinearInterpolation.cs">
+      <Link>Math\LinearInterpolation.cs</Link>
     </Compile>
-    <Compile Include="..\medo\math\MovingAverage [006].cs">
-      <Link>Math\MovingAverage [006].cs</Link>
+    <Compile Include="..\Medo\Math\MovingAverage.cs">
+      <Link>Math\MovingAverage.cs</Link>
     </Compile>
-    <Compile Include="..\medo\math\ProcessCapability [002].cs">
-      <Link>Math\ProcessCapability [002].cs</Link>
+    <Compile Include="..\Medo\Math\ProcessCapability.cs">
+      <Link>Math\ProcessCapability.cs</Link>
     </Compile>
-    <Compile Include="..\medo\math\SimpleAverage [006].cs">
-      <Link>Math\SimpleAverage [006].cs</Link>
+    <Compile Include="..\Medo\Math\SimpleAverage.cs">
+      <Link>Math\SimpleAverage.cs</Link>
     </Compile>
-    <Compile Include="..\medo\math\WeightedMovingAverage [005].cs">
-      <Link>Math\WeightedMovingAverage [005].cs</Link>
+    <Compile Include="..\Medo\Math\WeightedMovingAverage.cs">
+      <Link>Math\WeightedMovingAverage.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\MessageBox [007].cs">
-      <Link>MessageBox [007].cs</Link>
+    <Compile Include="..\Medo\MessageBox.cs">
+      <Link>MessageBox.cs</Link>
     </Compile>
-    <Compile Include="..\medo\net\KeyValuePacket [002].cs">
-      <Link>Net\KeyValuePacket [002].cs</Link>
+    <Compile Include="..\Medo\Net\KeyValuePacket.cs">
+      <Link>Net\KeyValuePacket.cs</Link>
     </Compile>
-    <Compile Include="..\medo\net\SyslogMessage [004].cs">
-      <Link>Net\SyslogMessage [004].cs</Link>
+    <Compile Include="..\Medo\Net\SyslogMessage.cs">
+      <Link>Net\SyslogMessage.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Net\TinyMessage [009-v20].cs">
-      <Link>Net\TinyMessage [009-v20].cs</Link>
+    <Compile Include="..\Medo\Net\TinyMessage.v20.cs">
+      <Link>Net\TinyMessage.v20.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Net\WakeOnLan [006].cs">
-      <Link>Net\WakeOnLan [006].cs</Link>
+    <Compile Include="..\Medo\Net\WakeOnLan.cs">
+      <Link>Net\WakeOnLan.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Random [001].cs">
-      <Link>Random [001].cs</Link>
+    <Compile Include="..\Medo\Random.cs">
+      <Link>Random.cs</Link>
     </Compile>
-    <Compile Include="..\medo\reflection\CallingAssembly [002].cs">
-      <Link>Reflection\CallingAssembly [002].cs</Link>
+    <Compile Include="..\Medo\Reflection\CallingAssembly.cs">
+      <Link>Reflection\CallingAssembly.cs</Link>
     </Compile>
-    <Compile Include="..\medo\reflection\EntryAssembly [003].cs">
-      <Link>Reflection\EntryAssembly [003].cs</Link>
+    <Compile Include="..\Medo\Reflection\EntryAssembly.cs">
+      <Link>Reflection\EntryAssembly.cs</Link>
     </Compile>
-    <Compile Include="..\medo\resources\ManifestResources [002].cs">
-      <Link>Resources\ManifestResources [002].cs</Link>
+    <Compile Include="..\Medo\Resources\ManifestResources.cs">
+      <Link>Resources\ManifestResources.cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\checksum\Crc16 [004].cs">
-      <Link>Security\Checksum\Crc16 [004].cs</Link>
+    <Compile Include="..\Medo\Security\Checksum\Crc16.cs">
+      <Link>Security\Checksum\Crc16.cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\checksum\Crc32 [004].cs">
-      <Link>Security\Checksum\Crc32 [004].cs</Link>
+    <Compile Include="..\Medo\Security\Checksum\Crc32.cs">
+      <Link>Security\Checksum\Crc32.cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\checksum\Crc8 [004].cs">
-      <Link>Security\Checksum\Crc8 [004].cs</Link>
+    <Compile Include="..\Medo\Security\Checksum\Crc8.cs">
+      <Link>Security\Checksum\Crc8.cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\checksum\Iso7064 [001].cs">
-      <Link>Security\Checksum\Iso7064 [001].cs</Link>
+    <Compile Include="..\Medo\Security\Checksum\Iso7064.cs">
+      <Link>Security\Checksum\Iso7064.cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\checksum\Lrc8 [002].cs">
-      <Link>Security\Checksum\Lrc8 [002].cs</Link>
+    <Compile Include="..\Medo\Security\Checksum\Lrc8.cs">
+      <Link>Security\Checksum\Lrc8.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Security\Cryptography\OpenSslAesStream [001].cs">
-      <Link>Security\Cryptography\OpenSslAesStream [001].cs</Link>
+    <Compile Include="..\Medo\Security\Cryptography\OpenSslAesStream.cs">
+      <Link>Security\Cryptography\OpenSslAesStream.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Security\Cryptography\Password [001].cs">
-      <Link>Security\Cryptography\Password [001].cs</Link>
+    <Compile Include="..\Medo\Security\Cryptography\Password.cs">
+      <Link>Security\Cryptography\Password.cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\cryptography\Pbkdf2 [001].cs">
-      <Link>Security\Cryptography\Pbkdf2 [001].cs</Link>
+    <Compile Include="..\Medo\Security\Cryptography\Pbkdf2.cs">
+      <Link>Security\Cryptography\Pbkdf2.cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\cryptography\Sha1 [001].cs">
-      <Link>Security\Cryptography\Sha1 [001].cs</Link>
+    <Compile Include="..\Medo\Security\Cryptography\Sha1.cs">
+      <Link>Security\Cryptography\Sha1.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Security\Cryptography\Twofish [001].cs">
-      <Link>Security\Cryptography\Twofish [001].cs</Link>
+    <Compile Include="..\Medo\Security\Cryptography\Twofish.cs">
+      <Link>Security\Cryptography\Twofish.cs</Link>
     </Compile>
-    <Compile Include="..\medo\security\principal\Impersonation [002].cs">
-      <Link>Security\Principal\Impersonation [002].cs</Link>
+    <Compile Include="..\Medo\Security\Principal\Impersonation.cs">
+      <Link>Security\Principal\Impersonation.cs</Link>
     </Compile>
-    <Compile Include="..\medo\services\Upgrade [004].cs">
-      <Link>Services\Upgrade [004].cs</Link>
+    <Compile Include="..\Medo\Services\Upgrade.cs">
+      <Link>Services\Upgrade.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\TagItem [004].cs">
-      <Link>TagItem [004].cs</Link>
+    <Compile Include="..\Medo\TagItem.cs">
+      <Link>TagItem.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Text\Placeholder [003].cs">
-      <Link>Text\Placeholder [003].cs</Link>
+    <Compile Include="..\Medo\Text\Placeholder.cs">
+      <Link>Text\Placeholder.cs</Link>
     </Compile>
-    <Compile Include="..\medo\text\StringAdder [002].cs">
-      <Link>Text\StringAdder [002].cs</Link>
+    <Compile Include="..\Medo\Text\StringAdder.cs">
+      <Link>Text\StringAdder.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\WaitCursor [001].cs">
-      <Link>WaitCursor [001].cs</Link>
+    <Compile Include="..\Medo\WaitCursor.cs">
+      <Link>WaitCursor.cs</Link>
     </Compile>
-    <Compile Include="..\medo\web\gdata\GDataClientLogin [002].cs">
-      <Link>Web\GData\GDataClientLogin [002].cs</Link>
+    <Compile Include="..\Medo\Web\GData\GDataClientLogin.cs">
+      <Link>Web\GData\GDataClientLogin.cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Windows\Forms\AboutBox [014].cs">
-      <Link>Windows\Forms\AboutBox [014].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\AboutBox.cs">
+      <Link>Windows\Forms\AboutBox.cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\Button [001].cs">
-      <Link>Windows\Forms\Button [001].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\Button.cs">
+      <Link>Windows\Forms\Button.cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\CheckBox [002].cs">
-      <Link>Windows\Forms\CheckBox [002].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\CheckBox.cs">
+      <Link>Windows\Forms\CheckBox.cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\CheckedListBox [002].cs">
-      <Link>Windows\Forms\CheckedListBox [002].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\CheckedListBox.cs">
+      <Link>Windows\Forms\CheckedListBox.cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\ComboBox [002].cs">
-      <Link>Windows\Forms\ComboBox [002].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\ComboBox.cs">
+      <Link>Windows\Forms\ComboBox.cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\DateTimePicker [002].cs">
-      <Link>Windows\Forms\DateTimePicker [002].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\DateTimePicker.cs">
+      <Link>Windows\Forms\DateTimePicker.cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\Hotkey [002].cs">
-      <Link>Windows\Forms\Hotkey [002].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\Hotkey.cs">
+      <Link>Windows\Forms\Hotkey.cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\InputBox [002].cs">
-      <Link>Windows\Forms\InputBox [002].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\InputBox.cs">
+      <Link>Windows\Forms\InputBox.cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\LoginDialog [003].cs">
-      <Link>Windows\Forms\LoginDialog [003].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\LoginDialog.cs">
+      <Link>Windows\Forms\LoginDialog.cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\PrintPreviewDialog [005].cs">
-      <Link>Windows\Forms\PrintPreviewDialog [005].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\PrintPreviewDialog.cs">
+      <Link>Windows\Forms\PrintPreviewDialog.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\RadioButton [002].cs">
-      <Link>Windows\Forms\RadioButton [002].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\RadioButton.cs">
+      <Link>Windows\Forms\RadioButton.cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\SplashBox [011].cs">
-      <Link>Windows\Forms\SplashBox [011].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\SplashBox.cs">
+      <Link>Windows\Forms\SplashBox.cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\State [015].cs">
-      <Link>Windows\Forms\State [015].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\State.cs">
+      <Link>Windows\Forms\State.cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\TaskbarProgress [003].cs">
-      <Link>Windows\Forms\TaskbarProgress [003].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\TaskbarProgress.cs">
+      <Link>Windows\Forms\TaskbarProgress.cs</Link>
     </Compile>
-    <Compile Include="..\medo\windows\forms\TextBox [002].cs">
-      <Link>Windows\Forms\TextBox [002].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\TextBox.cs">
+      <Link>Windows\Forms\TextBox.cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\medo\windows\forms\WaitBox [001].cs">
-      <Link>Windows\Forms\WaitBox [001].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\WaitBox.cs">
+      <Link>Windows\Forms\WaitBox.cs</Link>
     </Compile>
-    <Compile Include="..\medo\xml\XmlResourceResolver [001].cs">
-      <Link>Xml\XmlResourceResolver [001].cs</Link>
+    <Compile Include="..\Medo\Xml\XmlResourceResolver.cs">
+      <Link>Xml\XmlResourceResolver.cs</Link>
     </Compile>
-    <Compile Include="..\medo\xml\XmlTagWriter [002].cs">
-      <Link>Xml\XmlTagWriter [002].cs</Link>
+    <Compile Include="..\Medo\Xml\XmlTagWriter.cs">
+      <Link>Xml\XmlTagWriter.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
