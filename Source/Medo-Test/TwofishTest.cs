@@ -548,6 +548,88 @@ namespace Test {
             }
         }
 
+
+        [TestMethod()]
+        public void Twofish_Padding_AnsiX923_ECB_128_Encrypt() {
+            var key = ParseBytes("00000000000000000000000000000000");
+            var pt = Encoding.UTF8.GetBytes("The quick brown fox jumps over the lazy dog");
+            using (var algorithm = new TwofishManaged() { KeySize = 128, Mode = CipherMode.ECB, Padding = PaddingMode.ANSIX923 }) {
+                var ct = Encrypt(algorithm, key, null, pt);
+                Assert.AreEqual("B0DD30E9AB1F1329C1BEE154DDBE88AF1194B36D8E0BDD5AC10842B549230BB3B696D40A5E12225D3E05E8A466F078C2", BitConverter.ToString(ct).Replace("-", ""));
+            }
+        }
+
+        [TestMethod()]
+        public void Twofish_Padding_AnsiX923_ECB_128_Decrypt() {
+            var key = ParseBytes("00000000000000000000000000000000");
+            var ct = ParseBytes("B0DD30E9AB1F1329C1BEE154DDBE88AF1194B36D8E0BDD5AC10842B549230BB3B696D40A5E12225D3E05E8A466F078C2");
+            using (var algorithm = new TwofishManaged() { KeySize = 128, Mode = CipherMode.ECB, Padding = PaddingMode.ANSIX923 }) {
+                var pt = Decrypt(algorithm, key, null, ct);
+                Assert.AreEqual("The quick brown fox jumps over the lazy dog", Encoding.UTF8.GetString(pt));
+            }
+        }
+
+        [TestMethod()]
+        public void Twofish_Padding_AnsiX923_ECB_128_Encrypt_16() {
+            var key = ParseBytes("00000000000000000000000000000000");
+            var pt = Encoding.UTF8.GetBytes("The quick brown fox jumps over the lazy dog once");
+            using (var algorithm = new TwofishManaged() { KeySize = 128, Mode = CipherMode.ECB, Padding = PaddingMode.ANSIX923 }) {
+                var ct = Encrypt(algorithm, key, null, pt);
+                Assert.AreEqual("B0DD30E9AB1F1329C1BEE154DDBE88AF1194B36D8E0BDD5AC10842B549230BB36D66FC3AFE1F40216590079AF862AB5958A06DC5AD2D7C0550771D6E9D59D58B", BitConverter.ToString(ct).Replace("-", ""));
+            }
+        }
+
+        [TestMethod()]
+        public void Twofish_Padding_AnsiX923_ECB_128_Decrypt_16() {
+            var key = ParseBytes("00000000000000000000000000000000");
+            var ct = ParseBytes("B0DD30E9AB1F1329C1BEE154DDBE88AF1194B36D8E0BDD5AC10842B549230BB36D66FC3AFE1F40216590079AF862AB5958A06DC5AD2D7C0550771D6E9D59D58B");
+            using (var algorithm = new TwofishManaged() { KeySize = 128, Mode = CipherMode.ECB, Padding = PaddingMode.ANSIX923 }) {
+                var pt = Decrypt(algorithm, key, null, ct);
+                Assert.AreEqual("The quick brown fox jumps over the lazy dog once", Encoding.UTF8.GetString(pt));
+            }
+        }
+
+
+        [TestMethod()]
+        public void Twofish_Padding_Iso10126_ECB_128_DecryptAndEncrypt() {
+            var key = ParseBytes("00000000000000000000000000000000");
+            var pt = "The quick brown fox jumps over the lazy dog";
+
+            var ctA = ParseBytes("B0DD30E9AB1F1329C1BEE154DDBE88AF1194B36D8E0BDD5AC10842B549230BB3B696D40A5E12225D3E05E8A466F078C2");
+            using (var algorithm = new TwofishManaged() { KeySize = 128, Mode = CipherMode.ECB, Padding = PaddingMode.ISO10126 }) {
+                var ptA = Decrypt(algorithm, key, null, ctA);
+                Assert.AreEqual(pt, Encoding.UTF8.GetString(ptA));
+            }
+
+            var ptB = Encoding.UTF8.GetBytes(pt);
+            using (var algorithm = new TwofishManaged() { KeySize = 128, Mode = CipherMode.ECB, Padding = PaddingMode.ISO10126 }) {
+                var ctB = Encrypt(algorithm, key, null, ptB);
+                var ptC = Decrypt(algorithm, key, null, ctB);
+                Assert.AreEqual(pt, Encoding.UTF8.GetString(ptC));
+                Assert.AreNotEqual(BitConverter.ToString(ctA).Replace("-", ""), BitConverter.ToString(ctB).Replace("-", "")); //chances are good padding will be different (due to randomness involved)
+            }
+        }
+
+        [TestMethod()]
+        public void Twofish_Padding_Iso10126_ECB_128_DecryptAndEncrypt_16() {
+            var key = ParseBytes("00000000000000000000000000000000");
+            var pt = "The quick brown fox jumps over the lazy dog once";
+
+            var ctA = ParseBytes("B0DD30E9AB1F1329C1BEE154DDBE88AF1194B36D8E0BDD5AC10842B549230BB36D66FC3AFE1F40216590079AF862AB5958A06DC5AD2D7C0550771D6E9D59D58B");
+            using (var algorithm = new TwofishManaged() { KeySize = 128, Mode = CipherMode.ECB, Padding = PaddingMode.ISO10126 }) {
+                var ptA = Decrypt(algorithm, key, null, ctA);
+                Assert.AreEqual(pt, Encoding.UTF8.GetString(ptA));
+            }
+
+            var ptB = Encoding.UTF8.GetBytes(pt);
+            using (var algorithm = new TwofishManaged() { KeySize = 128, Mode = CipherMode.ECB, Padding = PaddingMode.ISO10126 }) {
+                var ctB = Encrypt(algorithm, key, null, ptB);
+                var ptC = Decrypt(algorithm, key, null, ctB);
+                Assert.AreEqual(pt, Encoding.UTF8.GetString(ptC));
+                Assert.AreNotEqual(BitConverter.ToString(ctA).Replace("-", ""), BitConverter.ToString(ctB).Replace("-", "")); //chances are good padding will be different (due to randomness involved)
+            }
+        }
+
         #endregion
 
 
