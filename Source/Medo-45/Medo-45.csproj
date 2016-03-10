@@ -235,6 +235,9 @@
     <Compile Include="..\Medo\Localization\PostOffices.cs">
       <Link>Localization\PostOffices.cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Math\BoxAndWhiskers.cs">
+      <Link>Math\BoxAndWhiskers.cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Math\ExponentialMovingAverage.cs">
       <Link>Math\ExponentialMovingAverage.cs</Link>
     </Compile>

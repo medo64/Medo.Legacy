@@ -168,6 +168,9 @@
     <Compile Include="..\Medo\Localization\Croatia\Oib.cs">
       <Link>Localization\Croatia\Oib.cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Math\BoxAndWhiskers.cs">
+      <Link>Math\BoxAndWhiskers.cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Math\ExponentialMovingAverage.cs">
       <Link>Math\ExponentialMovingAverage.cs</Link>
     </Compile>

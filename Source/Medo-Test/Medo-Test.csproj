@@ -99,6 +99,7 @@
     <Compile Include="ExpirableTest.cs" />
     <Compile Include="HermoTests.cs" />
     <Compile Include="HistoryTest.cs" />
+    <Compile Include="BoxAndWhiskersTest.cs" />
     <Compile Include="TwofishTest.cs" />
     <Compile Include="OneTimePasswordTests.cs" />
     <Compile Include="SerialGpsTests.cs" />
