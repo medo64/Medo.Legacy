@@ -1,10 +1,11 @@
-﻿using Medo.Configuration;
+using Medo.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Globalization;
 
 namespace Test {
 
     [TestClass()]
-    public class RecentTest {
+    public class RecentFilesTest {
 
         public TestContext TestContext { get; set; }
 
@@ -55,6 +56,24 @@ namespace Test {
             Assert.AreEqual(@"C:\testB.txt", x[1].FileName);
             x.Load();
             Assert.AreEqual(0, x.Count);
+        }
+
+
+        [TestMethod()]
+        public void RecentFiles_05() {
+            var recentFiles = new RecentFiles();
+            recentFiles.Clear();
+            RecentFiles.NoRegistryWrites = true;
+            recentFiles.Push(@"3");
+            recentFiles.Push(@"2");
+            recentFiles.Push(@"1");
+            Assert.AreEqual(3, recentFiles.Count);
+
+            var i = 0;
+            foreach (var file in recentFiles) {
+                i++;
+                Assert.AreEqual(i.ToString(CultureInfo.InvariantCulture), file.FileName);
+            }
         }
 
     }

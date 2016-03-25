@@ -109,7 +109,7 @@
     <Compile Include="IniFileTest.cs" />
     <Compile Include="LinearCalibrationTest.cs" />
     <Compile Include="HolidayTest.cs" />
-    <Compile Include="RecentTest.cs" />
+    <Compile Include="RecentFilesTest.cs" />
     <Compile Include="OpenSslAesStreamTest.cs" />
     <Compile Include="Pbkdf2Test.cs" />
     <Compile Include="TinyPacketTest.cs" />

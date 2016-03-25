@@ -1,5 +1,6 @@
 //Josip Medved <jmedved@jmedved.com>   www.medo64.com
 
+//2016-03-24: Added IEnumerable interface.
 //2012-08-20: Fixed crash when HideFileExt cannot be found in registry.
 //2012-05-31: Refactoring.
 //2010-10-31: Added option to skip registry writes (NoRegistryWrites).
@@ -8,6 +9,7 @@
 
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -21,7 +23,8 @@ namespace Medo.Configuration {
     /// Enables loading and saving of files list.
     /// It is written in State key at HKEY_CURRENT_USER branch withing defined SubKeyPath.
     /// </summary>
-    public class RecentFiles {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "While this class offers IEnumerable interface, it is not a collection as such.")]
+    public class RecentFiles : IEnumerable<RecentFile> {
 
         /// <summary>
         /// Creates new instance with "Default" as group name and maximum of 16 files.
@@ -229,7 +232,6 @@ namespace Medo.Configuration {
         }
 
 
-
         /// <summary>
         /// Gets/sets subkey used for registry storage.
         /// </summary>
@@ -240,6 +242,23 @@ namespace Medo.Configuration {
                 return (Type.GetType("Mono.Runtime") != null);
             }
         }
+
+
+        #region IEnumerable
+
+        /// <summary>
+        /// Returns an IEnumerator for the recent files.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<RecentFile> GetEnumerator() {
+            return this.Items.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return this.Items.GetEnumerator();
+        }
+
+        #endregion
 
     }
 
