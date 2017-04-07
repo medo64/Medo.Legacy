@@ -1,4 +1,4 @@
-﻿using Medo.Localization.Croatia;
+using Medo.Localization.Croatia;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 

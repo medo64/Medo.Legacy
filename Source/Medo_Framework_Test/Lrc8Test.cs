@@ -1,4 +1,4 @@
-﻿using Medo.Security.Checksum;
+using Medo.Security.Checksum;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Test {

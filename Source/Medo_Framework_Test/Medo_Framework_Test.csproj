@@ -163,12 +163,6 @@
     <None Include="Properties\App.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Medo-45\Medo-45.csproj">
-      <Project>{4c58ca83-e0d1-4fae-92fc-c062c13d7c28}</Project>
-      <Name>Medo-45</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Twofish\CBC_D_M.TXT" />
     <EmbeddedResource Include="Twofish\CBC_E_M.TXT" />
     <EmbeddedResource Include="Twofish\ECB_D_M.TXT" />
@@ -176,6 +170,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Twofish\ECB_TBL.TXT" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Medo_Framework_45\Medo_Framework_45.csproj">
+      <Project>{4c58ca83-e0d1-4fae-92fc-c062c13d7c28}</Project>
+      <Name>Medo_Framework_45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

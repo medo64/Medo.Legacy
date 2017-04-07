@@ -1,12 +1,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo-20", "Medo-20\Medo-20.csproj", "{C1E4B693-E5EE-4E24-9734-0346767DCE2C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo_Framework_20", "Medo_Framework_20\Medo_Framework_20.csproj", "{C1E4B693-E5EE-4E24-9734-0346767DCE2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo-45", "Medo-45\Medo-45.csproj", "{4C58CA83-E0D1-4FAE-92FC-C062C13D7C28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo_Framework_45", "Medo_Framework_45\Medo_Framework_45.csproj", "{4C58CA83-E0D1-4FAE-92FC-C062C13D7C28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo-Test", "Medo-Test\Medo-Test.csproj", "{1091D8E2-5CC3-4AAF-8E73-0271E302E1A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo_Framework_Test", "Medo_Framework_Test\Medo_Framework_Test.csproj", "{1091D8E2-5CC3-4AAF-8E73-0271E302E1A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

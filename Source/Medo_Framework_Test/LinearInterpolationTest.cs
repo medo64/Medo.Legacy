@@ -1,4 +1,4 @@
-﻿using Medo.Math;
+using Medo.Math;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Test {
