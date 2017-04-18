@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Compile Include="..\Medo\Configuration\Properties [001].cs" Link="Configuration\Properties [001].cs" />
+    <Compile Include="..\Medo\Configuration\RecentlyUsed [001].cs" Link="Configuration\RecentlyUsed [001].cs" />
   </ItemGroup>
 
   <ItemGroup>

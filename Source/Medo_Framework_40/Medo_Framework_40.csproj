@@ -115,6 +115,9 @@
     <Compile Include="..\Medo\Configuration\RecentFiles [006].cs">
       <Link>Configuration\RecentFiles [006].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Configuration\RecentlyUsed [001].cs">
+      <Link>Configuration\RecentlyUsed [001].cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Configuration\RunOnStartup [003].cs">
       <Link>Configuration\RunOnStartup [003].cs</Link>
     </Compile>
