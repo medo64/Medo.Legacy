@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <RootNamespace>Medo</RootNamespace>
+    <Version>1.6.0</Version>
+    <PackageId>Medo-16</PackageId>
+    <Authors>Josip Medved &lt;jmedved@jmedved.com&gt;</Authors>
+    <Company>Josip Medved</Company>
+    <Product>Medo</Product>
+    <Copyright>Copyright 2017 by Josip Medved &lt;jmedved@jmedved.com&gt;</Copyright>
+    <PackageProjectUrl>https://www.medo64.com/medo/</PackageProjectUrl>
+    <Description>Common functions assembly.</Description>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
+    <AssemblyName>Medo16</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>Q:\Projects\Libraries\Medo\Binaries\netstandard1.6\</OutputPath>
+    <DocumentationFile>Q:\Projects\Libraries\Medo\Binaries\netstandard1.6\Medo16.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>Q:\Projects\Libraries\Medo\Binaries\</OutputPath>
+    <DocumentationFile>Q:\Projects\Libraries\Medo\Binaries\netstandard1.6\Medo16.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Medo\Configuration\Properties [001].cs" Link="Configuration\Properties [001].cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>    
+    <TargetFramework>netcoreapp1.1</TargetFramework>    
+    <RootNamespace>Test</RootNamespace>    
+    <SignAssembly>True</SignAssembly>    
+    <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
+    <Copyright>Copyright 2017 by Josip Medved &lt;jmedved@jmedved.com&gt;</Copyright>
+    <PackageProjectUrl>https://www.medo64.com/medo/</PackageProjectUrl>
+    <Authors>Josip Medved &lt;jmedved@jmedved.com&gt;</Authors>
+    <Company>Josip Medved</Company>
+    <AssemblyName>MedoTest</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Properties\KeyWhitespace.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\RemoveMulti.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteConverted.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\KeyWhitespace.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteMulti.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteMulti.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\SpacingPreserved.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\SpacingPreserved.properties" />
+    <EmbeddedResource Include="Resources\Properties\SpacingCorrections.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\SpacingCorrections.properties" />
+    <EmbeddedResource Include="Resources\Properties\SpacingEscape.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\SpacingEscape.properties" />
+    <EmbeddedResource Include="Resources\Properties\CommentsWithValues.properties" />
+    <EmbeddedResource Include="Resources\Properties\EmptyLinesCR.properties" />
+    <EmbeddedResource Include="Resources\Properties\EmptyLinesLF.properties" />
+    <EmbeddedResource Include="Resources\Properties\EmptyLinesCRLF.properties" />
+    <EmbeddedResource Include="Resources\Properties\Empty.properties" />
+    <EmbeddedResource Include="Resources\Properties\EmptyLinesMixed.properties" />
+    <EmbeddedResource Include="Resources\Properties\EmptyLinesMixed.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\CommentsOnly.properties" />
+    <EmbeddedResource Include="Resources\Properties\RemoveMulti.properties" />
+    <EmbeddedResource Include="Resources\Properties\Remove.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\Remove.properties" />
+    <EmbeddedResource Include="Resources\Properties\ReplaceOnlyLast.properties" />
+    <EmbeddedResource Include="Resources\Properties\ReplaceOnlyLast.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\Replace.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\Replace.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteSameSeparatorSpace.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteSameSeparatorSpace.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteSameSeparatorEquals.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteSameSeparatorEquals.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteNoEmptyLine.Good.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteNoEmptyLine.properties" />
+    <EmbeddedResource Include="Resources\Properties\WriteBasic.Good.properties" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Medo_Standard_16\Medo_Standard_16.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+
+</Project>
