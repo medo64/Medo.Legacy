@@ -298,6 +298,9 @@
     <Compile Include="..\Medo\Security\Checksum\Crc8 [004].cs">
       <Link>Security\Checksum\Crc8 [004].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Security\Checksum\Fletcher16 [001].cs">
+      <Link>Security\Checksum\Fletcher16 [001].cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Security\Checksum\Iso7064 [001].cs">
       <Link>Security\Checksum\Iso7064 [001].cs</Link>
     </Compile>
