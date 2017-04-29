@@ -112,8 +112,8 @@
     <Compile Include="..\Medo\Configuration\History [002].cs">
       <Link>Configuration\History [002].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Configuration\RecentFiles [006].cs">
-      <Link>Configuration\RecentFiles [006].cs</Link>
+    <Compile Include="..\Medo\Configuration\RecentFiles [---].cs">
+      <Link>Configuration\RecentFiles [---].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Configuration\RecentlyUsed [001].cs">
       <Link>Configuration\RecentlyUsed [001].cs</Link>
@@ -121,8 +121,8 @@
     <Compile Include="..\Medo\Configuration\RunOnStartup [003].cs">
       <Link>Configuration\RunOnStartup [003].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Configuration\Settings [013].cs">
-      <Link>Configuration\Settings [013].cs</Link>
+    <Compile Include="..\Medo\Configuration\Settings [---].cs">
+      <Link>Configuration\Settings [---].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Data\CommonConnection [010].cs">
       <Link>Data\CommonConnection [010].cs</Link>

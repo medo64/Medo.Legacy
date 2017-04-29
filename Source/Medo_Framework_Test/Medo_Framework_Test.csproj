@@ -103,13 +103,11 @@
     <Compile Include="TwofishTest.cs" />
     <Compile Include="OneTimePasswordTests.cs" />
     <Compile Include="SerialGpsTests.cs" />
-    <Compile Include="SettingsTest.cs" />
     <Compile Include="PasswordTest.cs" />
     <Compile Include="PlaceholderTest.cs" />
     <Compile Include="IniFileTest.cs" />
     <Compile Include="LinearCalibrationTest.cs" />
     <Compile Include="HolidayTest.cs" />
-    <Compile Include="RecentFilesTest.cs" />
     <Compile Include="OpenSslAesStreamTest.cs" />
     <Compile Include="Pbkdf2Test.cs" />
     <Compile Include="TinyPacketTest.cs" />

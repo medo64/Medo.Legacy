@@ -1,5 +1,6 @@
 //Josip Medved <jmedved@jmedved.com>   www.medo64.com
 
+//2017-04-29: Obsoleted.
 //2016-03-24: Added IEnumerable interface.
 //2012-08-20: Fixed crash when HideFileExt cannot be found in registry.
 //2012-05-31: Refactoring.
@@ -23,6 +24,7 @@ namespace Medo.Configuration {
     /// Enables loading and saving of files list.
     /// It is written in State key at HKEY_CURRENT_USER branch withing defined SubKeyPath.
     /// </summary>
+    [Obsolete("Use RecentlyUsed in combination with Config instead.")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "While this class offers IEnumerable interface, it is not a collection as such.")]
     public class RecentFiles : IEnumerable<RecentFile> {
 
