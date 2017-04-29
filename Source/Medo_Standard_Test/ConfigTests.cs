@@ -238,9 +238,9 @@ namespace Test {
             Assert.Equal("test", x);
 
             Assert.True(Config.Save(), "Save should create directory structure and succeed.");
-
-
             Assert.True(File.Exists(propertiesFile));
+
+            Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectory"), true);
         }
 
         [Fact(DisplayName = "Config: Write creates directory (2 levels deep)")]
@@ -257,9 +257,9 @@ namespace Test {
             Assert.Equal("test", x);
 
             Assert.True(Config.Save(), "Save should create directory structure and succeed.");
-
-
             Assert.True(File.Exists(propertiesFile));
+
+            Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter"), true);
         }
 
         [Fact(DisplayName = "Config: Write creates directory (3 levels deep)")]
@@ -276,9 +276,9 @@ namespace Test {
             Assert.Equal("test", x);
 
             Assert.True(Config.Save(), "Save should create directory structure and succeed.");
-
-
             Assert.True(File.Exists(propertiesFile));
+
+            Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter"), true);
         }
 
 
