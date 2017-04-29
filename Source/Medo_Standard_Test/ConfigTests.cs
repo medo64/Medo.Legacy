@@ -7,9 +7,9 @@ using Medo.Configuration;
 using Xunit;
 
 namespace Test {
-    public class PropertiesTests {
+    public class ConfigTests {
 
-        [Fact(DisplayName = "Properties: Null key throws exception")]
+        [Fact(DisplayName = "Config: Null key throws exception")]
         void NullKey() {
             var ex = Assert.Throws<ArgumentNullException>(() => {
                 Config.Read(null, "");
@@ -17,7 +17,7 @@ namespace Test {
             Assert.StartsWith("Key cannot be null.", ex.Message);
         }
 
-        [Fact(DisplayName = "Properties: Empty key throws exception")]
+        [Fact(DisplayName = "Config: Empty key throws exception")]
         void EmptyKey() {
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() => {
                 Config.Read("   ", "");
@@ -26,7 +26,7 @@ namespace Test {
         }
 
 
-        [Fact(DisplayName = "Properties: Empty file Load/Save")]
+        [Fact(DisplayName = "Config: Empty file Load/Save")]
         void EmptySave() {
             using (var loader = new ConfigLoader("Empty.cfg")) {
                 Assert.True(Config.Load(), "File should exist before load.");
@@ -36,7 +36,7 @@ namespace Test {
         }
 
 
-        [Fact(DisplayName = "Properties: CRLF preserved on Save")]
+        [Fact(DisplayName = "Config: CRLF preserved on Save")]
         void EmptyLinesCRLF() {
             using (var loader = new ConfigLoader("EmptyLinesCRLF.cfg")) {
                 Config.Save();
@@ -44,7 +44,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: LF preserved on Save")]
+        [Fact(DisplayName = "Config: LF preserved on Save")]
         void EmptyLinesLF() {
             using (var loader = new ConfigLoader("EmptyLinesLF.cfg")) {
                 Config.Save();
@@ -52,7 +52,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: CR preserved on Save")]
+        [Fact(DisplayName = "Config: CR preserved on Save")]
         void EmptyLinesCR() {
             using (var loader = new ConfigLoader("EmptyLinesCR.cfg")) {
                 Config.Save();
@@ -60,7 +60,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Mixed line ending gets normalized on Save")]
+        [Fact(DisplayName = "Config: Mixed line ending gets normalized on Save")]
         void EmptyLinesMixed() {
             using (var loader = new ConfigLoader("EmptyLinesMixed.cfg", "EmptyLinesMixed.Good.cfg")) {
                 Config.Save();
@@ -68,7 +68,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Comments are preserved on Save")]
+        [Fact(DisplayName = "Config: Comments are preserved on Save")]
         void CommentsOnly() {
             using (var loader = new ConfigLoader("CommentsOnly.cfg")) {
                 Config.Save();
@@ -76,7 +76,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Values with comments are preserved on Save")]
+        [Fact(DisplayName = "Config: Values with comments are preserved on Save")]
         void CommentsWithValues() {
             using (var loader = new ConfigLoader("CommentsWithValues.cfg")) {
                 Config.Save();
@@ -85,7 +85,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Leading spaces are preserved on Save")]
+        [Fact(DisplayName = "Config: Leading spaces are preserved on Save")]
         void SpacingEscape() {
             using (var loader = new ConfigLoader("SpacingEscape.cfg", "SpacingEscape.Good.cfg")) {
                 Assert.Equal(" Value 1", Config.Read("Key1", null));
@@ -103,7 +103,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Basic write")]
+        [Fact(DisplayName = "Config: Basic write")]
         void WriteBasic() {
             using (var loader = new ConfigLoader("Empty.cfg", "WriteBasic.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
@@ -115,7 +115,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Basic write (without empty line ending)")]
+        [Fact(DisplayName = "Config: Basic write (without empty line ending)")]
         void WriteNoEmptyLine() {
             using (var loader = new ConfigLoader("WriteNoEmptyLine.cfg", "WriteNoEmptyLine.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
@@ -127,7 +127,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Separator equals (=) is preserved upon save")]
+        [Fact(DisplayName = "Config: Separator equals (=) is preserved upon save")]
         void WriteSameSeparatorEquals() {
             using (var loader = new ConfigLoader("WriteSameSeparatorEquals.cfg", "WriteSameSeparatorEquals.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
@@ -139,7 +139,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Separator space ( ) is preserved upon save")]
+        [Fact(DisplayName = "Config: Separator space ( ) is preserved upon save")]
         void WriteSameSeparatorSpace() {
             using (var loader = new ConfigLoader("WriteSameSeparatorSpace.cfg", "WriteSameSeparatorSpace.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
@@ -151,7 +151,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Write replaces existing entry")]
+        [Fact(DisplayName = "Config: Write replaces existing entry")]
         void Replace() {
             using (var loader = new ConfigLoader("Replace.cfg", "Replace.Good.cfg")) {
                 Config.Write("Key1", "Value 1a");
@@ -166,7 +166,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Write preserves spacing")]
+        [Fact(DisplayName = "Config: Write preserves spacing")]
         void SpacingPreserved() {
             using (var loader = new ConfigLoader("SpacingPreserved.cfg", "SpacingPreserved.Good.cfg")) {
                 Config.Write("KeyOne", "Value 1a");
@@ -179,7 +179,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Write preserves spacing on add")]
+        [Fact(DisplayName = "Config: Write preserves spacing on add")]
         void SpacingPreservedOnAdd() {
             using (var loader = new ConfigLoader("SpacingPreservedOnAdd.cfg", "SpacingPreservedOnAdd.Good.cfg")) {
                 Config.Write("One", "Value 1a");
@@ -195,7 +195,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Write without preexisting file")]
+        [Fact(DisplayName = "Config: Write without preexisting file")]
         void WriteToEmpty() {
             using (var loader = new ConfigLoader(null, "Replace.Good.cfg")) {
                 Config.Write("Key1", "Value 1a");
@@ -207,7 +207,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Write replaces only last instance of same key")]
+        [Fact(DisplayName = "Config: Write replaces only last instance of same key")]
         void ReplaceOnlyLast() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.cfg", "ReplaceOnlyLast.Good.cfg")) {
                 Config.Write("Key1", "Value 1a");
@@ -224,11 +224,11 @@ namespace Test {
         }
 
 
-        [Fact(DisplayName = "Properties: Write creates directory")]
+        [Fact(DisplayName = "Config: Write creates directory")]
         void SaveInNonexistingDirectory1() {
-            var propertiesFile = Path.Combine(Path.GetTempPath(), "PropertiesDirectory", "Test.cfg");
+            var propertiesFile = Path.Combine(Path.GetTempPath(), "ConfigDirectory", "Test.cfg");
             try {
-                Directory.Delete(Path.Combine(Path.GetTempPath(), "PropertiesDirectory"), true);
+                Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectory"), true);
             } catch (IOException) { }
             Config.FileName = propertiesFile;
 
@@ -243,11 +243,11 @@ namespace Test {
             Assert.True(File.Exists(propertiesFile));
         }
 
-        [Fact(DisplayName = "Properties: Write creates directory (2 levels deep)")]
+        [Fact(DisplayName = "Config: Write creates directory (2 levels deep)")]
         void SaveInNonexistingDirectory2() {
-            var propertiesFile = Path.Combine(Path.GetTempPath(), "PropertiesDirectoryOuter", "PropertiesDirectoryInner", "Test.cfg");
+            var propertiesFile = Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter", "ConfigDirectoryInner", "Test.cfg");
             try {
-                Directory.Delete(Path.Combine(Path.GetTempPath(), "PropertiesDirectoryOuter"), true);
+                Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter"), true);
             } catch (IOException) { }
             Config.FileName = propertiesFile;
 
@@ -262,11 +262,11 @@ namespace Test {
             Assert.True(File.Exists(propertiesFile));
         }
 
-        [Fact(DisplayName = "Properties: Write creates directory (3 levels deep)")]
+        [Fact(DisplayName = "Config: Write creates directory (3 levels deep)")]
         void SaveInNonexistingDirectory3() {
-            var propertiesFile = Path.Combine(Path.GetTempPath(), "PropertiesDirectoryOuter", "PropertiesDirectoryMiddle", "PropertiesDirectoryInner", "Test.cfg");
+            var propertiesFile = Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter", "ConfigDirectoryMiddle", "ConfigDirectoryInner", "Test.cfg");
             try {
-                Directory.Delete(Path.Combine(Path.GetTempPath(), "PropertiesDirectoryOuter"), true);
+                Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter"), true);
             } catch (IOException) { }
             Config.FileName = propertiesFile;
 
@@ -282,7 +282,7 @@ namespace Test {
         }
 
 
-        [Fact(DisplayName = "Properties: Removing entry")]
+        [Fact(DisplayName = "Config: Removing entry")]
         void RemoveSingle() {
             using (var loader = new ConfigLoader("Remove.cfg", "Remove.Good.cfg")) {
                 Config.Delete("Key1");
@@ -292,7 +292,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Removing multiple entries")]
+        [Fact(DisplayName = "Config: Removing multiple entries")]
         void RemoveMulti() {
             using (var loader = new ConfigLoader("RemoveMulti.cfg", "RemoveMulti.Good.cfg")) {
                 Config.Delete("Key2");
@@ -303,14 +303,14 @@ namespace Test {
         }
 
 
-        [Fact(DisplayName = "Properties: Override is used first")]
+        [Fact(DisplayName = "Config: Override is used first")]
         void UseOverrideFirst() {
             using (var loader = new ConfigLoader("Replace.cfg", resourceOverrideFileName: "Replace.Good.cfg")) {
                 Assert.Equal("Value 1a", Config.Read("Key1", null));
             }
         }
 
-        [Fact(DisplayName = "Properties: Override is not written")]
+        [Fact(DisplayName = "Config: Override is not written")]
         void DontOverwriteOverride() {
             using (var loader = new ConfigLoader("Replace.cfg", resourceOverrideFileName: "Replace.Good.cfg")) {
                 Config.Write("Key1", "XXX");
@@ -321,7 +321,7 @@ namespace Test {
         }
 
 
-        [Fact(DisplayName = "Properties: Reading multiple entries")]
+        [Fact(DisplayName = "Config: Reading multiple entries")]
         void ReadMulti() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.Good.cfg")) {
                 var list = new List<string>(Config.Read("Key2"));
@@ -331,7 +331,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Reading multiple entries from override")]
+        [Fact(DisplayName = "Config: Reading multiple entries from override")]
         void ReadMultiFromOverride() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.Good.cfg", resourceOverrideFileName: "RemoveMulti.cfg")) {
                 var list = new List<string>(Config.Read("Key2"));
@@ -342,7 +342,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Reading multi entries when override is not found")]
+        [Fact(DisplayName = "Config: Reading multi entries when override is not found")]
         void ReadMultiFromOverrideNotFound() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.Good.cfg", resourceOverrideFileName: "RemoveMulti.cfg")) {
                 var list = new List<string>(Config.Read("Key3"));
@@ -351,7 +351,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Multi-value write")]
+        [Fact(DisplayName = "Config: Multi-value write")]
         void MultiWrite() {
             using (var loader = new ConfigLoader(null, resourceFileNameGood: "WriteMulti.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
@@ -370,7 +370,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Multi-value replace")]
+        [Fact(DisplayName = "Config: Multi-value replace")]
         void MultiReplace() {
             using (var loader = new ConfigLoader("WriteMulti.cfg", resourceFileNameGood: "WriteMulti.Good.cfg")) {
                 Config.Write("Key2", new string[] { "Value 2a", "Value 2b", "Value 2c" });
@@ -387,7 +387,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Multi-value override is not written")]
+        [Fact(DisplayName = "Config: Multi-value override is not written")]
         void DontOverwriteOverrideMulti() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.Good.cfg", resourceOverrideFileName: "RemoveMulti.cfg")) {
                 Config.Write("Key2", "Value X");
@@ -400,7 +400,7 @@ namespace Test {
         }
 
 
-        [Fact(DisplayName = "Properties: Test conversion")]
+        [Fact(DisplayName = "Config: Test conversion")]
         void TestConversion() {
             using (var loader = new ConfigLoader(null, resourceFileNameGood: "WriteConverted.Good.cfg")) {
                 Config.Write("Integer", 42);
@@ -443,7 +443,7 @@ namespace Test {
             }
         }
 
-        [Fact(DisplayName = "Properties: Key whitespace reading and saving")]
+        [Fact(DisplayName = "Config: Key whitespace reading and saving")]
         void KeyWhitespace() {
             using (var loader = new ConfigLoader("KeyWhitespace.cfg", "KeyWhitespace.Good.cfg")) {
                 Config.Save();
@@ -526,7 +526,7 @@ namespace Test {
         }
 
         private static byte[] GetResourceStreamBytes(string fileName) {
-            var resStream = typeof(PropertiesTests).GetTypeInfo().Assembly.GetManifestResourceStream("Test.Resources.Config." + fileName);
+            var resStream = typeof(ConfigTests).GetTypeInfo().Assembly.GetManifestResourceStream("Test.Resources.Config." + fileName);
             var buffer = new byte[(int)resStream.Length];
             resStream.Read(buffer, 0, buffer.Length);
             return buffer;
