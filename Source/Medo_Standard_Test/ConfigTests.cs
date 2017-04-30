@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using Medo.Configuration;
 using Xunit;
 
@@ -32,7 +34,34 @@ namespace Test {
                 Assert.True(Config.Load(), "File should exist before load.");
                 Assert.True(Config.Save(), "Save should succeed.");
                 Assert.Equal(BitConverter.ToString(loader.Bytes), BitConverter.ToString(File.ReadAllBytes(loader.FileName)));
+                Assert.False(Config.IsAssumedInstalled);
             }
+        }
+
+        [Fact(DisplayName = "Config: Installation status assumption")]
+        void AssumeInstalled() {
+            Assert.False(Config.IsAssumedInstalled);
+
+            Config.Reset();
+
+            var userFileLocation = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? Path.Combine(Environment.GetEnvironmentVariable("AppData"), "", "Microsoft.TestHost", "Microsoft.TestHost.cfg")
+                : Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "~", "Microsoft.TestHost.cfg");
+
+            var userFileDirectory = Path.GetDirectoryName(userFileLocation);
+
+            try { //create empty file in AppData directory
+                if (!Directory.Exists(userFileDirectory)) { Directory.CreateDirectory(userFileDirectory); }
+                File.WriteAllText(userFileLocation, "");
+
+                Assert.True(Config.IsAssumedInstalled);
+            } finally {
+                if (Directory.Exists(userFileDirectory)) { Directory.Delete(userFileDirectory, true); }
+            }
+
+            Config.Reset();
+
+            Assert.False(Config.IsAssumedInstalled);
         }
 
 
@@ -98,6 +127,7 @@ namespace Test {
 
                 Config.Save();
                 Config.Write("Null", "\0Null\0");
+                Config.Save();
 
                 Assert.Equal(loader.GoodText, File.ReadAllText(loader.FileName));
             }
@@ -313,6 +343,8 @@ namespace Test {
         [Fact(DisplayName = "Config: Override is not written")]
         void DontOverwriteOverride() {
             using (var loader = new ConfigLoader("Replace.cfg", resourceOverrideFileName: "Replace.Good.cfg")) {
+                Config.ImmediateSave = true;
+
                 Config.Write("Key1", "XXX");
                 Assert.Equal("Value 1a", Config.Read("Key1", null));
                 Config.OverrideFileName = null;
@@ -357,6 +389,7 @@ namespace Test {
                 Config.Write("Key1", "Value 1");
                 Config.Write("Key2", new string[] { "Value 2a", "Value 2b", "Value 2c" });
                 Config.Write("Key3", "Value 3");
+                Config.Save();
                 Assert.Equal(loader.GoodText, File.ReadAllText(loader.FileName));
 
                 Assert.Equal("Value 1", Config.Read("Key1", null));
@@ -374,6 +407,7 @@ namespace Test {
         void MultiReplace() {
             using (var loader = new ConfigLoader("WriteMulti.cfg", resourceFileNameGood: "WriteMulti.Good.cfg")) {
                 Config.Write("Key2", new string[] { "Value 2a", "Value 2b", "Value 2c" });
+                Config.Save();
                 Assert.Equal(loader.GoodText, File.ReadAllText(loader.FileName));
 
                 Assert.Equal("Value 1", Config.Read("Key1", null));
@@ -420,6 +454,7 @@ namespace Test {
                 Config.Write("Double Infinity+", double.PositiveInfinity);
                 Config.Write("Double Infinity-", double.NegativeInfinity);
 
+                Config.Save();
                 Assert.Equal(loader.GoodText, File.ReadAllText(loader.FileName));
 
                 using (var loader2 = new ConfigLoader(loader.FileName, resourceFileNameGood: "WriteConverted.Good.cfg")) {
@@ -462,7 +497,22 @@ namespace Test {
         }
 
 
-        //TODO: Read multi with whitespace in key (\_)
+        [Fact(DisplayName = "Config: Delete all values")]
+        void DeleteAll() {
+            using (var loader = new ConfigLoader("WriteBasic.Good.cfg", "Empty.cfg")) {
+                Assert.Equal("Value 1", Config.Read("Key1", null));
+                Assert.Equal("Value 2", Config.Read("Key2", null));
+                Config.DeleteAll();
+
+                Assert.Equal(null, Config.Read("Key1", null));
+                Assert.Equal(null, Config.Read("Key2", null));
+
+                Assert.NotEqual(loader.GoodText, File.ReadAllText(loader.FileName)); //check that changes are not saved
+
+                Config.Save();
+                Assert.Equal(loader.GoodText, File.ReadAllText(loader.FileName)); //check that changes are saved
+            }
+        }
 
 
         #region Utils
@@ -474,6 +524,8 @@ namespace Test {
             public byte[] GoodBytes { get; }
 
             public ConfigLoader(string resourceFileName, string resourceFileNameGood = null, string resourceOverrideFileName = null) {
+                Config.Reset();
+
                 if (File.Exists(resourceFileName)) {
                     this.Bytes = File.ReadAllBytes(resourceFileName);
                 } else {
@@ -498,6 +550,8 @@ namespace Test {
                 } else {
                     Config.OverrideFileName = null;
                 }
+
+                Config.ImmediateSave = false;
             }
 
             private readonly Encoding Utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
