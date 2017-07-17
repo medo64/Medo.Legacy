@@ -372,6 +372,9 @@
       <Link>Windows\Forms\DateTimePicker [002].cs</Link>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="..\Medo\Windows\Forms\OpenFolderDialog.cs">
+      <Link>Windows\Forms\OpenFolderDialog.cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Windows\Forms\Hotkey [002].cs">
       <Link>Windows\Forms\Hotkey [002].cs</Link>
     </Compile>
