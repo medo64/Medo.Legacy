@@ -18,13 +18,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>Q:\Projects\Libraries\Medo\Binaries\netstandard1.6\</OutputPath>
-    <DocumentationFile>Q:\Projects\Libraries\Medo\Binaries\netstandard1.6\Medo16.xml</DocumentationFile>
+    <OutputPath>..\..\Binaries\</OutputPath>
+    <DocumentationFile>..\..\Binaries\netstandard1.6\Medo16.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>Q:\Projects\Libraries\Medo\Binaries\</OutputPath>
-    <DocumentationFile>Q:\Projects\Libraries\Medo\Binaries\netstandard1.6\Medo16.xml</DocumentationFile>
+    <OutputPath>..\..\Binaries\</OutputPath>
+    <DocumentationFile>..\..\Binaries\netstandard1.6\Medo16.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
