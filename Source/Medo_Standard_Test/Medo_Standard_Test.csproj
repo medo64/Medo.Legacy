@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>    
-    <TargetFramework>netcoreapp1.1</TargetFramework>    
+    <TargetFramework>netcoreapp2.0</TargetFramework>    
     <RootNamespace>Test</RootNamespace>    
     <SignAssembly>True</SignAssembly>    
     <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
@@ -12,6 +12,14 @@
     <Company>Josip Medved</Company>
     <AssemblyName>MedoTest</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Twofish\CBC_D_M.TXT" />
+    <None Remove="Resources\Twofish\CBC_E_M.TXT" />
+    <None Remove="Resources\Twofish\ECB_D_M.TXT" />
+    <None Remove="Resources\Twofish\ECB_E_M.TXT" />
+    <None Remove="Resources\Twofish\ECB_TBL.TXT" />
+  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\Config\KeyWhitespace.Good.cfg" />
@@ -50,6 +58,11 @@
     <EmbeddedResource Include="Resources\Config\WriteNoEmptyLine.Good.cfg" />
     <EmbeddedResource Include="Resources\Config\WriteNoEmptyLine.cfg" />
     <EmbeddedResource Include="Resources\Config\WriteBasic.Good.cfg" />
+    <EmbeddedResource Include="Resources\Twofish\CBC_D_M.TXT" />
+    <EmbeddedResource Include="Resources\Twofish\CBC_E_M.TXT" />
+    <EmbeddedResource Include="Resources\Twofish\ECB_D_M.TXT" />
+    <EmbeddedResource Include="Resources\Twofish\ECB_E_M.TXT" />
+    <EmbeddedResource Include="Resources\Twofish\ECB_TBL.TXT" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,7 +76,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Medo_Standard_16\Medo_Standard_16.csproj" />
+    <ProjectReference Include="..\Medo_Standard_20\Medo_Standard_20.csproj" />
   </ItemGroup>
 
   <ItemGroup>
