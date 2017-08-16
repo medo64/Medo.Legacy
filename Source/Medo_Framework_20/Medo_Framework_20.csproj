@@ -246,8 +246,8 @@
     <Compile Include="..\Medo\Security\Cryptography\Sha1 [001].cs">
       <Link>Security\Cryptography\Sha1 [001].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Security\Cryptography\Twofish [002].cs">
-      <Link>Security\Cryptography\Twofish [002].cs</Link>
+    <Compile Include="..\Medo\Security\Cryptography\Twofish [002 F20].cs">
+      <Link>Security\Cryptography\Twofish [002 F20].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Security\Principal\Impersonation [002].cs">
       <Link>Security\Principal\Impersonation [002].cs</Link>
