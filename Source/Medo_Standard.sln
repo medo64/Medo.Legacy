@@ -1,10 +1,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo_Standard_16", "Medo_Standard_16\Medo_Standard_16.csproj", "{9E18EAE4-1526-446E-A0DA-B83840060B76}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Medo_Standard_Test", "Medo_Standard_Test\Medo_Standard_Test.csproj", "{5ED0576E-3C52-4728-9912-8CFC0DFD500A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo_Standard_20", "Medo_Standard_20\Medo_Standard_20.csproj", "{6C0593D5-7739-4E83-92FC-A5C5C3F6C733}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,8 +22,15 @@ Global
 		{5ED0576E-3C52-4728-9912-8CFC0DFD500A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5ED0576E-3C52-4728-9912-8CFC0DFD500A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5ED0576E-3C52-4728-9912-8CFC0DFD500A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C0593D5-7739-4E83-92FC-A5C5C3F6C733}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C0593D5-7739-4E83-92FC-A5C5C3F6C733}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C0593D5-7739-4E83-92FC-A5C5C3F6C733}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C0593D5-7739-4E83-92FC-A5C5C3F6C733}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B58A3332-F2F4-429B-A3A8-0A089A98207F}
 	EndGlobalSection
 EndGlobal

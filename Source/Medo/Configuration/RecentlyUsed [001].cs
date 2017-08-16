@@ -240,7 +240,7 @@ namespace Medo.Configuration {
         }
 
 
-#if NETSTANDARD1_6
+#if NETSTANDARD1_6 || NETSTANDARD2_0
         private static bool HideExtension {
             get { return false; }
         }

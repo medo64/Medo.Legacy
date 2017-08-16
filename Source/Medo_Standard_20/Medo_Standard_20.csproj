@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Medo</RootNamespace>
+    <Version>1.6.0</Version>
+    <PackageId>Medo-20</PackageId>
+    <Authors>Josip Medved &lt;jmedved@jmedved.com&gt;</Authors>
+    <Company>Josip Medved</Company>
+    <Product>Medo</Product>
+    <Copyright>Copyright 2017 by Josip Medved &lt;jmedved@jmedved.com&gt;</Copyright>
+    <PackageProjectUrl>https://www.medo64.com/medo/</PackageProjectUrl>
+    <Description>Common functions assembly.</Description>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>Properties\App.snk</AssemblyOriginatorKeyFile>
+    <AssemblyName>Medo20</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\..\Binaries\</OutputPath>
+    <DocumentationFile>..\..\Binaries\netstandard2.0\Medo20.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\Binaries\</OutputPath>
+    <DocumentationFile>..\..\Binaries\netstandard2.0\Medo20.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Medo\Configuration\Config [003].cs" Link="Configuration\Config [003].cs" />
+    <Compile Include="..\Medo\Configuration\RecentlyUsed [001].cs" Link="Configuration\RecentlyUsed [001].cs" />
+    <Compile Include="..\Medo\Security\Checksum\Fletcher16 [001].cs" Link="Security\Checksum\Fletcher16 [001].cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+    <Folder Include="Security\Checksum\" />
+  </ItemGroup>
+
+</Project>
