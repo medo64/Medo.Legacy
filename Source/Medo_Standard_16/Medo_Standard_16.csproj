@@ -32,11 +32,13 @@
     <Compile Include="..\Medo\Configuration\RecentlyUsed [001].cs" Link="Configuration\RecentlyUsed [001].cs" />
     <Compile Include="..\Medo\Security\Checksum\Damm [001].cs" Link="Security\Checksum\Damm [001].cs" />
     <Compile Include="..\Medo\Security\Checksum\Fletcher16 [001].cs" Link="Security\Checksum\Fletcher16 [001].cs" />
+    <Compile Include="..\Medo\Security\Cryptography\OneTimePassword [002].cs" Link="Security\Cryptography\OneTimePassword [002].cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Configuration\" />
     <Folder Include="Security\Checksum\" />
+    <Folder Include="Security\Cryptography\" />
   </ItemGroup>
 
 </Project>

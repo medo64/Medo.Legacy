@@ -33,6 +33,7 @@
     <Compile Include="..\Medo\Net\TrivialNtpClient [001].cs" Link="Net\TrivialNtpClient [001].cs" />
     <Compile Include="..\Medo\Security\Checksum\Damm [001].cs" Link="Security\Checksum\Damm [001].cs" />
     <Compile Include="..\Medo\Security\Checksum\Fletcher16 [001].cs" Link="Security\Checksum\Fletcher16 [001].cs" />
+    <Compile Include="..\Medo\Security\Cryptography\OneTimePassword [002].cs" Link="Security\Cryptography\OneTimePassword [002].cs" />
     <Compile Include="..\Medo\Security\Cryptography\Twofish [003].cs" Link="Security\Cryptography\Twofish [003].cs" />
   </ItemGroup>
 
