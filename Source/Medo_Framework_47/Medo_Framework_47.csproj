@@ -277,6 +277,9 @@
     <Compile Include="..\Medo\Net\TinyMessage [013].cs">
       <Link>Net\TinyMessage [013].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Net\TrivialNtpClient [001].cs">
+      <Link>Net\TrivialNtpClient [001].cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Net\WakeOnLan [006].cs">
       <Link>Net\WakeOnLan [006].cs</Link>
     </Compile>
