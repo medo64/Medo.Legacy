@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Medo\Configuration\Config [003].cs" Link="Configuration\Config [003].cs" />
+    <Compile Include="..\Medo\Configuration\Config [004].cs" Link="Configuration\Config [004].cs" />
     <Compile Include="..\Medo\Configuration\RecentlyUsed [001].cs" Link="Configuration\RecentlyUsed [001].cs" />
     <Compile Include="..\Medo\Net\TrivialNtpClient [001].cs" Link="Net\TrivialNtpClient [001].cs" />
     <Compile Include="..\Medo\Security\Checksum\Damm [001].cs" Link="Security\Checksum\Damm [001].cs" />
