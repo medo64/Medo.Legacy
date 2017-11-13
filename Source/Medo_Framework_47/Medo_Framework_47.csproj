@@ -355,6 +355,9 @@
     <Compile Include="..\Medo\Web\GData\GDataClientLogin [002].cs">
       <Link>Web\GData\GDataClientLogin [002].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Win32\LowLevelKeyboardHook [001].cs">
+      <Link>Win32\LowLevelKeyboardHook [001].cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Windows\AboutWindow [003].cs">
       <Link>Windows\AboutWindow [003].cs</Link>
     </Compile>
