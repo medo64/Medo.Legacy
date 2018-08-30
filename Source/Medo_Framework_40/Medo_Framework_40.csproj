@@ -142,6 +142,9 @@
     <Compile Include="..\Medo\Data\UpdateCommand [005].cs">
       <Link>Data\UpdateCommand [005].cs</Link>
     </Compile>
+    <Compile Include="..\Medo\Device\Cananka [001].cs">
+      <Link>Device\Cananka [001].cs</Link>
+    </Compile>
     <Compile Include="..\Medo\Device\Elsidi [007].cs">
       <Link>Device\Elsidi [007].cs</Link>
     </Compile>
