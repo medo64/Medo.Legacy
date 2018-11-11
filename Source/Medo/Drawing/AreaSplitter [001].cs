@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-04-09: First version.
 
@@ -38,9 +38,10 @@ namespace Medo.Drawing {
 				}
 			}
 
-			AreaSplitter area = new AreaSplitter();
-			area._rectangles = rects.ToArray();
-			return area;
+            AreaSplitter area = new AreaSplitter {
+                _rectangles = rects.ToArray()
+            };
+            return area;
 		}
 
 		private RectangleF[] _rectangles;
@@ -49,7 +50,7 @@ namespace Medo.Drawing {
         /// Gets number of items.
         /// </summary>
 		public int Count {
-			get { return this._rectangles.Length; }
+			get { return _rectangles.Length; }
 		}
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace Medo.Drawing {
         /// <param name="index">Index of item to retrieve.</param>
         /// <returns></returns>
 		public RectangleF this[int index] {
-			get { return this._rectangles[index]; }
+			get { return _rectangles[index]; }
 		}
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace Medo.Drawing {
         /// </summary>
         /// <param name="index">Index of item to retrieve.</param>
         public Rectangle GetRectangle(int index) {
-            return new Rectangle((int)this._rectangles[index].Left, (int)this._rectangles[index].Top, (int)this._rectangles[index].Width, (int)this._rectangles[index].Height);
+            return new Rectangle((int)_rectangles[index].Left, (int)_rectangles[index].Top, (int)_rectangles[index].Width, (int)_rectangles[index].Height);
         }
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace Medo.Drawing {
         /// </summary>
         /// <param name="index">Index of item to retrieve.</param>
         public RectangleF GetRectangleF(int index) {
-            return this._rectangles[index];
+            return _rectangles[index];
         }
 
 	}

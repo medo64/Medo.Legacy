@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2017-08-15: Replacing ThreadStatic with Lazy<RandomNumberGenerator>.
 //2016-01-08: Added ANSIX923 and ISO10126 padding modes.
@@ -42,13 +42,13 @@ namespace Medo.Security.Cryptography {
         /// <param name="rgbIV">The IV to be used for the symmetric algorithm.</param>
         public override ICryptoTransform CreateDecryptor(byte[] rgbKey, byte[] rgbIV) {
             if (rgbKey == null) { throw new ArgumentNullException("rgbKey", "Key cannot be null."); }
-            if (rgbKey.Length != this.KeySize / 8) { throw new ArgumentOutOfRangeException("rgbKey", "Key size mismatch."); }
-            if (this.Mode == CipherMode.CBC) {
+            if (rgbKey.Length != KeySize / 8) { throw new ArgumentOutOfRangeException("rgbKey", "Key size mismatch."); }
+            if (Mode == CipherMode.CBC) {
                 if (rgbIV == null) { throw new ArgumentNullException("rgbIV", "IV cannot be null."); }
                 if (rgbIV.Length != 16) { throw new ArgumentOutOfRangeException("rgbIV", "Invalid IV size."); }
             }
 
-            return NewEncryptor(rgbKey, this.Mode, rgbIV, TwofishManagedTransformMode.Decrypt);
+            return NewEncryptor(rgbKey, Mode, rgbIV, TwofishManagedTransformMode.Decrypt);
         }
 
         /// <summary>
@@ -58,29 +58,29 @@ namespace Medo.Security.Cryptography {
         /// <param name="rgbIV">The IV to be used for the symmetric algorithm.</param>
         public override ICryptoTransform CreateEncryptor(byte[] rgbKey, byte[] rgbIV) {
             if (rgbKey == null) { throw new ArgumentNullException("rgbKey", "Key cannot be null."); }
-            if (rgbKey.Length != this.KeySize / 8) { throw new ArgumentOutOfRangeException("rgbKey", "Key size mismatch."); }
-            if (this.Mode == CipherMode.CBC) {
+            if (rgbKey.Length != KeySize / 8) { throw new ArgumentOutOfRangeException("rgbKey", "Key size mismatch."); }
+            if (Mode == CipherMode.CBC) {
                 if (rgbIV == null) { throw new ArgumentNullException("rgbIV", "IV cannot be null."); }
                 if (rgbIV.Length != 16) { throw new ArgumentOutOfRangeException("rgbIV", "Invalid IV size."); }
             }
 
-            return NewEncryptor(rgbKey, this.Mode, rgbIV, TwofishManagedTransformMode.Encrypt);
+            return NewEncryptor(rgbKey, Mode, rgbIV, TwofishManagedTransformMode.Encrypt);
         }
 
         /// <summary>
         /// Generates a random initialization vector to be used for the algorithm.
         /// </summary>
         public override void GenerateIV() {
-            this.IVValue = new byte[this.FeedbackSizeValue / 8];
-            Rng.Value.GetBytes(this.IVValue);
+            IVValue = new byte[FeedbackSizeValue / 8];
+            Rng.Value.GetBytes(IVValue);
         }
 
         /// <summary>
         /// Generates a random key to be used for the algorithm.
         /// </summary>
         public override void GenerateKey() {
-            this.KeyValue = new byte[this.KeySizeValue / 8];
-            Rng.Value.GetBytes(this.KeyValue);
+            KeyValue = new byte[KeySizeValue / 8];
+            Rng.Value.GetBytes(KeyValue);
         }
 
 
@@ -123,16 +123,16 @@ namespace Medo.Security.Cryptography {
 
         private ICryptoTransform NewEncryptor(byte[] rgbKey, CipherMode mode, byte[] rgbIV, TwofishManagedTransformMode encryptMode) {
             if (rgbKey == null) {
-                rgbKey = new byte[this.KeySize / 8];
+                rgbKey = new byte[KeySize / 8];
                 Rng.Value.GetBytes(rgbKey);
             }
 
             if ((mode != CipherMode.ECB) && (rgbIV == null)) {
-                rgbIV = new byte[this.KeySize / 8];
+                rgbIV = new byte[KeySize / 8];
                 Rng.Value.GetBytes(rgbIV);
             }
 
-            return new TwofishManagedTransform(rgbKey, mode, rgbIV, encryptMode, this.Padding);
+            return new TwofishManagedTransform(rgbKey, mode, rgbIV, encryptMode, Padding);
         }
 
         #endregion
@@ -146,8 +146,8 @@ namespace Medo.Security.Cryptography {
     /// </summary>
     public sealed class TwofishManagedTransform : ICryptoTransform {
         internal TwofishManagedTransform(byte[] key, CipherMode mode, byte[] iv, TwofishManagedTransformMode transformMode, PaddingMode paddingMode) {
-            this.TransformMode = transformMode;
-            this.PaddingMode = paddingMode;
+            TransformMode = transformMode;
+            PaddingMode = paddingMode;
 
             var key32 = new uint[key.Length / 4];
             Buffer.BlockCopy(key, 0, key32, 0, key.Length);
@@ -155,9 +155,9 @@ namespace Medo.Security.Cryptography {
             if (iv != null) {
                 var iv32 = new uint[iv.Length / 4];
                 Buffer.BlockCopy(iv, 0, iv32, 0, iv.Length);
-                this.Implementation = new TwofishImplementation(key32, iv32, mode);
+                Implementation = new TwofishImplementation(key32, iv32, mode);
             } else {
-                this.Implementation = new TwofishImplementation(key32, null, mode);
+                Implementation = new TwofishImplementation(key32, null, mode);
             }
         }
 
@@ -192,13 +192,13 @@ namespace Medo.Security.Cryptography {
         /// Releases resources.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
         }
 
         private void Dispose(bool disposing) {
             if (disposing) {
-                this.Implementation.Dispose();
-                if (this.PaddingBuffer != null) { Array.Clear(this.PaddingBuffer, 0, this.PaddingBuffer.Length); }
+                Implementation.Dispose();
+                if (PaddingBuffer != null) { Array.Clear(PaddingBuffer, 0, PaddingBuffer.Length); }
             }
         }
 
@@ -226,12 +226,12 @@ namespace Medo.Security.Cryptography {
             if (outputBuffer == null) { throw new ArgumentNullException("outputBuffer", "Output buffer cannot be null."); }
             if (outputOffset + inputCount > outputBuffer.Length) { throw new ArgumentOutOfRangeException("outputOffset", "Insufficient buffer."); }
 
-            if (this.TransformMode == TwofishManagedTransformMode.Encrypt) {
+            if (TransformMode == TwofishManagedTransformMode.Encrypt) {
 
                 #region Encrypt
 
                 for (var i = 0; i < inputCount; i += 16) {
-                    this.Implementation.BlockEncrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset + i);
+                    Implementation.BlockEncrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset + i);
                 }
                 return inputCount;
 
@@ -243,24 +243,24 @@ namespace Medo.Security.Cryptography {
 
                 var bytesWritten = 0;
 
-                if (this.PaddingBuffer != null) {
-                    this.Implementation.BlockDecrypt(this.PaddingBuffer, 0, outputBuffer, outputOffset);
+                if (PaddingBuffer != null) {
+                    Implementation.BlockDecrypt(PaddingBuffer, 0, outputBuffer, outputOffset);
                     outputOffset += 16;
                     bytesWritten += 16;
                 }
 
                 for (var i = 0; i < inputCount - 16; i += 16) {
-                    this.Implementation.BlockDecrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset);
+                    Implementation.BlockDecrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset);
                     outputOffset += 16;
                     bytesWritten += 16;
                 }
 
-                if (this.PaddingMode == PaddingMode.None) {
-                    this.Implementation.BlockDecrypt(inputBuffer, inputOffset + inputCount - 16, outputBuffer, outputOffset);
+                if (PaddingMode == PaddingMode.None) {
+                    Implementation.BlockDecrypt(inputBuffer, inputOffset + inputCount - 16, outputBuffer, outputOffset);
                     bytesWritten += 16;
                 } else { //save last block without processing because decryption otherwise cannot detect padding in CryptoStream
-                    if (this.PaddingBuffer == null) { this.PaddingBuffer = new byte[16]; }
-                    Buffer.BlockCopy(inputBuffer, inputOffset + inputCount - 16, this.PaddingBuffer, 0, 16);
+                    if (PaddingBuffer == null) { PaddingBuffer = new byte[16]; }
+                    Buffer.BlockCopy(inputBuffer, inputOffset + inputCount - 16, PaddingBuffer, 0, 16);
                 }
 
                 return bytesWritten;
@@ -282,14 +282,14 @@ namespace Medo.Security.Cryptography {
             if ((inputCount < 0) || (inputCount > inputBuffer.Length)) { throw new ArgumentOutOfRangeException("inputCount", "Invalid input count."); }
             if ((inputBuffer.Length - inputCount) < inputOffset) { throw new ArgumentOutOfRangeException("inputCount", "Invalid input length."); }
 
-            if (this.TransformMode == TwofishManagedTransformMode.Encrypt) {
+            if (TransformMode == TwofishManagedTransformMode.Encrypt) {
 
                 #region Encrypt
 
                 int paddedLength;
                 byte[] paddedInputBuffer;
                 int paddedInputOffset;
-                if (this.PaddingMode == PaddingMode.PKCS7) {
+                if (PaddingMode == PaddingMode.PKCS7) {
                     paddedLength = inputCount / 16 * 16 + 16; //to round to next whole block
                     paddedInputBuffer = new byte[paddedLength];
                     paddedInputOffset = 0;
@@ -298,18 +298,18 @@ namespace Medo.Security.Cryptography {
                     for (var i = inputCount; i < inputCount + added; i++) {
                         paddedInputBuffer[i] = added;
                     }
-                } else if (this.PaddingMode == PaddingMode.Zeros) {
+                } else if (PaddingMode == PaddingMode.Zeros) {
                     paddedLength = (inputCount + 15) / 16 * 16; //to round to next whole block
                     paddedInputBuffer = new byte[paddedLength];
                     paddedInputOffset = 0;
                     Buffer.BlockCopy(inputBuffer, inputOffset, paddedInputBuffer, 0, inputCount);
-                } else if (this.PaddingMode == PaddingMode.ANSIX923) {
+                } else if (PaddingMode == PaddingMode.ANSIX923) {
                     paddedLength = inputCount / 16 * 16 + 16; //to round to next whole block
                     paddedInputBuffer = new byte[paddedLength];
                     paddedInputOffset = 0;
                     Buffer.BlockCopy(inputBuffer, inputOffset, paddedInputBuffer, 0, inputCount);
                     paddedInputBuffer[paddedInputBuffer.Length - 1] = (byte)(paddedLength - inputCount);
-                } else if (this.PaddingMode == PaddingMode.ISO10126) {
+                } else if (PaddingMode == PaddingMode.ISO10126) {
                     paddedLength = inputCount / 16 * 16 + 16; //to round to next whole block
                     paddedInputBuffer = new byte[paddedLength];
                     Rng.GetBytes(paddedInputBuffer);
@@ -326,7 +326,7 @@ namespace Medo.Security.Cryptography {
                 var outputBuffer = new byte[paddedLength];
 
                 for (var i = 0; i < paddedLength; i += 16) {
-                    this.Implementation.BlockEncrypt(paddedInputBuffer, paddedInputOffset + i, outputBuffer, i);
+                    Implementation.BlockEncrypt(paddedInputBuffer, paddedInputOffset + i, outputBuffer, i);
                 }
 
                 return outputBuffer;
@@ -339,19 +339,19 @@ namespace Medo.Security.Cryptography {
 
                 if (inputCount % 16 != 0) { throw new ArgumentOutOfRangeException("inputCount", "Invalid input count."); }
 
-                var outputBuffer = new byte[inputCount + ((this.PaddingBuffer != null) ? 16 : 0)];
+                var outputBuffer = new byte[inputCount + ((PaddingBuffer != null) ? 16 : 0)];
                 var outputOffset = 0;
 
-                if (this.PaddingBuffer != null) { //process leftover padding buffer to keep CryptoStream happy
-                    this.Implementation.BlockDecrypt(this.PaddingBuffer, 0, outputBuffer, 0);
+                if (PaddingBuffer != null) { //process leftover padding buffer to keep CryptoStream happy
+                    Implementation.BlockDecrypt(PaddingBuffer, 0, outputBuffer, 0);
                     outputOffset = 16;
                 }
 
                 for (var i = 0; i < inputCount; i += 16) {
-                    this.Implementation.BlockDecrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset + i);
+                    Implementation.BlockDecrypt(inputBuffer, inputOffset + i, outputBuffer, outputOffset + i);
                 }
 
-                return RemovePadding(outputBuffer, this.PaddingMode);
+                return RemovePadding(outputBuffer, PaddingMode);
 
                 #endregion
 
@@ -407,21 +407,21 @@ namespace Medo.Security.Cryptography {
         private class TwofishImplementation : IDisposable {
 
             public TwofishImplementation(uint[] key, uint[] iv, CipherMode cipherMode) {
-                this.Key = new DWord[key.Length];
-                for (var i = 0; i < this.Key.Length; i++) {
-                    this.Key[i] = (DWord)key[i];
+                Key = new DWord[key.Length];
+                for (var i = 0; i < Key.Length; i++) {
+                    Key[i] = (DWord)key[i];
                 }
 
                 if (iv != null) {
-                    this.IV = new DWord[iv.Length];
-                    for (var i = 0; i < this.IV.Length; i++) {
-                        this.IV[i] = (DWord)iv[i];
+                    IV = new DWord[iv.Length];
+                    for (var i = 0; i < IV.Length; i++) {
+                        IV[i] = (DWord)iv[i];
                     }
                 }
 
-                this.CipherMode = cipherMode;
+                CipherMode = cipherMode;
 
-                this.ReKey();
+                ReKey();
             }
 
             private readonly DWord[] Key;
@@ -442,10 +442,10 @@ namespace Medo.Security.Cryptography {
 
 
             public void Dispose() {
-                Array.Clear(this.Key, 0, this.Key.Length);
-                if (this.IV != null) { Array.Clear(this.IV, 0, this.IV.Length); }
-                Array.Clear(this.SBoxKeys, 0, this.SBoxKeys.Length);
-                Array.Clear(this.SubKeys, 0, this.SubKeys.Length);
+                Array.Clear(Key, 0, Key.Length);
+                if (IV != null) { Array.Clear(IV, 0, IV.Length); }
+                Array.Clear(SBoxKeys, 0, SBoxKeys.Length);
+                Array.Clear(SubKeys, 0, SubKeys.Length);
             }
 
 
@@ -461,24 +461,24 @@ namespace Medo.Security.Cryptography {
             private void ReKey() {
                 BuildMds(); //built only first time it is accessed
 
-                var k32e = new DWord[this.Key.Length / 2];
-                var k32o = new DWord[this.Key.Length / 2]; //even/odd key dwords
+                var k32e = new DWord[Key.Length / 2];
+                var k32o = new DWord[Key.Length / 2]; //even/odd key dwords
 
-                var k64Cnt = this.Key.Length / 2;
+                var k64Cnt = Key.Length / 2;
                 for (var i = 0; i < k64Cnt; i++) { //split into even/odd key dwords
-                    k32e[i] = this.Key[2 * i];
-                    k32o[i] = this.Key[2 * i + 1];
-                    this.SBoxKeys[k64Cnt - 1 - i] = ReedSolomonMdsEncode(k32e[i], k32o[i]); //compute S-box keys using (12,8) Reed-Solomon code over GF(256)
+                    k32e[i] = Key[2 * i];
+                    k32o[i] = Key[2 * i + 1];
+                    SBoxKeys[k64Cnt - 1 - i] = ReedSolomonMdsEncode(k32e[i], k32o[i]); //compute S-box keys using (12,8) Reed-Solomon code over GF(256)
                 }
 
                 int subkeyCnt = RoundSubkeys + 2 * Rounds;
-                var keyLen = this.Key.Length * 4 * 8;
+                var keyLen = Key.Length * 4 * 8;
                 for (var i = 0; i < subkeyCnt / 2; i++) { //compute round subkeys for PHT
                     var A = F32((DWord)(i * SubkeyStep), k32e, keyLen); //A uses even key dwords
                     var B = F32((DWord)(i * SubkeyStep + SubkeyBump), k32o, keyLen);   //B uses odd  key dwords
                     B = RotateLeft(B, 8);
-                    this.SubKeys[2 * i] = A + B; //combine with a PHT
-                    this.SubKeys[2 * i + 1] = RotateLeft(A + 2 * B, SubkeyRotateLeft);
+                    SubKeys[2 * i] = A + B; //combine with a PHT
+                    SubKeys[2 * i + 1] = RotateLeft(A + 2 * B, SubkeyRotateLeft);
                 }
             }
 
@@ -493,18 +493,18 @@ namespace Medo.Security.Cryptography {
             internal void BlockEncrypt(byte[] inputBuffer, int inputOffset, byte[] outputBuffer, int outputBufferOffset) {
                 var x = new DWord[BlockSize / 32];
                 for (var i = 0; i < BlockSize / 32; i++) { //copy in the block, add whitening
-                    x[i] = new DWord(inputBuffer, inputOffset + i * 4) ^ this.SubKeys[InputWhiten + i];
-                    if (this.CipherMode == CipherMode.CBC) { x[i] ^= this.IV[i]; }
+                    x[i] = new DWord(inputBuffer, inputOffset + i * 4) ^ SubKeys[InputWhiten + i];
+                    if (CipherMode == CipherMode.CBC) { x[i] ^= IV[i]; }
                 }
 
-                var keyLen = this.Key.Length * 4 * 8;
+                var keyLen = Key.Length * 4 * 8;
                 for (var r = 0; r < Rounds; r++) { //main Twofish encryption loop
-                    var t0 = F32(x[0], this.SBoxKeys, keyLen);
-                    var t1 = F32(RotateLeft(x[1], 8), this.SBoxKeys, keyLen);
+                    var t0 = F32(x[0], SBoxKeys, keyLen);
+                    var t1 = F32(RotateLeft(x[1], 8), SBoxKeys, keyLen);
 
                     x[3] = RotateLeft(x[3], 1);
-                    x[2] ^= t0 + t1 + this.SubKeys[RoundSubkeys + 2 * r]; //PHT, round keys
-                    x[3] ^= t0 + 2 * t1 + this.SubKeys[RoundSubkeys + 2 * r + 1];
+                    x[2] ^= t0 + t1 + SubKeys[RoundSubkeys + 2 * r]; //PHT, round keys
+                    x[3] ^= t0 + 2 * t1 + SubKeys[RoundSubkeys + 2 * r + 1];
                     x[2] = RotateRight(x[2], 1);
 
                     if (r < Rounds - 1) { //swap for next round
@@ -514,12 +514,12 @@ namespace Medo.Security.Cryptography {
                 }
 
                 for (var i = 0; i < BlockSize / 32; i++) { //copy out, with whitening
-                    var outValue = x[i] ^ this.SubKeys[OutputWhiten + i];
+                    var outValue = x[i] ^ SubKeys[OutputWhiten + i];
                     outputBuffer[outputBufferOffset + i * 4 + 0] = outValue.B0;
                     outputBuffer[outputBufferOffset + i * 4 + 1] = outValue.B1;
                     outputBuffer[outputBufferOffset + i * 4 + 2] = outValue.B2;
                     outputBuffer[outputBufferOffset + i * 4 + 3] = outValue.B3;
-                    if (this.CipherMode == CipherMode.CBC) { this.IV[i] = outValue; }
+                    if (CipherMode == CipherMode.CBC) { IV[i] = outValue; }
                 }
             }
 
@@ -531,17 +531,17 @@ namespace Medo.Security.Cryptography {
                 var input = new DWord[BlockSize / 32];
                 for (var i = 0; i < BlockSize / 32; i++) { //copy in the block, add whitening
                     input[i] = new DWord(inputBuffer, inputOffset + i * 4);
-                    x[i] = input[i] ^ this.SubKeys[OutputWhiten + i];
+                    x[i] = input[i] ^ SubKeys[OutputWhiten + i];
                 }
 
-                var keyLen = this.Key.Length * 4 * 8;
+                var keyLen = Key.Length * 4 * 8;
                 for (var r = Rounds - 1; r >= 0; r--) { //main Twofish decryption loop
-                    var t0 = F32(x[0], this.SBoxKeys, keyLen);
-                    var t1 = F32(RotateLeft(x[1], 8), this.SBoxKeys, keyLen);
+                    var t0 = F32(x[0], SBoxKeys, keyLen);
+                    var t1 = F32(RotateLeft(x[1], 8), SBoxKeys, keyLen);
 
                     x[2] = RotateLeft(x[2], 1);
-                    x[2] ^= t0 + t1 + this.SubKeys[RoundSubkeys + 2 * r]; //PHT, round keys
-                    x[3] ^= t0 + 2 * t1 + this.SubKeys[RoundSubkeys + 2 * r + 1];
+                    x[2] ^= t0 + t1 + SubKeys[RoundSubkeys + 2 * r]; //PHT, round keys
+                    x[3] ^= t0 + 2 * t1 + SubKeys[RoundSubkeys + 2 * r + 1];
                     x[3] = RotateRight(x[3], 1);
 
                     if (r > 0) { //unswap, except for last round
@@ -551,8 +551,8 @@ namespace Medo.Security.Cryptography {
                 }
 
                 for (var i = 0; i < BlockSize / 32; i++) { //copy out, with whitening
-                    x[i] ^= this.SubKeys[InputWhiten + i];
-                    if (this.CipherMode == CipherMode.CBC) {
+                    x[i] ^= SubKeys[InputWhiten + i];
+                    if (CipherMode == CipherMode.CBC) {
                         x[i] ^= IV[i];
                         IV[i] = input[i];
                     }
@@ -604,28 +604,28 @@ namespace Medo.Security.Cryptography {
             }
 
 
-            private static uint P_01 = 0;
-            private static uint P_02 = 0;
-            private static uint P_03 = (P_01 ^ 1); //"extend" to larger key sizes
-            private static uint P_04 = 1;
+            private static readonly uint P_01 = 0;
+            private static readonly uint P_02 = 0;
+            private static readonly uint P_03 = (P_01 ^ 1); //"extend" to larger key sizes
+            private static readonly uint P_04 = 1;
 
-            private static uint P_11 = 0;
-            private static uint P_12 = 1;
-            private static uint P_13 = (P_11 ^ 1);
-            private static uint P_14 = 0;
+            private static readonly uint P_11 = 0;
+            private static readonly uint P_12 = 1;
+            private static readonly uint P_13 = (P_11 ^ 1);
+            private static readonly uint P_14 = 0;
 
-            private static uint P_21 = 1;
-            private static uint P_22 = 0;
-            private static uint P_23 = (P_21 ^ 1);
-            private static uint P_24 = 0;
+            private static readonly uint P_21 = 1;
+            private static readonly uint P_22 = 0;
+            private static readonly uint P_23 = (P_21 ^ 1);
+            private static readonly uint P_24 = 0;
 
-            private static uint P_31 = 1;
-            private static uint P_32 = 1;
-            private static uint P_33 = (P_31 ^ 1);
-            private static uint P_34 = 1;
+            private static readonly uint P_31 = 1;
+            private static readonly uint P_32 = 1;
+            private static readonly uint P_33 = (P_31 ^ 1);
+            private static readonly uint P_34 = 1;
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Member", Justification = "Multidimensional array does not waste space.")]
-            private static byte[,] P8x8 = {
+            private static readonly byte[,] P8x8 = {
                                             {
                                                 0xA9, 0x67, 0xB3, 0xE8, 0x04, 0xFD, 0xA3, 0x76,
                                                 0x9A, 0x92, 0x80, 0x78, 0xE4, 0xDD, 0xD1, 0x38,
@@ -697,7 +697,7 @@ namespace Medo.Security.Cryptography {
                                           };
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Member", Justification = "Multidimensional array does not waste space.")]
-            private static DWord[,] MdsTable = new DWord[4, 256];
+            private static readonly DWord[,] MdsTable = new DWord[4, 256];
             private static bool MdsTableBuilt = false;
             private static readonly object BuildMdsSyncLock = new object();
 
@@ -819,14 +819,14 @@ namespace Medo.Security.Cryptography {
                 private uint Value;
 
                 private DWord(uint value) : this() {
-                    this.Value = value;
+                    Value = value;
                 }
 
                 internal DWord(byte[] buffer, int offset) : this() {
-                    this.B0 = buffer[offset + 0];
-                    this.B1 = buffer[offset + 1];
-                    this.B2 = buffer[offset + 2];
-                    this.B3 = buffer[offset + 3];
+                    B0 = buffer[offset + 0];
+                    B1 = buffer[offset + 1];
+                    B2 = buffer[offset + 2];
+                    B3 = buffer[offset + 3];
                 }
 
 

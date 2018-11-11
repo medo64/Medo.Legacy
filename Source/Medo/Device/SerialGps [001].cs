@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2015-03-16: Initial version.
 
@@ -43,20 +43,21 @@ namespace Medo.Device {
             portName = portName.Trim();
             foreach (var systemPortName in SerialPort.GetPortNames()) { //match system casing
                 if (string.Equals(portName, systemPortName, StringComparison.OrdinalIgnoreCase)) {
-                    this.PortName = systemPortName;
+                    PortName = systemPortName;
                     foundPort = true;
                     break;
                 }
             }
             if (!foundPort) { throw new ArgumentOutOfRangeException("portName", "Invalid port parameters."); }
 
-            this.SerialPort = new SerialPort(this.PortName, baudRate, Parity.None, 8, StopBits.One);
-            this.SerialPort.Encoding = ASCIIEncoding.ASCII;
-            this.SerialPort.NewLine = "\n";
-            this.SerialPort.ReadTimeout = 2500;
-            this.SerialPort.WriteTimeout = 1000;
-            this.SerialPort.DtrEnable = true;
-            this.SerialPort.RtsEnable = true;
+            SerialPort = new SerialPort(PortName, baudRate, Parity.None, 8, StopBits.One) {
+                Encoding = ASCIIEncoding.ASCII,
+                NewLine = "\n",
+                ReadTimeout = 2500,
+                WriteTimeout = 1000,
+                DtrEnable = true,
+                RtsEnable = true
+            };
         }
 
 
@@ -74,27 +75,27 @@ namespace Medo.Device {
         /// <exception cref="System.IO.IOException">Cannot open port.</exception>
         public void Open() {
             try {
-                this.SerialPort.Open();
+                SerialPort.Open();
             } catch (Exception ex) {
                 throw new IOException(ex.Message, ex);
             }
 
-            this.ThreadCancelEvent = new ManualResetEvent(false);
-            this.Thread = new Thread(Run) { CurrentCulture = CultureInfo.InvariantCulture, IsBackground = true, Name = "Hermo @" + this.PortName };
-            this.Thread.Start();
+            ThreadCancelEvent = new ManualResetEvent(false);
+            Thread = new Thread(Run) { CurrentCulture = CultureInfo.InvariantCulture, IsBackground = true, Name = "Hermo @" + PortName };
+            Thread.Start();
         }
 
         /// <summary>
         /// Closes a connection.
         /// </summary>
         public void Close() {
-            if (this.SerialPort.IsOpen) {
-                this.SerialPort.Close();
-                this.ThreadCancelEvent.Set();
-                while (this.Thread.IsAlive) { Thread.Sleep(1); }
-                this.ThreadCancelEvent.Close();
-                this.ThreadCancelEvent = null;
-                this.Thread = null;
+            if (SerialPort.IsOpen) {
+                SerialPort.Close();
+                ThreadCancelEvent.Set();
+                while (Thread.IsAlive) { Thread.Sleep(1); }
+                ThreadCancelEvent.Close();
+                ThreadCancelEvent = null;
+                Thread = null;
             }
         }
 
@@ -103,7 +104,7 @@ namespace Medo.Device {
         /// Gets if connection toward Hermo is open.
         /// </summary>
         public bool IsOpen {
-            get { return this.SerialPort.IsOpen; }
+            get { return SerialPort.IsOpen; }
         }
 
 
@@ -113,7 +114,7 @@ namespace Medo.Device {
         /// Disposes used resources.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -123,8 +124,8 @@ namespace Medo.Device {
         /// <param name="disposing">If true, managed resources are to be disposed.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.Close();
-                this.SerialPort.Dispose();
+                Close();
+                SerialPort.Dispose();
             }
         }
 
@@ -143,7 +144,7 @@ namespace Medo.Device {
         public GpsPosition Position {
             get {
                 lock (SyncRoot) {
-                    return new GpsPosition(this.LastReadings.Latitude, this.LastReadings.Longitude, this.LastReadings.Altitude);
+                    return new GpsPosition(LastReadings.Latitude, LastReadings.Longitude, LastReadings.Altitude);
                 }
             }
         }
@@ -155,7 +156,7 @@ namespace Medo.Device {
         public GpsVelocity Velocity {
             get {
                 lock (SyncRoot) {
-                    return new GpsVelocity(this.LastReadings.Speed, this.LastReadings.Heading, this.LastReadings.MagneticVariation);
+                    return new GpsVelocity(LastReadings.Speed, LastReadings.Heading, LastReadings.MagneticVariation);
                 }
             }
         }
@@ -167,7 +168,7 @@ namespace Medo.Device {
         public GpsGeometry Geometry {
             get {
                 lock (SyncRoot) {
-                    return new GpsGeometry(this.LastReadings.HorizontalDilution, this.LastReadings.VerticalDilution, this.LastReadings.PositionDilution, this.LastReadings.SatellitesInUse, this.LastReadings.SatellitesInView);
+                    return new GpsGeometry(LastReadings.HorizontalDilution, LastReadings.VerticalDilution, LastReadings.PositionDilution, LastReadings.SatellitesInUse, LastReadings.SatellitesInView);
                 }
             }
         }
@@ -190,7 +191,7 @@ namespace Medo.Device {
         private void OnDataUpdate(EventArgs e) {
             if (e == null) { throw new ArgumentNullException("e", "Event arguments cannot be null."); }
 
-            var eh = this.DataUpdate;
+            var eh = DataUpdate;
             if (eh != null) { eh.Invoke(this, e); }
         }
 
@@ -209,7 +210,7 @@ namespace Medo.Device {
         private void OnRawSentenceReceived(GpsSentenceEventArgs e) {
             if (e == null) { throw new ArgumentNullException("e", "Event arguments cannot be null."); }
 
-            var eh = this.RawSentenceReceived;
+            var eh = RawSentenceReceived;
             if (eh != null) { eh.Invoke(this, e); }
         }
 
@@ -227,7 +228,7 @@ namespace Medo.Device {
         private void OnTimeUpdate(GpsTimeEventArgs e) {
             if (e == null) { throw new ArgumentNullException("e", "Event arguments cannot be null."); }
 
-            var eh = this.TimeUpdate;
+            var eh = TimeUpdate;
             if (eh != null) { eh.Invoke(this, e); }
         }
 
@@ -245,7 +246,7 @@ namespace Medo.Device {
         private void OnPositionUpdate(GpsPositionEventArgs e) {
             if (e == null) { throw new ArgumentNullException("e", "Event arguments cannot be null."); }
 
-            var eh = this.PositionUpdate;
+            var eh = PositionUpdate;
             if (eh != null) { eh.Invoke(this, e); }
         }
 
@@ -263,7 +264,7 @@ namespace Medo.Device {
         private void OnVelocityUpdate(GpsVelocityEventArgs e) {
             if (e == null) { throw new ArgumentNullException("e", "Event arguments cannot be null."); }
 
-            var eh = this.VelocityUpdate;
+            var eh = VelocityUpdate;
             if (eh != null) { eh.Invoke(this, e); }
         }
 
@@ -281,7 +282,7 @@ namespace Medo.Device {
         private void OnGeometryUpdate(GpsGeometryEventArgs e) {
             if (e == null) { throw new ArgumentNullException("e", "Event arguments cannot be null."); }
 
-            var eh = this.GeometryUpdate;
+            var eh = GeometryUpdate;
             if (eh != null) { eh.Invoke(this, e); }
         }
 
@@ -295,16 +296,16 @@ namespace Medo.Device {
 
         private void Run() {
             try {
-                while (!this.ThreadCancelEvent.WaitOne(0, false)) {
+                while (!ThreadCancelEvent.WaitOne(0, false)) {
                     try {
-                        if (this.SerialPort.IsOpen) {
-                            var line = this.SerialPort.ReadLine().Trim();
+                        if (SerialPort.IsOpen) {
+                            var line = SerialPort.ReadLine().Trim();
                             var readings = ParseLine(line);
                             if (readings != null) {
                                 var anyUpdate = false;
 
                                 if (readings.Time.HasValue) {
-                                    this.OnTimeUpdate(new GpsTimeEventArgs(readings.Time.Value));
+                                    OnTimeUpdate(new GpsTimeEventArgs(readings.Time.Value));
                                     anyUpdate = true;
                                 }
 
@@ -312,8 +313,8 @@ namespace Medo.Device {
                                 anyUpdate |= ProcessVelocity(readings);
                                 anyUpdate |= ProcessGeometry(readings);
 
-                                if (anyUpdate) { this.OnDataUpdate(new EventArgs()); }
-                                this.OnRawSentenceReceived(new GpsSentenceEventArgs(line));
+                                if (anyUpdate) { OnDataUpdate(new EventArgs()); }
+                                OnRawSentenceReceived(new GpsSentenceEventArgs(line));
                             }
                         } else {
                             ResetSerialPort();
@@ -334,15 +335,15 @@ namespace Medo.Device {
 
         private bool ProcessPosition(Readings readings) {
             if (readings.Latitude.HasValue || readings.Longitude.HasValue || readings.Altitude.HasValue) {
-                lock (this.SyncRoot) {
-                    if (readings.Latitude.HasValue) { this.LastReadings.Latitude.Value = readings.Latitude.Value; }
-                    if (readings.Longitude.HasValue) { this.LastReadings.Longitude.Value = readings.Longitude.Value; }
-                    if (readings.Altitude.HasValue) { this.LastReadings.Altitude.Value = readings.Altitude.Value; }
+                lock (SyncRoot) {
+                    if (readings.Latitude.HasValue) { LastReadings.Latitude.Value = readings.Latitude.Value; }
+                    if (readings.Longitude.HasValue) { LastReadings.Longitude.Value = readings.Longitude.Value; }
+                    if (readings.Altitude.HasValue) { LastReadings.Altitude.Value = readings.Altitude.Value; }
                 }
-                this.OnPositionUpdate(new GpsPositionEventArgs(new GpsPosition(
-                    readings.Latitude.HasValue ? readings.Latitude.Value : double.NaN,
-                    readings.Longitude.HasValue ? readings.Longitude.Value : double.NaN,
-                    readings.Altitude.HasValue ? readings.Altitude.Value : double.NaN
+                OnPositionUpdate(new GpsPositionEventArgs(new GpsPosition(
+                    readings.Latitude ?? double.NaN,
+                    readings.Longitude ?? double.NaN,
+                    readings.Altitude ?? double.NaN
                 )));
                 return true;
             }
@@ -351,15 +352,15 @@ namespace Medo.Device {
 
         private bool ProcessVelocity(Readings readings) {
             if (readings.Speed.HasValue || readings.Heading.HasValue || readings.MagneticVariation.HasValue) {
-                lock (this.SyncRoot) {
-                    if (readings.Speed.HasValue) { this.LastReadings.Speed.Value = readings.Speed.Value; }
-                    if (readings.Heading.HasValue) { this.LastReadings.Heading.Value = readings.Heading.Value; }
-                    if (readings.MagneticVariation.HasValue) { this.LastReadings.MagneticVariation.Value = readings.MagneticVariation.Value; }
+                lock (SyncRoot) {
+                    if (readings.Speed.HasValue) { LastReadings.Speed.Value = readings.Speed.Value; }
+                    if (readings.Heading.HasValue) { LastReadings.Heading.Value = readings.Heading.Value; }
+                    if (readings.MagneticVariation.HasValue) { LastReadings.MagneticVariation.Value = readings.MagneticVariation.Value; }
                 }
-                this.OnVelocityUpdate(new GpsVelocityEventArgs(new GpsVelocity(
-                    readings.Speed.HasValue ? readings.Speed.Value : double.NaN,
-                    readings.Heading.HasValue ? readings.Heading.Value : double.NaN,
-                    readings.MagneticVariation.HasValue ? readings.MagneticVariation.Value : double.NaN
+                OnVelocityUpdate(new GpsVelocityEventArgs(new GpsVelocity(
+                    readings.Speed ?? double.NaN,
+                    readings.Heading ?? double.NaN,
+                    readings.MagneticVariation ?? double.NaN
                 )));
                 return true;
             }
@@ -368,19 +369,19 @@ namespace Medo.Device {
 
         private bool ProcessGeometry(Readings readings) {
             if (readings.HorizontalDilution.HasValue || readings.VerticalDilution.HasValue || readings.PositionDilution.HasValue || readings.SatellitesInUse.HasValue || readings.SatellitesInView.HasValue) {
-                lock (this.SyncRoot) {
-                    if (readings.HorizontalDilution.HasValue) { this.LastReadings.HorizontalDilution.Value = readings.HorizontalDilution.Value; }
-                    if (readings.VerticalDilution.HasValue) { this.LastReadings.VerticalDilution.Value = readings.VerticalDilution.Value; }
-                    if (readings.PositionDilution.HasValue) { this.LastReadings.PositionDilution.Value = readings.PositionDilution.Value; }
-                    if (readings.SatellitesInUse.HasValue) { this.LastReadings.SatellitesInUse.Value = readings.SatellitesInUse.Value; }
-                    if (readings.SatellitesInView.HasValue) { this.LastReadings.SatellitesInView.Value = readings.SatellitesInView.Value; }
+                lock (SyncRoot) {
+                    if (readings.HorizontalDilution.HasValue) { LastReadings.HorizontalDilution.Value = readings.HorizontalDilution.Value; }
+                    if (readings.VerticalDilution.HasValue) { LastReadings.VerticalDilution.Value = readings.VerticalDilution.Value; }
+                    if (readings.PositionDilution.HasValue) { LastReadings.PositionDilution.Value = readings.PositionDilution.Value; }
+                    if (readings.SatellitesInUse.HasValue) { LastReadings.SatellitesInUse.Value = readings.SatellitesInUse.Value; }
+                    if (readings.SatellitesInView.HasValue) { LastReadings.SatellitesInView.Value = readings.SatellitesInView.Value; }
                 }
-                this.OnGeometryUpdate(new GpsGeometryEventArgs(new GpsGeometry(
-                    readings.HorizontalDilution.HasValue ? readings.HorizontalDilution.Value : double.NaN,
-                    readings.VerticalDilution.HasValue ? readings.VerticalDilution.Value : double.NaN,
-                    readings.PositionDilution.HasValue ? readings.PositionDilution.Value : double.NaN,
-                    readings.SatellitesInUse.HasValue ? readings.SatellitesInUse.Value : 0,
-                    readings.SatellitesInView.HasValue ? readings.SatellitesInView.Value : 0
+                OnGeometryUpdate(new GpsGeometryEventArgs(new GpsGeometry(
+                    readings.HorizontalDilution ?? double.NaN,
+                    readings.VerticalDilution ?? double.NaN,
+                    readings.PositionDilution ?? double.NaN,
+                    readings.SatellitesInUse ?? 0,
+                    readings.SatellitesInView ?? 0
                 )));
                 return true;
             }
@@ -390,12 +391,12 @@ namespace Medo.Device {
 
         private void ResetSerialPort() {
             try {
-                if (this.SerialPort.IsOpen) { this.SerialPort.Close(); }
-                for (var i = 0; i < this.SerialPort.ReadTimeout / 100; i++) {
-                    if (this.ThreadCancelEvent.WaitOne(0, false)) { break; }
+                if (SerialPort.IsOpen) { SerialPort.Close(); }
+                for (var i = 0; i < SerialPort.ReadTimeout / 100; i++) {
+                    if (ThreadCancelEvent.WaitOne(0, false)) { break; }
                     Thread.Sleep(100);
                 }
-                this.SerialPort.Open();
+                SerialPort.Open();
             } catch (IOException) {
                 Thread.Sleep(100);
             } catch (UnauthorizedAccessException) {
@@ -449,10 +450,10 @@ namespace Medo.Device {
 
             if (string.Equals(fixTypePart, "0", StringComparison.OrdinalIgnoreCase)) { return null; } //no lock
 
-            var readings = new Readings();
-
-            readings.Latitude = ParseLatitude(latitudePart, latitudeSignPart);
-            readings.Longitude = ParseLongitude(longitudePart, longitudeSignPart);
+            var readings = new Readings {
+                Latitude = ParseLatitude(latitudePart, latitudeSignPart),
+                Longitude = ParseLongitude(longitudePart, longitudeSignPart)
+            };
             if (string.Equals(altitudeUnitsPart, "M", StringComparison.OrdinalIgnoreCase)) {
                 readings.Altitude = ParseDouble(altitudePart);
             }
@@ -471,10 +472,10 @@ namespace Medo.Device {
 
             if ((statusPart != null) && !string.Equals(statusPart, "A", StringComparison.OrdinalIgnoreCase)) { return null; } //not active
 
-            var readings = new Readings();
-
-            readings.Latitude = ParseLatitude(latitudePart, latitudeSignPart);
-            readings.Longitude = ParseLongitude(longitudePart, longitudeSignPart);
+            var readings = new Readings {
+                Latitude = ParseLatitude(latitudePart, latitudeSignPart),
+                Longitude = ParseLongitude(longitudePart, longitudeSignPart)
+            };
 
             return readings;
         }
@@ -487,11 +488,11 @@ namespace Medo.Device {
 
             if ((modePart != null) && string.Equals(modePart, "1", StringComparison.OrdinalIgnoreCase)) { return null; } //no fix
 
-            var readings = new Readings();
-
-            readings.HorizontalDilution = ParseDouble(hdopPart);
-            readings.VerticalDilution = ParseDouble(vdopPart);
-            readings.PositionDilution = ParseDouble(pdopPart);
+            var readings = new Readings {
+                HorizontalDilution = ParseDouble(hdopPart),
+                VerticalDilution = ParseDouble(vdopPart),
+                PositionDilution = ParseDouble(pdopPart)
+            };
 
             return readings;
         }
@@ -499,9 +500,9 @@ namespace Medo.Device {
         private static Readings ParseSentenceGsv(string[] parts) {
             var satellitesInViewPart = (parts.Length > 3) ? parts[3] : null;
 
-            var readings = new Readings();
-
-            readings.SatellitesInView = ParseInt32(satellitesInViewPart);
+            var readings = new Readings {
+                SatellitesInView = ParseInt32(satellitesInViewPart)
+            };
 
             return readings;
         }
@@ -521,14 +522,14 @@ namespace Medo.Device {
 
             if ((statusPart != null) && !string.Equals(statusPart, "A", StringComparison.OrdinalIgnoreCase)) { return null; } //not active
 
-            var readings = new Readings();
-
-            readings.Time = ParseTime(utcDatePart, utcTimePart);
-            readings.Latitude = ParseLatitude(latitudePart, latitudeSignPart);
-            readings.Longitude = ParseLongitude(longitudePart, longitudeSignPart);
-            readings.Speed = ParseDouble(speedOverGroundPart, 1852.0 / 3600);
-            readings.Heading = ParseDouble(headingPart);
-            readings.MagneticVariation = ParseDegrees(magneticVariationPart, magneticVariationSignPart);
+            var readings = new Readings {
+                Time = ParseTime(utcDatePart, utcTimePart),
+                Latitude = ParseLatitude(latitudePart, latitudeSignPart),
+                Longitude = ParseLongitude(longitudePart, longitudeSignPart),
+                Speed = ParseDouble(speedOverGroundPart, 1852.0 / 3600),
+                Heading = ParseDouble(headingPart),
+                MagneticVariation = ParseDegrees(magneticVariationPart, magneticVariationSignPart)
+            };
 
             return readings;
         }
@@ -558,8 +559,7 @@ namespace Medo.Device {
         private static DateTime? ParseTime(string utcDatePart, string utcTimePart) {
             if ((utcDatePart == null) || (utcTimePart == null)) { return null; }
 
-            DateTime time;
-            if (DateTime.TryParseExact(utcDatePart + " " + utcTimePart, DateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out time)) {
+            if (DateTime.TryParseExact(utcDatePart + " " + utcTimePart, DateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out var time)) {
                 return time;
             }
             return null;
@@ -570,9 +570,7 @@ namespace Medo.Device {
 
             var latitudeDegreesPart = (latitudePart.Length > 2) ? latitudePart.Substring(0, 2) : null;
             var latitudeMinutesPart = (latitudePart.Length > 2) ? latitudePart.Substring(2) : null;
-            int latitudeDegrees;
-            double latitudeMinutes;
-            if (int.TryParse(latitudeDegreesPart, NumberStyles.Integer, CultureInfo.InvariantCulture, out latitudeDegrees) && double.TryParse(latitudeMinutesPart, NumberStyles.Float, CultureInfo.InvariantCulture, out latitudeMinutes)) {
+            if (int.TryParse(latitudeDegreesPart, NumberStyles.Integer, CultureInfo.InvariantCulture, out var latitudeDegrees) && double.TryParse(latitudeMinutesPart, NumberStyles.Float, CultureInfo.InvariantCulture, out var latitudeMinutes)) {
                 var latitude = latitudeDegrees + latitudeMinutes / 60.0;
                 if (string.Equals(latitudeSignPart, "N", StringComparison.OrdinalIgnoreCase)) {
                     return latitude;
@@ -588,9 +586,7 @@ namespace Medo.Device {
 
             var longitudeDegreesPart = (longitudePart.Length > 2) ? longitudePart.Substring(0, 3) : null;
             var longitudeMinutesPart = (longitudePart.Length > 2) ? longitudePart.Substring(3) : null;
-            int longitudeDegrees;
-            double longitudeMinutes;
-            if (int.TryParse(longitudeDegreesPart, NumberStyles.Integer, CultureInfo.InvariantCulture, out longitudeDegrees) && double.TryParse(longitudeMinutesPart, NumberStyles.Float, CultureInfo.InvariantCulture, out longitudeMinutes)) {
+            if (int.TryParse(longitudeDegreesPart, NumberStyles.Integer, CultureInfo.InvariantCulture, out var longitudeDegrees) && double.TryParse(longitudeMinutesPart, NumberStyles.Float, CultureInfo.InvariantCulture, out var longitudeMinutes)) {
                 var longitude = longitudeDegrees + longitudeMinutes / 60.0;
                 if (string.Equals(longitudeSignPart, "E", StringComparison.OrdinalIgnoreCase)) {
                     return longitude;
@@ -602,8 +598,7 @@ namespace Medo.Device {
         }
 
         private static double? ParseDegrees(string degreesPart, string degreesSignPart) {
-            double degrees;
-            if (double.TryParse(degreesPart, NumberStyles.Float, CultureInfo.InvariantCulture, out degrees)) {
+            if (double.TryParse(degreesPart, NumberStyles.Float, CultureInfo.InvariantCulture, out var degrees)) {
                 if (string.Equals(degreesSignPart, "E", StringComparison.OrdinalIgnoreCase)) {
                     return degrees;
                 } else if (string.Equals(degreesSignPart, "W", StringComparison.OrdinalIgnoreCase)) {
@@ -614,16 +609,14 @@ namespace Medo.Device {
         }
 
         private static int? ParseInt32(string valuePart) {
-            int value;
-            if (int.TryParse(valuePart, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)) {
+            if (int.TryParse(valuePart, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value)) {
                 return value;
             }
             return null;
         }
 
         private static double? ParseDouble(string valuePart, double multiplier = 1) {
-            double value;
-            if (double.TryParse(valuePart, NumberStyles.Float, CultureInfo.InvariantCulture, out value)) {
+            if (double.TryParse(valuePart, NumberStyles.Float, CultureInfo.InvariantCulture, out var value)) {
                 return value * multiplier;
             }
             return null;
@@ -662,7 +655,7 @@ namespace Medo.Device {
 
             internal class ExpirableValue<T> where T : struct {
                 public ExpirableValue(T defaultValue) {
-                    this.DefaultValue = defaultValue;
+                    DefaultValue = defaultValue;
                 }
 
                 private readonly T DefaultValue;
@@ -670,10 +663,10 @@ namespace Medo.Device {
 
                 private T _value;
                 internal T Value {
-                    get { return (DateTime.UtcNow < this.ExpireTime) ? this._value : this.DefaultValue; }
+                    get { return (DateTime.UtcNow < ExpireTime) ? _value : DefaultValue; }
                     set {
-                        this._value = value;
-                        this.ExpireTime = DateTime.UtcNow.AddSeconds(5);
+                        _value = value;
+                        ExpireTime = DateTime.UtcNow.AddSeconds(5);
                     }
                 }
 
@@ -700,7 +693,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="time">Time.</param>
         public GpsTimeEventArgs(DateTime time) {
-            this.Time = time;
+            Time = time;
         }
 
 
@@ -723,8 +716,7 @@ namespace Medo.Device {
         /// <param name="position">Positon.</param>
         /// <exception cref="System.ArgumentNullException">Position cannot be null.</exception>
         public GpsPositionEventArgs(GpsPosition position) {
-            if (position == null) { throw new ArgumentNullException("position", "Position cannot be null."); }
-            this.Position = position;
+            Position = position ?? throw new ArgumentNullException("position", "Position cannot be null.");
         }
 
 
@@ -747,8 +739,7 @@ namespace Medo.Device {
         /// <param name="velocity">Velocity.</param>
         /// <exception cref="System.ArgumentNullException">Velocity cannot be null.</exception>
         public GpsVelocityEventArgs(GpsVelocity velocity) {
-            if (velocity == null) { throw new ArgumentNullException("velocity", "Velocity cannot be null."); }
-            this.Velocity = velocity;
+            Velocity = velocity ?? throw new ArgumentNullException("velocity", "Velocity cannot be null.");
         }
 
 
@@ -771,8 +762,7 @@ namespace Medo.Device {
         /// <param name="geometry">Geometry.</param>
         /// <exception cref="System.ArgumentNullException">Geometry cannot be null.</exception>
         public GpsGeometryEventArgs(GpsGeometry geometry) {
-            if (geometry == null) { throw new ArgumentNullException("geometry", "Geometry cannot be null."); }
-            this.Geometry = geometry;
+            Geometry = geometry ?? throw new ArgumentNullException("geometry", "Geometry cannot be null.");
         }
 
 
@@ -795,15 +785,14 @@ namespace Medo.Device {
         /// <param name="sentence">Sentence.</param>
         /// <exception cref="System.ArgumentNullException">Sentence cannot be null.</exception>
         public GpsSentenceEventArgs(string sentence) {
-            if (sentence == null) { throw new ArgumentNullException("sentence", "Sentence cannot be null."); }
-            this.Sentence = sentence;
+            Sentence = sentence ?? throw new ArgumentNullException("sentence", "Sentence cannot be null.");
         }
 
 
         /// <summary>
         /// Gets geometry information.
         /// </summary>
-        public String Sentence { get; private set; }
+        public string Sentence { get; private set; }
 
     }
 
@@ -832,9 +821,9 @@ namespace Medo.Device {
         /// <param name="longitude">Longitude in degrees.</param>
         /// <param name="altitude">Altitude in meters.</param>
         public GpsPosition(double latitude, double longitude, double altitude) {
-            this.Latitude = latitude;
-            this.Longitude = longitude;
-            this.Altitude = altitude;
+            Latitude = latitude;
+            Longitude = longitude;
+            Altitude = altitude;
         }
 
         /// <summary>
@@ -855,7 +844,7 @@ namespace Medo.Device {
         /// Gets if latitude is defined.
         /// </summary>
         public bool HasLatitude {
-            get { return !double.IsNaN(this.Latitude); }
+            get { return !double.IsNaN(Latitude); }
         }
 
 
@@ -869,7 +858,7 @@ namespace Medo.Device {
         /// Gets if longitude is defined.
         /// </summary>
         public bool HasLongitude {
-            get { return !double.IsNaN(this.Longitude); }
+            get { return !double.IsNaN(Longitude); }
         }
 
         /// <summary>
@@ -882,7 +871,7 @@ namespace Medo.Device {
         /// Gets if altitude is defined.
         /// </summary>
         public bool HasAltitude {
-            get { return !double.IsNaN(this.Altitude); }
+            get { return !double.IsNaN(Altitude); }
         }
 
 
@@ -934,15 +923,14 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         public override bool Equals(object obj) {
-            var other = obj as GpsPosition;
-            return ((other != null) && this.Latitude.Equals(other.Latitude) && this.Longitude.Equals(other.Longitude) && this.Altitude.Equals(other.Altitude));
+            return ((obj is GpsPosition other) && Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude) && Altitude.Equals(other.Altitude));
         }
 
         /// <summary>
         /// Serves as a hash function for a particular type.
         /// </summary>
         public override int GetHashCode() {
-            return unchecked(this.Latitude.GetHashCode() * 41 + this.Longitude.GetHashCode());
+            return unchecked(Latitude.GetHashCode() * 41 + Longitude.GetHashCode());
         }
 
         /// <summary>
@@ -950,10 +938,10 @@ namespace Medo.Device {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            if (this.HasLatitude && this.HasLongitude) {
+            if (HasLatitude && HasLongitude) {
                 return string.Format(CultureInfo.InvariantCulture, "{0:0.0000}° {1}, {2:0.0000}° {3}",
-                    System.Math.Abs(this.Latitude), (this.Latitude >= 0) ? "N" : "S",
-                    System.Math.Abs(this.Longitude), (this.Latitude >= 0) ? "E" : "W"
+                    System.Math.Abs(Latitude), (Latitude >= 0) ? "N" : "S",
+                    System.Math.Abs(Longitude), (Latitude >= 0) ? "E" : "W"
                 );
             } else {
                 return "";
@@ -995,9 +983,9 @@ namespace Medo.Device {
         /// <param name="heading">Heading in degrees.</param>
         /// <param name="magneticVariation">Magnetic variation in degrees.</param>
         public GpsVelocity(double speed, double heading, double magneticVariation) {
-            this.Speed = speed;
-            this.Heading = heading;
-            this.MagneticVariation = magneticVariation;
+            Speed = speed;
+            Heading = heading;
+            MagneticVariation = magneticVariation;
         }
 
         /// <summary>
@@ -1018,7 +1006,7 @@ namespace Medo.Device {
         /// Gets if speed is defined.
         /// </summary>
         public bool HasSpeed {
-            get { return !double.IsNaN(this.Speed); }
+            get { return !double.IsNaN(Speed); }
         }
 
         /// <summary>
@@ -1028,7 +1016,7 @@ namespace Medo.Device {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Kph", Justification = "Shorthand for km/h.")]
         public double SpeedInKph {
             get {
-                return this.HasSpeed ? this.Speed * (3600 / 1000.0) : double.NaN;
+                return HasSpeed ? Speed * (3600 / 1000.0) : double.NaN;
             }
         }
 
@@ -1038,7 +1026,7 @@ namespace Medo.Device {
         /// </summary>
         public double SpeedInMph {
             get {
-                return this.HasSpeed ? this.Speed * (3600 / 1609.344) : double.NaN;
+                return HasSpeed ? Speed * (3600 / 1609.344) : double.NaN;
             }
         }
 
@@ -1048,7 +1036,7 @@ namespace Medo.Device {
         /// </summary>
         public double SpeedInKnots {
             get {
-                return this.HasSpeed ? this.Speed * (3600 / 1852.0) : double.NaN;
+                return HasSpeed ? Speed * (3600 / 1852.0) : double.NaN;
             }
         }
 
@@ -1059,7 +1047,7 @@ namespace Medo.Device {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ftps", Justification = "Shorthand for ft/s.")]
         public double SpeedInFtps {
             get {
-                return this.HasSpeed ? this.Speed * (1 / 0.3048) : double.NaN;
+                return HasSpeed ? Speed * (1 / 0.3048) : double.NaN;
             }
         }
 
@@ -1074,7 +1062,7 @@ namespace Medo.Device {
         /// Gets if heading is defined.
         /// </summary>
         public bool HasHeading {
-            get { return !double.IsNaN(this.Heading); }
+            get { return !double.IsNaN(Heading); }
         }
 
 
@@ -1089,7 +1077,7 @@ namespace Medo.Device {
         /// Gets if magnetic variation is defined.
         /// </summary>
         public bool HasMagneticVariation {
-            get { return !double.IsNaN(this.MagneticVariation); }
+            get { return !double.IsNaN(MagneticVariation); }
         }
 
 
@@ -1100,15 +1088,14 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         public override bool Equals(object obj) {
-            var other = obj as GpsVelocity;
-            return ((other != null) && this.Speed.Equals(other.Speed) && this.Heading.Equals(other.Heading) && this.MagneticVariation.Equals(other.MagneticVariation));
+            return ((obj is GpsVelocity other) && Speed.Equals(other.Speed) && Heading.Equals(other.Heading) && MagneticVariation.Equals(other.MagneticVariation));
         }
 
         /// <summary>
         /// Serves as a hash function for a particular type.
         /// </summary>
         public override int GetHashCode() {
-            return unchecked(this.Speed.GetHashCode() * 41 + this.Heading.GetHashCode());
+            return unchecked(Speed.GetHashCode() * 41 + Heading.GetHashCode());
         }
 
         /// <summary>
@@ -1116,7 +1103,7 @@ namespace Medo.Device {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return this.HasSpeed ? this.Speed.ToString("0.0 m/s", CultureInfo.InvariantCulture) : "";
+            return HasSpeed ? Speed.ToString("0.0 m/s", CultureInfo.InvariantCulture) : "";
         }
 
         #endregion
@@ -1139,11 +1126,11 @@ namespace Medo.Device {
         /// <param name="satellitesInUse">Number of satellites in use.</param>
         /// <param name="satellitesInView">Number of satellites in view.</param>
         public GpsGeometry(double horizontalDilution, double verticalDilution, double positionDilution, int satellitesInUse, int satellitesInView) {
-            this.HorizontalDilution = horizontalDilution;
-            this.VerticalDilution = verticalDilution;
-            this.PositionDilution = positionDilution;
-            this.SatellitesInUse = satellitesInUse;
-            this.SatellitesInView = satellitesInView;
+            HorizontalDilution = horizontalDilution;
+            VerticalDilution = verticalDilution;
+            PositionDilution = positionDilution;
+            SatellitesInUse = satellitesInUse;
+            SatellitesInView = satellitesInView;
         }
 
         /// <summary>
@@ -1174,7 +1161,7 @@ namespace Medo.Device {
         /// Gets if horizontal dilution is defined.
         /// </summary>
         public bool HasHorizontalDilution {
-            get { return !double.IsNaN(this.HorizontalDilution); }
+            get { return !double.IsNaN(HorizontalDilution); }
         }
 
 
@@ -1188,7 +1175,7 @@ namespace Medo.Device {
         /// Gets if vertical dilution is defined.
         /// </summary>
         public bool HasVerticalDilution {
-            get { return !double.IsNaN(this.VerticalDilution); }
+            get { return !double.IsNaN(VerticalDilution); }
         }
 
 
@@ -1203,7 +1190,7 @@ namespace Medo.Device {
         /// Gets if position (3D) dilution is defined.
         /// </summary>
         public bool HasPositionDilution {
-            get { return !double.IsNaN(this.PositionDilution); }
+            get { return !double.IsNaN(PositionDilution); }
         }
 
 
@@ -1217,7 +1204,7 @@ namespace Medo.Device {
         /// True if there is positive number of satellites in use.
         /// </summary>
         public bool HasAnySatellitesInUse {
-            get { return (this.SatellitesInUse > 0); }
+            get { return (SatellitesInUse > 0); }
         }
 
 
@@ -1231,7 +1218,7 @@ namespace Medo.Device {
         /// True if there is positive number of satellites in view.
         /// </summary>
         public bool HasAnySatellitesInView {
-            get { return (this.SatellitesInView > 0); }
+            get { return (SatellitesInView > 0); }
         }
 
 
@@ -1242,15 +1229,14 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         public override bool Equals(object obj) {
-            var other = obj as GpsGeometry;
-            return ((other != null) && this.HorizontalDilution.Equals(other.HorizontalDilution) && this.VerticalDilution.Equals(other.VerticalDilution) && this.PositionDilution.Equals(other.PositionDilution) && this.SatellitesInUse.Equals(other.SatellitesInUse) && this.SatellitesInView.Equals(other.SatellitesInView));
+            return ((obj is GpsGeometry other) && HorizontalDilution.Equals(other.HorizontalDilution) && VerticalDilution.Equals(other.VerticalDilution) && PositionDilution.Equals(other.PositionDilution) && SatellitesInUse.Equals(other.SatellitesInUse) && SatellitesInView.Equals(other.SatellitesInView));
         }
 
         /// <summary>
         /// Serves as a hash function for a particular type.
         /// </summary>
         public override int GetHashCode() {
-            return unchecked(this.HorizontalDilution.GetHashCode() * 41 + this.VerticalDilution.GetHashCode());
+            return unchecked(HorizontalDilution.GetHashCode() * 41 + VerticalDilution.GetHashCode());
         }
 
         /// <summary>
@@ -1258,7 +1244,7 @@ namespace Medo.Device {
         /// </summary>
         /// <returns></returns>
         public override string ToString() {
-            return this.HasPositionDilution ? this.PositionDilution.ToString("0.0", CultureInfo.InvariantCulture) : "";
+            return HasPositionDilution ? PositionDilution.ToString("0.0", CultureInfo.InvariantCulture) : "";
         }
 
         #endregion

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-11-04: Moved to Medo.Net namespace.
 //2008-08-08: Initial version.
@@ -20,8 +20,8 @@ namespace Medo.Net {
         /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
         public KeyValuePacket(string key, byte[] value) {
-            this._key = key;
-            this._value = value;
+            _key = key;
+            _value = value;
         }
 
 
@@ -30,15 +30,15 @@ namespace Medo.Net {
         /// Gets key.
         /// </summary>
         public string Key {
-            get { return this._key; }
+            get { return _key; }
         }
 
-        private byte[] _value;
+        private readonly byte[] _value;
         /// <summary>
         /// Returns value.
         /// </summary>
         public byte[] GetValue() {
-            return this._value;
+            return _value;
         }
 
 
@@ -51,19 +51,19 @@ namespace Medo.Net {
             int keyLength;
             int valueLength;
 
-            if (this.Key == null) {
+            if (Key == null) {
                 baKey = new byte[] { };
                 keyLength = -1;
             } else {
-                baKey = UTF8Encoding.UTF8.GetBytes(this.Key);
+                baKey = UTF8Encoding.UTF8.GetBytes(Key);
                 keyLength = baKey.Length;
             }
-            if (this._value == null) {
+            if (_value == null) {
                 baValue = new byte[] { };
                 valueLength = -1;
 
             } else {
-                baValue = this._value;
+                baValue = _value;
                 valueLength = baValue.Length;
             }
 
@@ -109,10 +109,7 @@ namespace Medo.Net {
         /// <param name="offset">Array offset at which to start.</param>
         /// <exception cref="System.FormatException">Not enough bytes to start. -or- Invalid header. -or- Not enough bytes. -or- Invalid checksum.</exception>
         public static KeyValuePacket Parse(byte[] array, int offset) {
-            KeyValuePacket result;
-            int newOffset;
-            System.Exception exception;
-            if (TryParse(array, offset, out result, out newOffset, out exception)) {
+            if (TryParse(array, offset, out var result, out var newOffset, out var exception)) {
                 return result;
             } else {
                 throw exception;
@@ -126,9 +123,7 @@ namespace Medo.Net {
         /// <param name="offset">Array offset at which to start.</param>
         /// <param name="result">Out. Result of parse.</param>
         public static bool TryParse(byte[] array, int offset, out KeyValuePacket result) {
-            System.Exception ex;
-            int newOffset;
-            return TryParse(array, offset, out result, out newOffset, out ex);
+            return TryParse(array, offset, out result, out _, out _);
         }
 
         /// <summary>
@@ -140,8 +135,7 @@ namespace Medo.Net {
         /// <param name="newOffset">Out. Index at which last operation was performed.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#", Justification = "TryParse needs out parameter.")]
         public static bool TryParse(byte[] array, int offset, out KeyValuePacket result, out int newOffset) {
-            System.Exception ex;
-            return TryParse(array, offset, out result, out newOffset, out ex);
+            return TryParse(array, offset, out result, out newOffset, out _);
         }
 
         private static bool TryParse(byte[] array, int offset, out KeyValuePacket result, out int newOffset, out System.Exception exception) {
@@ -220,14 +214,13 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="obj">A TagItem object to compare to this instance.</param>
         public override bool Equals(object obj) {
-            if (obj is KeyValuePacket) {
-                KeyValuePacket otherKeyValuePacket = (KeyValuePacket)obj;
-                return (this._key.Equals(otherKeyValuePacket._key));
+            if (obj is KeyValuePacket otherKeyValuePacket) {
+                return (_key.Equals(otherKeyValuePacket._key));
             }
 
             string otherString = obj as string;
             if (obj != null) {
-                return (this._key.Equals(otherString));
+                return (_key.Equals(otherString));
             }
 
             return false;
@@ -238,7 +231,7 @@ namespace Medo.Net {
         /// </summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
         public override int GetHashCode() {
-            return this.Key.GetHashCode();
+            return Key.GetHashCode();
         }
 
         /// <summary>
@@ -246,10 +239,10 @@ namespace Medo.Net {
         /// </summary>
         /// <returns>String that represents this instance.</returns>
         public override string ToString() {
-            if (this.Key == null) {
+            if (Key == null) {
                 return "";
             } else {
-                return this.Key;
+                return Key;
             }
         }
 

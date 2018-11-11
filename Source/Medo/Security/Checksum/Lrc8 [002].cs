@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-06-07: Append is not longer returning intermediate digest (performance reasons).
 //2008-03-18: Initial version.
@@ -29,7 +29,7 @@ namespace Medo.Security.Checksum {
         /// </summary>
         /// <param name="initialValue">Starting digest.</param>
         public Lrc8(byte initialValue) {
-            this._currDigest = initialValue;
+            _currDigest = initialValue;
         }
 
 
@@ -41,7 +41,7 @@ namespace Medo.Security.Checksum {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public void Append(byte[] value) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-            this.Append(value, 0, value.Length);
+            Append(value, 0, value.Length);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Medo.Security.Checksum {
         public void Append(byte[] value, int index, int length) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
             for (int i = index; i < index + length; i++) {
-                this._currDigest = (byte)(this._currDigest ^ value[i]);
+                _currDigest = (byte)(_currDigest ^ value[i]);
             }
         }
 
@@ -68,9 +68,9 @@ namespace Medo.Security.Checksum {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public void Append(string value, bool useAsciiEncoding) {
             if (useAsciiEncoding) {
-                this.Append(System.Text.ASCIIEncoding.ASCII.GetBytes(value));
+                Append(System.Text.ASCIIEncoding.ASCII.GetBytes(value));
             } else {
-                this.Append(System.Text.UnicodeEncoding.Unicode.GetBytes(value));
+                Append(System.Text.UnicodeEncoding.Unicode.GetBytes(value));
             }//if
         }
 
@@ -78,7 +78,7 @@ namespace Medo.Security.Checksum {
         /// Gets current digest.
         /// </summary>
         public byte Digest {
-            get { return this._currDigest; }
+            get { return _currDigest; }
         }
 
         /// <summary>
@@ -87,8 +87,8 @@ namespace Medo.Security.Checksum {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "This is in order to have similar properties for all Medo.Security.Checksum namespace classes.")]
         public byte[] DigestAsAscii30 {
             get {
-                byte part1 = (byte)(0x30 + (this.Digest >> 4));
-                byte part2 = (byte)(0x30 + (this.Digest & 0x0f));
+                byte part1 = (byte)(0x30 + (Digest >> 4));
+                byte part2 = (byte)(0x30 + (Digest & 0x0f));
                 return new byte[] { part1, part2 };
             }
         }

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 //2010-02-07: Initial version.
@@ -33,7 +33,7 @@ namespace Medo.IO {
         /// <exception cref="System.ComponentModel.Win32Exception">Failed retrieving information.</exception>
         /// <remarks>Iterating NTFS Streams by Stephen Toub (http://msdn.microsoft.com/en-us/magazine/cc163677.aspx)</remarks>
         public static IEnumerable<string> GetStreamNames(string path) {
-            if (path == null) throw new ArgumentNullException("path", "Parameter \"path\" cannot be null.");
+            if (path == null) { throw new ArgumentNullException("path", "Parameter \"path\" cannot be null."); }
 
             var data = new NativeMethods.WIN32_FIND_STREAM_DATA();
 
@@ -41,7 +41,7 @@ namespace Medo.IO {
             try {
                 try {
                     handle = NativeMethods.FindFirstStreamW(path, NativeMethods.STREAM_INFO_LEVELS.FindStreamInfoStandard, ref  data, (uint)0);
-                    if (handle.IsInvalid) throw new Win32Exception(Marshal.GetLastWin32Error(), "Invalid handle value.");
+                    if (handle.IsInvalid) { throw new Win32Exception(Marshal.GetLastWin32Error(), "Invalid handle value."); }
                 } catch (EntryPointNotFoundException) {
                     throw new NotSupportedException("Operation is not supported on current OS version (minimum is Windows Vista).");
                 }
@@ -111,7 +111,7 @@ namespace Medo.IO {
         public AdsFileStream(string path, string streamName, FileMode mode, FileAccess access, FileShare share)
             : base() {
             if (streamName == null) { //no ADS support
-                this.FileStream = new FileStream(path, mode, access, share);
+                FileStream = new FileStream(path, mode, access, share);
             } else {
                 uint dwDesiredAccess = 0;
                 switch (access) {
@@ -176,8 +176,8 @@ namespace Medo.IO {
                 if (filePtr.IsInvalid) {
                     throw new Win32Exception(Marshal.GetLastWin32Error(), "Invalid handle value.");
                 }
-                this.FileStream = new FileStream(filePtr, access);
-                if (mode == FileMode.Append) { this.FileStream.Seek(0, SeekOrigin.End); }
+                FileStream = new FileStream(filePtr, access);
+                if (mode == FileMode.Append) { FileStream.Seek(0, SeekOrigin.End); }
             }
         }
 
@@ -185,21 +185,21 @@ namespace Medo.IO {
         /// Gets a value indicating whether the current stream supports reading.
         /// </summary>
         public override bool CanRead {
-            get { return this.FileStream.CanRead; }
+            get { return FileStream.CanRead; }
         }
 
         /// <summary>
         /// Gets a value indicating whether the current stream supports seeking.
         /// </summary>
         public override bool CanSeek {
-            get { return this.FileStream.CanSeek; }
+            get { return FileStream.CanSeek; }
         }
 
         /// <summary>
         /// Gets a value indicating whether the current stream supports writing.
         /// </summary>
         public override bool CanWrite {
-            get { return this.FileStream.CanWrite; }
+            get { return FileStream.CanWrite; }
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Medo.IO {
         /// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
         /// <exception cref="System.ObjectDisposedException">The stream is closed.</exception>
         public override void Flush() {
-            this.FileStream.Flush();
+            FileStream.Flush();
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace Medo.IO {
         /// <exception cref="System.NotSupportedException">System.IO.FileStream.CanSeek for this stream is false.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurs, such as the file being closed.</exception>
         public override long Length {
-            get { return this.FileStream.Length; }
+            get { return FileStream.Length; }
         }
 
         /// <summary>
@@ -229,10 +229,10 @@ namespace Medo.IO {
         /// <exception cref="System.IO.EndOfStreamException">Attempted seeking past the end of a stream that does not support this.</exception>
         public override long Position {
             get {
-                return this.FileStream.Position;
+                return FileStream.Position;
             }
             set {
-                this.FileStream.Position = value;
+                FileStream.Position = value;
             }
         }
 
@@ -250,7 +250,7 @@ namespace Medo.IO {
         /// <exception cref="System.ArgumentException">Offset and count describe an invalid range in array.</exception>
         /// <exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
         public override int Read(byte[] buffer, int offset, int count) {
-            return this.FileStream.Read(buffer, offset, count);
+            return FileStream.Read(buffer, offset, count);
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace Medo.IO {
         /// <exception cref="System.ArgumentException">Attempted seeking before the beginning of the stream.</exception>
         /// <exception cref="System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
         public override long Seek(long offset, System.IO.SeekOrigin origin) {
-            return this.FileStream.Seek(offset, origin);
+            return FileStream.Seek(offset, origin);
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace Medo.IO {
         /// <exception cref="System.NotSupportedException">The stream does not support both writing and seeking.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Attempted to set the value parameter to less than 0.</exception>
         public override void SetLength(long value) {
-            this.SetLength(value);
+            SetLength(value);
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace Medo.IO {
         /// <exception cref="System.ObjectDisposedException">The stream is closed.</exception>
         /// <exception cref="System.NotSupportedException">The current stream instance does not support writing.</exception>
         public override void Write(byte[] buffer, int offset, int count) {
-            this.FileStream.Write(buffer, offset, count);
+            FileStream.Write(buffer, offset, count);
         }
 
 
@@ -301,43 +301,41 @@ namespace Medo.IO {
         /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
         protected override void Dispose(bool disposing) {
-            this.FileStream.SafeFileHandle.Close();
-            this.FileStream.Dispose();
+            FileStream.SafeFileHandle.Close();
+            FileStream.Dispose();
             base.Dispose(disposing);
         }
 
 
 
-
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
-            public const uint GENERIC_READ = 0x80000000;
-            public const uint GENERIC_WRITE = 0x40000000;
+            public const UInt32 GENERIC_READ = 0x80000000;
+            public const UInt32 GENERIC_WRITE = 0x40000000;
 
-            public const uint FILE_SHARE_DELETE = 4;
-            public const uint FILE_SHARE_WRITE = 2;
-            public const uint FILE_SHARE_READ = 1;
+            public const UInt32 FILE_SHARE_DELETE = 4;
+            public const UInt32 FILE_SHARE_WRITE = 2;
+            public const UInt32 FILE_SHARE_READ = 1;
 
-            public const uint CREATE_ALWAYS = 2;
-            public const uint CREATE_NEW = 1;
-            public const uint OPEN_ALWAYS = 4;
-            public const uint OPEN_EXISTING = 3;
-            public const uint TRUNCATE_EXISTING = 5;
+            public const UInt32 CREATE_ALWAYS = 2;
+            public const UInt32 CREATE_NEW = 1;
+            public const UInt32 OPEN_ALWAYS = 4;
+            public const UInt32 OPEN_EXISTING = 3;
+            public const UInt32 TRUNCATE_EXISTING = 5;
 
-            public const uint FILE_FLAG_OPEN_NO_RECALL = 0x00100000;
+            public const UInt32 FILE_FLAG_OPEN_NO_RECALL = 0x00100000;
 
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode)]
-            public static extern SafeFileHandle CreateFileW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpFileName, uint dwDesiredAccess, uint dwShareMode, [InAttribute()] IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, [InAttribute()] IntPtr hTemplateFile);
+            public static extern SafeFileHandle CreateFileW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] String lpFileName, UInt32 dwDesiredAccess, UInt32 dwShareMode, [InAttribute()] IntPtr lpSecurityAttributes, UInt32 dwCreationDisposition, UInt32 dwFlagsAndAttributes, [InAttribute()] IntPtr hTemplateFile);
 
 
+            public const Int32 ERROR_HANDLE_EOF = 38;
 
 
-            public const int ERROR_HANDLE_EOF = 38;
-
-
-            public enum STREAM_INFO_LEVELS {
+            public enum STREAM_INFO_LEVELS : Int32 {
                 FindStreamInfoStandard,
                 FindStreamInfoMaxInfoLevel,
             }
@@ -347,14 +345,14 @@ namespace Medo.IO {
                 private SafeFindStreamHandle() : base(true) { }
 
                 protected override bool ReleaseHandle() {
-                    return FindClose(this.handle);
+                    return FindClose(base.handle);
                 }
 
                 //[ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
                 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
                 [DllImportAttribute("kernel32.dll", EntryPoint = "FindClose", CharSet = CharSet.Unicode)]
                 [return: MarshalAsAttribute(UnmanagedType.Bool)]
-                public static extern bool FindClose(IntPtr hFindFile);
+                public static extern Boolean FindClose(IntPtr hFindFile);
 
             }
 
@@ -364,26 +362,27 @@ namespace Medo.IO {
                 public Int64 StreamSize;
 
                 [MarshalAsAttribute(UnmanagedType.ByValTStr, SizeConst = 296)]
-                public string cStreamName;
+                public String cStreamName;
             }
 
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("Kernel32.dll", EntryPoint = "FindFirstStreamW", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern SafeFindStreamHandle FindFirstStreamW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpFileName, STREAM_INFO_LEVELS InfoLevel, ref WIN32_FIND_STREAM_DATA lpFindStreamData, uint dwFlags);
+            public static extern SafeFindStreamHandle FindFirstStreamW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpFileName, STREAM_INFO_LEVELS InfoLevel, ref WIN32_FIND_STREAM_DATA lpFindStreamData, UInt32 dwFlags);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("Kernel32.dll", EntryPoint = "FindNextStreamW", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
-            public static extern bool FindNextStreamW([InAttribute()] SafeFindStreamHandle hFindStream, ref WIN32_FIND_STREAM_DATA lpFindStreamData);
+            public static extern Boolean FindNextStreamW([InAttribute()] SafeFindStreamHandle hFindStream, ref WIN32_FIND_STREAM_DATA lpFindStreamData);
 
 
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImportAttribute("Kernel32.dll", EntryPoint = "DeleteFileW", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAsAttribute(UnmanagedType.Bool)]
-            public static extern bool DeleteFileW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] string lpFileName);
+            public static extern Boolean DeleteFileW([InAttribute()] [MarshalAsAttribute(UnmanagedType.LPWStr)] String lpFileName);
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
     }

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2009-01-05: Initial version.
 
@@ -17,7 +17,7 @@ namespace Medo.Security.Checksum {
         /// Creates new instance.
         /// </summary>
         public Iso7064() {
-            this._digestSum = 10;
+            _digestSum = 10;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Medo.Security.Checksum {
         /// <exception cref="System.ArgumentOutOfRangeException">Only numeric data is supported.</exception>
         public void Append(char[] value) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-            this.Append(value, 0, value.Length);
+            Append(value, 0, value.Length);
         }
 
         /// <summary>
@@ -41,15 +41,15 @@ namespace Medo.Security.Checksum {
         /// <exception cref="System.ArgumentOutOfRangeException">Only numeric data is supported.</exception>
         public void Append(char[] value, int index, int length) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-            int oldDigest = this._digestSum;
+            int oldDigest = _digestSum;
             for (int i = index; i < index + length; ++i) {
                 if ((value[i] >= '0') && (value[i] <= '9')) {
-                    this._digestSum += (value[i] - '0');
-                    if (this._digestSum > 10) { this._digestSum -= 10; }
-                    this._digestSum *= 2;
-                    if (this._digestSum >= 11) { this._digestSum -= 11; }
+                    _digestSum += (value[i] - '0');
+                    if (_digestSum > 10) { _digestSum -= 10; }
+                    _digestSum *= 2;
+                    if (_digestSum >= 11) { _digestSum -= 11; }
                 } else {
-                    this._digestSum = oldDigest;
+                    _digestSum = oldDigest;
                     throw new System.ArgumentOutOfRangeException("value", Resources.ExceptionOnlyNumericDataIsSupported);
                 }
             }
@@ -70,7 +70,7 @@ namespace Medo.Security.Checksum {
         /// </summary>
         public char Digest {
             get {
-                int tmp = 11 - this._digestSum;
+                int tmp = 11 - _digestSum;
                 if (tmp == 10) {
                     return '0';
                 } else {

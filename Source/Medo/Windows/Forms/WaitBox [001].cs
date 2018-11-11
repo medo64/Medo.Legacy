@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2007-01-04: New version.
 
@@ -18,7 +18,7 @@ namespace Medo.Windows.Forms {
 		private readonly object _syncRoot = new object();
 		private readonly object _syncForm = new object();
 		private Form _form;
-		private System.Windows.Forms.IWin32Window _owner;
+		private readonly System.Windows.Forms.IWin32Window _owner;
 		private string _text;
 		private int _progress = -1;
 		private Label _label;
@@ -51,10 +51,11 @@ namespace Medo.Windows.Forms {
 				_text = text;
 				_progress = progress;
 
-				_thread = new System.Threading.Thread(Run);
-				_thread.Name = "Medo.Windows.Forms.WaitBox.0";
-				_thread.IsBackground = true;
-				_thread.SetApartmentState(System.Threading.ApartmentState.STA);
+                _thread = new System.Threading.Thread(Run) {
+                    Name = "Medo.Windows.Forms.WaitBox.0",
+                    IsBackground = true
+                };
+                _thread.SetApartmentState(System.Threading.ApartmentState.STA);
 				_thread.Start();
 			}
 		}
@@ -127,22 +128,22 @@ namespace Medo.Windows.Forms {
 				_form.Controls.Add(_progressBar);
 				UpdateProgress();
 
-				_label = new Label();
-				_label.AutoSize = false;
-				_label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-				_label.Location = new Point(7, 7);
-				_label.Size = new Size(_form.ClientRectangle.Width - 7 - 7, _form.ClientRectangle.Height - 7 - 7 - 11 - _progressBar.Size.Height);
-				_form.Controls.Add(_label);
+                _label = new Label {
+                    AutoSize = false,
+                    TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                    Location = new Point(7, 7),
+                    Size = new Size(_form.ClientRectangle.Width - 7 - 7, _form.ClientRectangle.Height - 7 - 7 - 11 - _progressBar.Size.Height)
+                };
+                _form.Controls.Add(_label);
 				UpdateText();
 
 				if (_owner != null) {
-					Form formOwner = _owner as Form;
-					if ((formOwner != null) && (formOwner.TopMost == true)) {
-						//HACK: Because of bug in .NET.
-						_form.TopMost = false;
-						_form.TopMost = true;
-					}
-					_form.StartPosition = FormStartPosition.CenterParent;
+                    if ((_owner is Form formOwner) && (formOwner.TopMost == true)) {
+                        //HACK: Because of bug in .NET.
+                        _form.TopMost = false;
+                        _form.TopMost = true;
+                    }
+                    _form.StartPosition = FormStartPosition.CenterParent;
 					_form.Location = new Point((System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Width - _form.Width) / 2, (System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Height - _form.Height) / 2);
 					_form.Show(_owner);
 				} else {
@@ -200,7 +201,7 @@ namespace Medo.Windows.Forms {
 		/// Clean up any resources being used.
 		/// </summary>
 		public void Dispose() {
-			this.Dispose(true);
+			Dispose(true);
 			System.GC.SuppressFinalize(this);
 		}
 

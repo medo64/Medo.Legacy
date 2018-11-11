@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-11-21: Added GetText method.
 //            Added IDisposable.
@@ -15,9 +15,9 @@ namespace Medo.Localization.Croatia {
     /// </summary>
     public class NumberDeclination : IDisposable {
 
-        private string _text1;
-        private string _text2;
-        private string _text5;
+        private readonly string _text1;
+        private readonly string _text2;
+        private readonly string _text5;
 
         /// <summary>
         /// Creates new instance.
@@ -26,9 +26,9 @@ namespace Medo.Localization.Croatia {
         /// <param name="text2">Suffix text as if it is used with number 2 (ex. 2 "tima").</param>
         /// <param name="text5">Suffix text as if it is used with number 5 (ex. 5 "timova").</param>
         public NumberDeclination(string text1, string text2, string text5) {
-            this._text1 = text1;
-            this._text2 = text2;
-            this._text5 = text5;
+            _text1 = text1;
+            _text2 = text2;
+            _text5 = text5;
         }
 
         /// <summary>
@@ -49,13 +49,13 @@ namespace Medo.Localization.Croatia {
             int desetice = value % 100;
             int jedinice = value % 10;
             if ((desetice >= 10) && (desetice <= 20)) {
-                return string.Format(CultureInfo.CurrentCulture, "{0} {1}", value, this._text5);
+                return string.Format(CultureInfo.CurrentCulture, "{0} {1}", value, _text5);
             } else if (jedinice == 1) {
-                return string.Format(CultureInfo.CurrentCulture, "{0} {1}", value, this._text1);
+                return string.Format(CultureInfo.CurrentCulture, "{0} {1}", value, _text1);
             } else if ((jedinice >= 2) && (jedinice <= 4)) {
-                return string.Format(CultureInfo.CurrentCulture, "{0} {1}", value, this._text2);
+                return string.Format(CultureInfo.CurrentCulture, "{0} {1}", value, _text2);
             } else {
-                return string.Format(CultureInfo.CurrentCulture, "{0} {1}", value, this._text5);
+                return string.Format(CultureInfo.CurrentCulture, "{0} {1}", value, _text5);
             }
         }
 

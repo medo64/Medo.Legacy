@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-02-22: First version.
 
@@ -22,7 +22,7 @@ namespace Medo.Xml {
         /// </summary>
         /// <param name="resourceNamePrefix">Prefix of manifest resources part. E.g. "MyApp.Resources".</param>
         public XmlResourceResolver(string resourceNamePrefix) {
-            this.ResourceNamePrefix = resourceNamePrefix;
+            ResourceNamePrefix = resourceNamePrefix;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Medo.Xml {
 
             if (ofObjectToReturn.Equals(typeof(Stream))) {
                 var fileName = absoluteUri.Segments[absoluteUri.Segments.Length - 1];
-                var resourceName = this.ResourceNamePrefix + "." + fileName;
+                var resourceName = ResourceNamePrefix + "." + fileName;
                 var resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
                 return resourceStream;
             } else {

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2011-08-24: Added workaround for Seamless Citrix Application.
 //2009-07-01: New version.
@@ -133,6 +133,7 @@ namespace Medo.Windows.Forms {
 
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             internal const Int32 S_OK = 0x00000000;
 
@@ -150,17 +151,18 @@ namespace Medo.Windows.Forms {
                 Int32 DeleteTab(IntPtr hwnd);
                 Int32 ActivateTab(IntPtr hwnd);
                 Int32 SetActiveAlt(IntPtr hwnd);
-                Int32 MarkFullscreenWindow(IntPtr hwnd, [MarshalAs(UnmanagedType.Bool)] bool fFullscreen);
+                Int32 MarkFullscreenWindow(IntPtr hwnd, [MarshalAs(UnmanagedType.Bool)] Boolean fFullscreen);
                 Int32 SetProgressValue(IntPtr hwnd, UInt64 ullCompleted, UInt64 ullTotal);
                 Int32 SetProgressState(IntPtr hwnd, TaskbarProgressState tbpFlags);
                 Int32 RegisterTab(IntPtr hwndTab, IntPtr hwndMDI);
                 Int32 UnregisterTab(IntPtr hwndTab);
                 Int32 SetTabOrder(IntPtr hwndTab, IntPtr hwndInsertBefore);
                 Int32 ThumbBarSetImageList(IntPtr hwnd, IntPtr himl);
-                Int32 SetOverlayIcon(IntPtr hwnd, IntPtr hIcon, [MarshalAs(UnmanagedType.LPWStr)] string pszDescription);
-                Int32 SetThumbnailTooltip(IntPtr hwnd, [MarshalAs(UnmanagedType.LPWStr)] string pszTip);
+                Int32 SetOverlayIcon(IntPtr hwnd, IntPtr hIcon, [MarshalAs(UnmanagedType.LPWStr)] String pszDescription);
+                Int32 SetThumbnailTooltip(IntPtr hwnd, [MarshalAs(UnmanagedType.LPWStr)] String pszTip);
             }
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
 

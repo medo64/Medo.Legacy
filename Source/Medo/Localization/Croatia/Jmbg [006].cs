@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2009-01-09: Added IsValidJmbg method.
 //2009-01-05: Added support for OIB.
@@ -34,7 +34,7 @@ namespace Medo.Localization.Croatia {
         /// <param name="parseOib">If true, OIB is also parsed.</param>
         /// <remarks>All JMBG's with year digits lower than 800 will be considered as year 2xxx.</remarks>
         public Jmbg(string value, bool parseOib) {
-            this.Value = value;
+            Value = value;
 
             if (parseOib && (value.Length == 11)) { //this is OIB
                 int sum = 10;
@@ -45,7 +45,7 @@ namespace Medo.Localization.Croatia {
                         sum *= 2;
                         if (sum >= 11) { sum -= 11; }
                     } else {
-                        this.IsValid = false;
+                        IsValid = false;
                         return;
                     }
                 }
@@ -57,12 +57,12 @@ namespace Medo.Localization.Croatia {
                     checkDigit = System.Convert.ToChar('0' + sum2);
                 }
                 if (value[10] == checkDigit) {
-                    this.IsValid = true;
-                    this.IsBirthDateValid = false;
-                    this.Region = JmbgRegion.Unknown;
-                    this.Gender = JmbgGender.Unknown;
+                    IsValid = true;
+                    IsBirthDateValid = false;
+                    Region = JmbgRegion.Unknown;
+                    Gender = JmbgGender.Unknown;
                 } else {
-                    this.IsValid = false;
+                    IsValid = false;
                 }
                 return;
             }
@@ -79,8 +79,8 @@ namespace Medo.Localization.Croatia {
                         if ((birthDate.ToString("ddMM", System.Globalization.CultureInfo.InvariantCulture) + birthDate.ToString("yyyy", System.Globalization.CultureInfo.InvariantCulture).Remove(0, 1)) != value.Substring(0, 7)) { //date is invalid
                             return;
                         }
-                        this._birthDate = birthDate;
-                        this.IsBirthDateValid = birthDate <= DateTime.Today;
+                        _birthDate = birthDate;
+                        IsBirthDateValid = birthDate <= DateTime.Today;
                     } catch (System.ArgumentOutOfRangeException) { //date is invalid
                         return;
                     }
@@ -126,38 +126,38 @@ namespace Medo.Localization.Croatia {
 
                 string regionDigits = value.Substring(7, 2);
                 if (regionDigits == "03") {
-                    this._region = JmbgRegion.Foreign;
+                    _region = JmbgRegion.Foreign;
                 } else if (regionDigits.StartsWith("1", StringComparison.Ordinal)) {
-                    this._region = JmbgRegion.BosniaAndHerzegovina;
+                    _region = JmbgRegion.BosniaAndHerzegovina;
                 } else if (regionDigits.StartsWith("2", StringComparison.Ordinal)) {
-                    this._region = JmbgRegion.Montenegro;
+                    _region = JmbgRegion.Montenegro;
                 } else if (regionDigits.StartsWith("3", StringComparison.Ordinal)) {
-                    this._region = JmbgRegion.Croatia;
+                    _region = JmbgRegion.Croatia;
                 } else if (regionDigits.StartsWith("4", StringComparison.Ordinal)) {
-                    this._region = JmbgRegion.Macedonia;
+                    _region = JmbgRegion.Macedonia;
                 } else if (regionDigits.StartsWith("5", StringComparison.Ordinal)) {
-                    this._region = JmbgRegion.Slovenia;
+                    _region = JmbgRegion.Slovenia;
                 } else if (regionDigits.StartsWith("7", StringComparison.Ordinal)) {
-                    this._region = JmbgRegion.Serbia;
+                    _region = JmbgRegion.Serbia;
                 } else if (regionDigits.StartsWith("8", StringComparison.Ordinal)) {
-                    this._region = JmbgRegion.SerbiaVojvodina;
+                    _region = JmbgRegion.SerbiaVojvodina;
                 } else if (regionDigits.StartsWith("9", StringComparison.Ordinal)) {
-                    this._region = JmbgRegion.RepublicOfKosovo;
+                    _region = JmbgRegion.RepublicOfKosovo;
                 } else {
                     return;
                 }
 
 
                 if (int.Parse(value.Substring(9, 3), System.Globalization.CultureInfo.InvariantCulture) < 500) {
-                    this._gender = JmbgGender.Male;
+                    _gender = JmbgGender.Male;
                 } else {
-                    this._gender = JmbgGender.Female;
+                    _gender = JmbgGender.Female;
                 }
             } catch (FormatException) {
                 return;
             }
 
-            this._isValid = true;
+            _isValid = true;
         }
 
 
@@ -166,12 +166,12 @@ namespace Medo.Localization.Croatia {
         /// </summary>
         public string Value { get; private set; }
 
-        private DateTime _birthDate = DateTime.MinValue;
+        private readonly DateTime _birthDate = DateTime.MinValue;
         /// <summary>
         /// Returns birth date.
         /// </summary>
         public DateTime BirthDate {
-            get { return this._birthDate; }
+            get { return _birthDate; }
         }
 
         private JmbgRegion _region = JmbgRegion.Unknown;
@@ -179,8 +179,8 @@ namespace Medo.Localization.Croatia {
         /// Returns region.
         /// </summary>
         public JmbgRegion Region {
-            get { return this._region; }
-            private set { this._region = value; }
+            get { return _region; }
+            private set { _region = value; }
         }
 
         private JmbgGender _gender = JmbgGender.Unknown;
@@ -188,8 +188,8 @@ namespace Medo.Localization.Croatia {
         /// Returns gender.
         /// </summary>
         public JmbgGender Gender {
-            get { return this._gender; }
-            private set { this._gender = value; }
+            get { return _gender; }
+            private set { _gender = value; }
         }
 
         private bool _isValid;
@@ -197,8 +197,8 @@ namespace Medo.Localization.Croatia {
         /// Returns true if JMBG/OIB is valid.
         /// </summary>
         public bool IsValid {
-            get { return this._isValid; }
-            private set { this._isValid = value; }
+            get { return _isValid; }
+            private set { _isValid = value; }
         }
 
         /// <summary>
@@ -220,11 +220,11 @@ namespace Medo.Localization.Croatia {
         /// Returns JMBG/OIB if one is valid.
         /// </summary>
         public override string ToString() {
-            if (this.IsValid) {
-                return this.Value;
+            if (IsValid) {
+                return Value;
             } else {
-                if (this.IsBirthDateValid) {
-                    return this.BirthDate.ToString("ddMM", System.Globalization.CultureInfo.InvariantCulture) + (this.BirthDate.Year % 1000).ToString("000", System.Globalization.CultureInfo.InvariantCulture);
+                if (IsBirthDateValid) {
+                    return BirthDate.ToString("ddMM", System.Globalization.CultureInfo.InvariantCulture) + (BirthDate.Year % 1000).ToString("000", System.Globalization.CultureInfo.InvariantCulture);
                 } else {
                     return string.Empty;
                 }

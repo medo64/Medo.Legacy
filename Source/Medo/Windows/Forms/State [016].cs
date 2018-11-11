@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2018-02-24: Added option to raise event on read/write instead of using registry.
 //2010-10-31: Added option to skip registry writes (NoRegistryWrites).
@@ -566,9 +566,9 @@ namespace Medo.Windows.Forms {
             if (name == null) { throw new ArgumentNullException(nameof(name), "Name cannot be null."); }
             if (string.IsNullOrWhiteSpace(name)) { throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be empty."); }
 
-            this.Name = name;
-            this.DefaultValue = defaultValue;
-            this.Value = defaultValue;
+            Name = name;
+            DefaultValue = defaultValue;
+            Value = defaultValue;
         }
 
 
@@ -605,8 +605,8 @@ namespace Medo.Windows.Forms {
             if (name == null) { throw new ArgumentNullException(nameof(name), "Name cannot be null."); }
             if (string.IsNullOrWhiteSpace(name)) { throw new ArgumentOutOfRangeException(nameof(name), "Name cannot be empty."); }
 
-            this.Name = name;
-            this.Value = value;
+            Name = name;
+            Value = value;
         }
 
 
@@ -621,5 +621,4 @@ namespace Medo.Windows.Forms {
         public int Value { get; }
 
     }
-
 }

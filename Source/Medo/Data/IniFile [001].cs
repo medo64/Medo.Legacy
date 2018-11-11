@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-11-06: Initial version.
 
@@ -29,21 +29,21 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="stream">Stream to load.</param>
         public IniFile(Stream stream) {
-            this.Load(stream);
+            Load(stream);
         }
 
         /// <summary>
         /// Creates new instances.
         /// </summary>
         /// <param name="fileName">File name to load.</param>
-        public IniFile(String fileName) {
-            this.Load(fileName);
+        public IniFile(string fileName) {
+            Load(fileName);
         }
 
 
         private void Initialize() {
-            this.FileName = null;
-            this.Sections = new List<IniSection>();
+            FileName = null;
+            Sections = new List<IniSection>();
         }
 
 
@@ -55,7 +55,7 @@ namespace Medo.Data {
         /// <summary>
         /// Gets last file name used for load/save (if any).
         /// </summary>
-        public String FileName { get; private set; }
+        public string FileName { get; private set; }
 
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Medo.Data {
         /// <param name="sectionName">Section name.</param>
         public IniSection AddSection(string sectionName) {
             var section = new IniSection(sectionName);
-            this.Sections.Add(section);
+            Sections.Add(section);
             return section;
         }
 
@@ -74,8 +74,8 @@ namespace Medo.Data {
         /// <param name="sectionName">Section name.</param>
         public IniSection SetSection(string sectionName) {
             var section = new IniSection(sectionName);
-            this.RemoveSections(sectionName);
-            this.Sections.Add(section);
+            RemoveSections(sectionName);
+            Sections.Add(section);
             return section;
         }
 
@@ -84,9 +84,9 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="sectionName">Section name.</param>
         public void RemoveSections(string sectionName) {
-            for (int i = this.Sections.Count - 1; i >= 0; i--) {
-                if (this.Sections[i].Name.Equals(sectionName, StringComparison.OrdinalIgnoreCase)) {
-                    this.Sections.RemoveAt(i);
+            for (int i = Sections.Count - 1; i >= 0; i--) {
+                if (Sections[i].Name.Equals(sectionName, StringComparison.OrdinalIgnoreCase)) {
+                    Sections.RemoveAt(i);
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="sectionName">Section name.</param>
         public IniSection GetSection(string sectionName) {
-            foreach (var section in this.Sections) {
+            foreach (var section in Sections) {
                 if (section.Name.Equals(sectionName, StringComparison.OrdinalIgnoreCase)) {
                     return section;
                 }
@@ -109,7 +109,7 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="sectionName">Section name.</param>
         public bool HasSection(string sectionName) {
-            foreach (var section in this.Sections) {
+            foreach (var section in Sections) {
                 if (section.Name.Equals(sectionName, StringComparison.OrdinalIgnoreCase)) {
                     return true;
                 }
@@ -122,7 +122,7 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="sectionName">Section name.</param>
         public IEnumerable<IniSection> RetrieveSections(string sectionName) {
-            foreach (var section in this.Sections) {
+            foreach (var section in Sections) {
                 if (section.Name.Equals(sectionName, StringComparison.OrdinalIgnoreCase)) {
                     yield return section;
                 }
@@ -135,9 +135,9 @@ namespace Medo.Data {
         /// Name is not case sensitive.
         /// </summary>
         /// <param name="sectionName">Section name.</param>
-        public IniSection this[String sectionName] {
+        public IniSection this[string sectionName] {
             get {
-                return this.GetSection(sectionName);
+                return GetSection(sectionName);
             }
         }
 
@@ -154,7 +154,7 @@ namespace Medo.Data {
             var firstLine = true;
             using (var sw = new StreamWriter(stream, Encoding)) {
                 var sb = new StringBuilder();
-                foreach (var section in this.Sections) {
+                foreach (var section in Sections) {
                     if (firstLine) { firstLine = false; } else { sw.WriteLine(); }
                     sb.Append('[');
                     if (Escape(sb, section.Name)) {
@@ -181,18 +181,18 @@ namespace Medo.Data {
                     }
                 }
             }
-            this.FileName = null;
+            FileName = null;
         }
 
         /// <summary>
         /// Saves all items.
         /// </summary>
         /// <param name="fileName">File name.</param>
-        public void Save(String fileName) {
+        public void Save(string fileName) {
             using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read)) {
-                this.Save(stream);
+                Save(stream);
             }
-            this.FileName = FileName;
+            FileName = FileName;
         }
 
 
@@ -212,18 +212,18 @@ namespace Medo.Data {
                     ParseLine(this, line, sbName, sbValue);
                 }
             }
-            this.FileName = null;
+            FileName = null;
         }
 
         /// <summary>
         /// Loads file.
         /// </summary>
         /// <param name="fileName">File name.</param>
-        public void Load(String fileName) {
+        public void Load(string fileName) {
             using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read, 64 * 1024, FileOptions.SequentialScan)) {
                 Load(stream);
             }
-            this.FileName = fileName;
+            FileName = fileName;
         }
 
         #endregion
@@ -501,7 +501,7 @@ namespace Medo.Data {
                 case 'u':
                     if ((i + 4) >= line.Length) { return false; }
                     var hex = new string(new char[] { line[i + 1], line[i + 2], line[i + 3], line[i + 4] });
-                    var codepoint = UInt32.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    var codepoint = uint.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                     sb.Append(System.Convert.ToChar(codepoint).ToString());
                     i += 4;
                     return true;
@@ -553,7 +553,7 @@ namespace Medo.Data {
         /// Creates new instance.
         /// </summary>
         /// <param name="name">Section name.</param>
-        public IniSection(String name)
+        public IniSection(string name)
             : this(name, null) {
         }
 
@@ -562,10 +562,9 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="name">Section name.</param>
         /// <param name="properties">Section properties.</param>
-        public IniSection(String name, IEnumerable<IniProperty> properties) {
-            if (name == null) { throw new ArgumentNullException("name", "Name cannot be null."); }
-            this.Name = name;
-            this.Properties = (properties != null) ? new List<IniProperty>(properties) : new List<IniProperty>();
+        public IniSection(string name, IEnumerable<IniProperty> properties) {
+            Name = name ?? throw new ArgumentNullException("name", "Name cannot be null.");
+            Properties = (properties != null) ? new List<IniProperty>(properties) : new List<IniProperty>();
         }
 
 
@@ -573,13 +572,12 @@ namespace Medo.Data {
         /// <summary>
         /// Gets name.
         /// </summary>
-        public String Name {
+        public string Name {
             get {
-                return this._name;
+                return _name;
             }
             set {
-                if (value == null) { throw new ArgumentNullException("value", "Name cannot be null."); }
-                this._name = value;
+                _name = value ?? throw new ArgumentNullException("value", "Name cannot be null.");
             }
         }
 
@@ -596,7 +594,7 @@ namespace Medo.Data {
         /// <param name="propertyValue">Property value.</param>
         public IniProperty AddProperty(string propertyName, string propertyValue) {
             var property = new IniProperty(propertyName, propertyValue);
-            this.Properties.Add(property);
+            Properties.Add(property);
             return property;
         }
 
@@ -608,7 +606,7 @@ namespace Medo.Data {
         public IniProperty SetProperty(string propertyName, string propertyValue) {
             var property = new IniProperty(propertyName, propertyValue);
             RemoveProperties(propertyName);
-            this.Properties.Add(property);
+            Properties.Add(property);
             return property;
         }
 
@@ -617,9 +615,9 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="propertyName">Property name.</param>
         public void RemoveProperties(string propertyName) {
-            for (int i = this.Properties.Count - 1; i >= 0; i--) {
-                if (this.Properties[i].Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)) {
-                    this.Properties.RemoveAt(i);
+            for (int i = Properties.Count - 1; i >= 0; i--) {
+                if (Properties[i].Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)) {
+                    Properties.RemoveAt(i);
                 }
             }
         }
@@ -629,7 +627,7 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="propertyName">Property name.</param>
         public IniProperty GetProperty(string propertyName) {
-            foreach (var property in this.Properties) {
+            foreach (var property in Properties) {
                 if (property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)) {
                     return property;
                 }
@@ -642,7 +640,7 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="propertyName">Property name.</param>
         public bool HasProperty(string propertyName) {
-            foreach (var property in this.Properties) {
+            foreach (var property in Properties) {
                 if (property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)) {
                     return true;
                 }
@@ -655,7 +653,7 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="propertyName">Property name.</param>
         public IEnumerable<IniProperty> RetrieveProperties(string propertyName) {
-            foreach (var property in this.Properties) {
+            foreach (var property in Properties) {
                 if (property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)) {
                     yield return property;
                 }
@@ -669,13 +667,13 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="propertyName">Property name.</param>
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
-        public IniProperty this[String propertyName] {
+        public IniProperty this[string propertyName] {
             get {
-                return this.GetProperty(propertyName);
+                return GetProperty(propertyName);
             }
             set {
                 if (value == null) { throw new ArgumentNullException("value", "Value cannot be null."); }
-                this.SetProperty(propertyName, value.Value);
+                SetProperty(propertyName, value.Value);
             }
         }
 
@@ -692,7 +690,7 @@ namespace Medo.Data {
         /// Returns hash code.
         /// </summary>
         public override int GetHashCode() {
-            return this.Name.GetHashCode();
+            return Name.GetHashCode();
         }
 
     }
@@ -710,11 +708,9 @@ namespace Medo.Data {
         /// <param name="name">Property name.</param>
         /// <param name="value">Property value.</param>
         /// <exception cref="System.ArgumentNullException">Name or value cannot be null.</exception>
-        public IniProperty(String name, String value) {
-            if (name == null) { throw new ArgumentNullException("name", "Name cannot be null."); }
-            if (value == null) { throw new ArgumentNullException("value", "Value cannot be null."); }
-            this.Name = name;
-            this.Value = value;
+        public IniProperty(string name, string value) {
+            Name = name ?? throw new ArgumentNullException("name", "Name cannot be null.");
+            Value = value ?? throw new ArgumentNullException("value", "Value cannot be null.");
         }
 
 
@@ -723,13 +719,12 @@ namespace Medo.Data {
         /// Gets/sets name.
         /// </summary>
         /// <exception cref="System.ArgumentNullException">Name cannot be null.</exception>
-        public String Name {
+        public string Name {
             get {
-                return this._name;
+                return _name;
             }
             set {
-                if (value == null) { throw new ArgumentNullException("value", "Name cannot be null."); }
-                this._name = value;
+                _name = value ?? throw new ArgumentNullException("value", "Name cannot be null.");
             }
         }
 
@@ -738,13 +733,12 @@ namespace Medo.Data {
         /// Gets/sets value.
         /// </summary>
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
-        public String Value {
+        public string Value {
             get {
-                return this._value;
+                return _value;
             }
             set {
-                if (value == null) { throw new ArgumentNullException("value", "Value cannot be null."); }
-                this._value = value;
+                _value = value ?? throw new ArgumentNullException("value", "Value cannot be null.");
             }
         }
 
@@ -755,15 +749,14 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="obj">Other object.</param>
         public override bool Equals(object obj) {
-            var other = obj as IniProperty;
-            return ((other != null) && this.Name.Equals(other.Name, StringComparison.OrdinalIgnoreCase) && this.Value.Equals(other.Value, StringComparison.Ordinal));
+            return ((obj is IniProperty other) && Name.Equals(other.Name, StringComparison.OrdinalIgnoreCase) && Value.Equals(other.Value, StringComparison.Ordinal));
         }
 
         /// <summary>
         /// Returns hash code.
         /// </summary>
         public override int GetHashCode() {
-            return this.Name.GetHashCode();
+            return Name.GetHashCode();
         }
 
 
@@ -772,7 +765,7 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="property">Property.</param>
         public static string FromProperty(IniProperty property) {
-            return (property != null) ? property.Value : null;
+            return property?.Value;
         }
 
         /// <summary>
@@ -788,7 +781,7 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="property">Property.</param>
         public static implicit operator string(IniProperty property) {
-            return (property != null) ? property.Value : null;
+            return property?.Value;
         }
 
         /// <summary>

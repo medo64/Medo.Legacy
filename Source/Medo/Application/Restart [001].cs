@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2013-12-27: First version.
 
@@ -19,7 +19,7 @@ namespace Medo.Application {
         /// <summary>
         /// Returns true if this application successfully registered for restart.
         /// </summary>
-        public static Boolean Register() {
+        public static bool Register() {
             return Restart.Register(null, RestartModifiers.None);
         }
 
@@ -27,7 +27,7 @@ namespace Medo.Application {
         /// Returns true if this application successfully registered for restart.
         /// </summary>
         /// <param name="arguments">Command-line arguments for the application when it is restarted.</param>
-        public static Boolean Register(String arguments) {
+        public static bool Register(string arguments) {
             return Restart.Register(arguments, RestartModifiers.None);
         }
 
@@ -36,7 +36,7 @@ namespace Medo.Application {
         /// </summary>
         /// <param name="arguments">Command-line arguments for the application when it is restarted.</param>
         /// <param name="modifiers">Special behaviour.</param>
-        public static Boolean Register(String arguments, RestartModifiers modifiers) {
+        public static bool Register(string arguments, RestartModifiers modifiers) {
             try {
                 var hResult = NativeMethods.RegisterApplicationRestart(arguments, (int)modifiers);
                 if (NativeMethods.IsHResultSuccess(hResult)) {
@@ -53,12 +53,12 @@ namespace Medo.Application {
         /// <summary>
         /// Gets whether restart is registered.
         /// </summary>
-        public static Boolean IsRegistered { get; private set; }
+        public static bool IsRegistered { get; private set; }
 
         /// <summary>
         /// Returns true if this application has been successfully unregistered for restart.
         /// </summary>
-        public static Boolean Unregister() {
+        public static bool Unregister() {
             try {
                 var hResult = NativeMethods.UnregisterApplicationRestart();
                 if (NativeMethods.IsHResultSuccess(hResult)) {
@@ -74,6 +74,7 @@ namespace Medo.Application {
 
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "This is bogus warning.")]
@@ -88,6 +89,7 @@ namespace Medo.Application {
                 return (hResult & 0x80000000) != 0x80000000;
             }
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
     }

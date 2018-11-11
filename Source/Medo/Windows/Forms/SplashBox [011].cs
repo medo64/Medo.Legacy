@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 //2008-08-10: Form is not topmost any more.
@@ -39,19 +39,19 @@ namespace Medo.Windows.Forms {
 
 				System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.AppStarting;
 
-				_form = new Form();
+                _form = new Form {
+                    Cursor = Cursors.AppStarting,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    ControlBox = false,
+                    ShowIcon = false,
+                    ShowInTaskbar = false,
+                    MinimizeBox = false,
+                    MaximizeBox = false,
+                    AutoSize = false,
+                    AutoScaleMode = AutoScaleMode.None
+                };
 
-				_form.Cursor = Cursors.AppStarting;
-				_form.FormBorderStyle = FormBorderStyle.FixedDialog;
-				_form.ControlBox = false;
-				_form.ShowIcon = false;
-				_form.ShowInTaskbar = false;
-				_form.MinimizeBox = false;
-				_form.MaximizeBox = false;
-				_form.AutoSize = false;
-				_form.AutoScaleMode = AutoScaleMode.None;
-
-				using (Bitmap tmpBitmap = new Bitmap(1, 1))
+                using (Bitmap tmpBitmap = new Bitmap(1, 1))
 				using (Graphics tmpGraphics = Graphics.FromImage(tmpBitmap))
 				using (Font font = new System.Drawing.Font(System.Drawing.SystemFonts.DefaultFont.Name, 32, System.Drawing.SystemFonts.DefaultFont.Style, System.Drawing.GraphicsUnit.Pixel, System.Drawing.SystemFonts.DefaultFont.GdiCharSet)) {
 					Icon icon = null;
@@ -178,17 +178,19 @@ namespace Medo.Windows.Forms {
 
 
 		private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-			static extern internal System.IntPtr LoadIcon(System.IntPtr hInstance, string lpIconName);
+			static extern internal System.IntPtr LoadIcon(System.IntPtr hInstance, String lpIconName);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-			static extern internal System.IntPtr LoadLibrary(string lpFileName);
+			static extern internal System.IntPtr LoadLibrary(String lpFileName);
 
-		}
+#pragma warning restore IDE0049 // Simplify Names
+        }
 
-	}
+    }
 
 }

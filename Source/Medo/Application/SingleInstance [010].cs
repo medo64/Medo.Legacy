@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 //2010-10-07: Added IsOtherInstanceRunning method.
@@ -80,9 +80,10 @@ namespace Medo.Application {
 
                     } else {  //there is no application already running.
 
-                        _thread = new Thread(Run);
-                        _thread.Name = "Medo.Application.SingleInstance.0";
-                        _thread.IsBackground = true;
+                        _thread = new Thread(Run) {
+                            Name = "Medo.Application.SingleInstance.0",
+                            IsBackground = true
+                        };
                         _thread.Start();
 
                     }
@@ -137,7 +138,7 @@ namespace Medo.Application {
                 }
             }
         }
-        private static string NamedPipeName = @"\\.\pipe\" + MutexName;
+        private static readonly string NamedPipeName = @"\\.\pipe\" + MutexName;
 
         /// <summary>
         /// Gets whether there is another instance running.
@@ -149,8 +150,7 @@ namespace Medo.Application {
                     if (_mtxFirstInstance != null) {
                         return false; //no other instance is running
                     } else {
-                        bool isFirstInstance = false;
-                        var tempInstance = new Mutex(true, MutexName, out isFirstInstance);
+                        var tempInstance = new Mutex(true, MutexName, out var isFirstInstance);
                         tempInstance.Close();
                         return (isFirstInstance == false);
                     }
@@ -196,8 +196,8 @@ namespace Medo.Application {
                     }
 
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer)) {
-                        System.Runtime.Serialization.Formatters.Binary.BinaryFormatter bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                        if (NewInstanceDetected != null) { NewInstanceDetected(null, (NewInstanceEventArgs)bf.Deserialize(ms)); }
+                        var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                        NewInstanceDetected?.Invoke(null, (NewInstanceEventArgs)bf.Deserialize(ms));
                     }
 
                 } catch (System.Exception ex) {
@@ -232,18 +232,19 @@ namespace Medo.Application {
         }
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
-            public const uint FILE_ATTRIBUTE_NORMAL = 0;
-            public const uint GENERIC_READ = 0x80000000;
-            public const uint GENERIC_WRITE = 0x40000000;
-            public const int INVALID_HANDLE_VALUE = -1;
-            public const uint NMPWAIT_USE_DEFAULT_WAIT = 0x00000000;
-            public const uint OPEN_EXISTING = 3;
-            public const uint PIPE_ACCESS_DUPLEX = 0x00000003;
-            public const uint PIPE_READMODE_BYTE = 0x00000000;
-            public const uint PIPE_TYPE_BYTE = 0x00000000;
-            public const uint PIPE_UNLIMITED_INSTANCES = 255;
-            public const uint PIPE_WAIT = 0x00000000;
+            public const UInt32 FILE_ATTRIBUTE_NORMAL = 0;
+            public const UInt32 GENERIC_READ = 0x80000000;
+            public const UInt32 GENERIC_WRITE = 0x40000000;
+            public const Int32 INVALID_HANDLE_VALUE = -1;
+            public const UInt32 NMPWAIT_USE_DEFAULT_WAIT = 0x00000000;
+            public const UInt32 OPEN_EXISTING = 3;
+            public const UInt32 PIPE_ACCESS_DUPLEX = 0x00000003;
+            public const UInt32 PIPE_READMODE_BYTE = 0x00000000;
+            public const UInt32 PIPE_TYPE_BYTE = 0x00000000;
+            public const UInt32 PIPE_UNLIMITED_INSTANCES = 255;
+            public const UInt32 PIPE_WAIT = 0x00000000;
 
 
             public class FileSafeHandle : SafeHandle {
@@ -255,15 +256,15 @@ namespace Medo.Application {
 
 
                 public override bool IsInvalid {
-                    get { return (this.IsClosed) || (base.handle == minusOne); }
+                    get { return (IsClosed) || (base.handle == minusOne); }
                 }
 
                 protected override bool ReleaseHandle() {
-                    return CloseHandle(this.handle);
+                    return CloseHandle(base.handle);
                 }
 
                 public override string ToString() {
-                    return this.handle.ToString();
+                    return base.handle.ToString();
                 }
 
             }
@@ -272,41 +273,42 @@ namespace Medo.Application {
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool CloseHandle(System.IntPtr hObject);
+            public static extern Boolean CloseHandle(IntPtr hObject);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool ConnectNamedPipe(System.IntPtr hNamedPipe, System.IntPtr lpOverlapped);
+            public static extern Boolean ConnectNamedPipe(IntPtr hNamedPipe, IntPtr lpOverlapped);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern FileSafeHandle CreateFile(string lpFileName, uint dwDesiredAccess, uint dwShareMode, System.IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, System.IntPtr hTemplateFile);
+            public static extern FileSafeHandle CreateFile(String lpFileName, UInt32 dwDesiredAccess, UInt32 dwShareMode, IntPtr lpSecurityAttributes, UInt32 dwCreationDisposition, UInt32 dwFlagsAndAttributes, IntPtr hTemplateFile);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-            public static extern System.IntPtr CreateNamedPipe(string lpName, uint dwOpenMode, uint dwPipeMode, uint nMaxInstances, uint nOutBufferSize, uint nInBufferSize, uint nDefaultTimeOut, System.IntPtr lpSecurityAttributes);
+            public static extern IntPtr CreateNamedPipe(String lpName, UInt32 dwOpenMode, UInt32 dwPipeMode, UInt32 nMaxInstances, UInt32 nOutBufferSize, UInt32 nInBufferSize, UInt32 nDefaultTimeOut, IntPtr lpSecurityAttributes);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool PeekNamedPipe(System.IntPtr hNamedPipe, byte[] lpBuffer, uint nBufferSize, ref uint lpBytesRead, ref uint lpTotalBytesAvail, ref uint lpBytesLeftThisMessage);
+            public static extern Boolean PeekNamedPipe(IntPtr hNamedPipe, Byte[] lpBuffer, UInt32 nBufferSize, ref UInt32 lpBytesRead, ref UInt32 lpTotalBytesAvail, ref UInt32 lpBytesLeftThisMessage);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool ReadFile(System.IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToRead, ref uint lpNumberOfBytesRead, ref NativeOverlapped lpOverlapped);
+            public static extern Boolean ReadFile(IntPtr hFile, Byte[] lpBuffer, UInt32 nNumberOfBytesToRead, ref UInt32 lpNumberOfBytesRead, ref NativeOverlapped lpOverlapped);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool WriteFile(FileSafeHandle hFile, byte[] lpBuffer, uint nNumberOfBytesToWrite, ref uint lpNumberOfBytesWritten, ref NativeOverlapped lpOverlapped);
+            public static extern Boolean WriteFile(FileSafeHandle hFile, Byte[] lpBuffer, UInt32 nNumberOfBytesToWrite, ref UInt32 lpNumberOfBytesWritten, ref NativeOverlapped lpOverlapped);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool WaitNamedPipe(string lpNamedPipeName, uint nTimeOut);
+            public static extern Boolean WaitNamedPipe(String lpNamedPipeName, UInt32 nTimeOut);
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
     }
@@ -327,26 +329,25 @@ namespace Medo.Application {
         /// <param name="commandLine">Command line.</param>
         /// <param name="commandLineArgs">String array containing the command line arguments.</param>
         public NewInstanceEventArgs(string commandLine, string[] commandLineArgs) {
-            this._commandLine = commandLine;
-            this._commandLineArgs = commandLineArgs;
+            _commandLine = commandLine;
+            _commandLineArgs = commandLineArgs;
         }
 
-        private string _commandLine;
+        private readonly string _commandLine;
         /// <summary>
         /// Gets the command line.
         /// </summary>
         public string CommandLine {
-            get { return this._commandLine; }
+            get { return _commandLine; }
         }
 
-        private string[] _commandLineArgs;
+        private readonly string[] _commandLineArgs;
         /// <summary>
         /// Returns a string array containing the command line arguments.
         /// </summary>
         public string[] GetCommandLineArgs() {
-            return this._commandLineArgs;
+            return _commandLineArgs;
         }
 
     }
-
 }

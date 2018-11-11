@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2013-03-11: Nulls are supported.
 //2013-03-08: Bug-fixing.
@@ -25,7 +25,7 @@ namespace Medo.Text {
         /// <param name="items">Replacement items.</param>
         /// <exception cref="System.ArgumentNullException">Format string cannot be null.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1719:ParameterNamesShouldNotMatchMemberNames", MessageId = "0#", Justification = "Naming kept to match string.Format.")]
-        public static String Format(String format, IDictionary<String, Object> items) {
+        public static string Format(string format, IDictionary<string, object> items) {
             return Format(CultureInfo.CurrentCulture, format, items);
         }
 
@@ -38,7 +38,7 @@ namespace Medo.Text {
         /// <exception cref="System.ArgumentNullException">Provider cannot be null. -or- Format string cannot be null.</exception>
         /// <exception cref="System.ArgumentException">Invalid closing brace. -or- Cannot find placeholder item.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1719:ParameterNamesShouldNotMatchMemberNames", MessageId = "1#", Justification = "Naming kept to match string.Format.")]
-        public static String Format(IFormatProvider provider, String format, IDictionary<String, Object> items) {
+        public static string Format(IFormatProvider provider, string format, IDictionary<string, object> items) {
             if (provider == null) { throw new ArgumentNullException("provider", "Provider cannot be null."); }
             if (format == null) { throw new ArgumentNullException("format", "Format string cannot be null."); }
 
@@ -46,7 +46,7 @@ namespace Medo.Text {
             var sbArgName = new StringBuilder();
             var sbArgFormat = new StringBuilder();
             var argIndex = 0;
-            var args = new List<Object>();
+            var args = new List<object>();
 
             var state = State.Default;
             foreach (var ch in format) {
@@ -83,8 +83,7 @@ namespace Medo.Text {
                     case State.ArgName: {
                             if (ch == '}') {
                                 var argName = sbArgName.ToString();
-                                object arg;                                
-                                if (GetArg(items, argName, out arg)) {
+                                if (GetArg(items, argName, out var arg)) {
                                     args.Add(arg);
                                     sbFormat.AppendFormat(CultureInfo.InvariantCulture, "{{{0}}}", argIndex);
                                     argIndex += 1;
@@ -103,8 +102,7 @@ namespace Medo.Text {
                     case State.ArgFormat: {
                             if (ch == '}') {
                                 var argName = sbArgName.ToString();
-                                object arg;
-                                if (GetArg(items, argName, out arg)) {
+                                if (GetArg(items, argName, out var arg)) {
                                     args.Add(arg);
                                     var argFormat = sbArgFormat.ToString();
                                     sbFormat.AppendFormat(CultureInfo.InvariantCulture, "{{{0}:{1}}}", argIndex, argFormat);
@@ -124,7 +122,7 @@ namespace Medo.Text {
                 }
             }
 
-            return String.Format(provider, sbFormat.ToString(), args.ToArray());
+            return string.Format(provider, sbFormat.ToString(), args.ToArray());
         }
 
 
@@ -137,13 +135,12 @@ namespace Medo.Text {
         /// <exception cref="System.ArgumentNullException">Provider cannot be null. -or- Format string cannot be null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">There must be even number of names and values. -or- Name must be a string.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1719:ParameterNamesShouldNotMatchMemberNames", MessageId = "1#", Justification = "Naming kept to match string.Format.")]
-        public static String Format(IFormatProvider provider, String format, params Object[] namesAndValues) {
-            var items = new Dictionary<String, Object>();
+        public static string Format(IFormatProvider provider, string format, params object[] namesAndValues) {
+            var items = new Dictionary<string, object>();
             if (namesAndValues != null) {
                 if ((namesAndValues.Length % 2) != 0) { throw new ArgumentOutOfRangeException("namesAndValues", "There must be even number of names and values."); }
                 for (int i = 0; i < namesAndValues.Length; i += 2) {
-                    var name = namesAndValues[i] as string;
-                    if (name == null) { throw new ArgumentOutOfRangeException("namesAndValues", "Name must be a string."); }
+                    if (!(namesAndValues[i] is string name)) { throw new ArgumentOutOfRangeException("namesAndValues", "Name must be a string."); }
                     var value = namesAndValues[i + 1];
                     items.Add(name, value);
                 }
@@ -159,12 +156,12 @@ namespace Medo.Text {
         /// <exception cref="System.ArgumentNullException">Provider cannot be null. -or- Format string cannot be null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">There must be even number of names and values. -or- Name must be a string.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1719:ParameterNamesShouldNotMatchMemberNames", MessageId = "0#", Justification = "Naming kept to match string.Format.")]
-        public static String Format(String format, params Object[] namesAndValues) {
+        public static string Format(string format, params object[] namesAndValues) {
             return Format(CultureInfo.CurrentCulture, format, namesAndValues);
         }
 
 
-        private static bool GetArg(IDictionary<String, Object> items, string argumentName, out object value) {
+        private static bool GetArg(IDictionary<string, object> items, string argumentName, out object value) {
             if (items.TryGetValue(argumentName, out value)) {
                 return true;
             } else {

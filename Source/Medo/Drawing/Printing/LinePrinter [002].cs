@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-01-31: All empty places are 0 instead of space.
 //2008-01-22: Initial version.
@@ -28,7 +28,7 @@ namespace Medo.Drawing.Printing {
 		/// </summary>
 		/// <param name="width">Total width of paper in characters.</param>
 		public LinePrinter(int width) {
-			this._width = width;
+			_width = width;
 		}
 
 
@@ -37,8 +37,8 @@ namespace Medo.Drawing.Printing {
 		/// </summary>
 		public string[] GetLines() {
 			List<string> lines = new List<string>();
-			for (int i = 0; i < this._lines.Count; ++i) {
-				lines.Add(new string(this._lines[i]).Replace('\0', ' '));
+			for (int i = 0; i < _lines.Count; ++i) {
+				lines.Add(new string(_lines[i]).Replace('\0', ' '));
 			}
 			return lines.ToArray();
 		}
@@ -47,7 +47,7 @@ namespace Medo.Drawing.Printing {
 		/// Gets number of lines.
 		/// </summary>
 		public int LineCount {
-			get { return this._lines.Count; }
+			get { return _lines.Count; }
 		}
 
 
@@ -59,7 +59,7 @@ namespace Medo.Drawing.Printing {
 		/// <param name="left">Index at which text will be added.</param>
 		/// <returns>Index of modified line. It may not be last line since word wrap can occurr.</returns>
 		public int Write(int lineIndex, string text, int left) {
-			return Write(lineIndex, text, left, this.Width - left, System.Windows.Forms.HorizontalAlignment.Left, true);
+			return Write(lineIndex, text, left, Width - left, System.Windows.Forms.HorizontalAlignment.Left, true);
 		}
 
 		/// <summary>
@@ -91,7 +91,7 @@ namespace Medo.Drawing.Printing {
 		public int Write(int lineIndex, string text, int left, int width, System.Windows.Forms.HorizontalAlignment alignment, bool wordWrap) {
 			if (left < 0) { throw new System.ArgumentOutOfRangeException("left", left, Resources.ExceptionLeftCannotBeNegative); }
 			if (width <= 0) { throw new System.ArgumentOutOfRangeException("width", width, Resources.ExceptionWidthCannotBeZeroOrNegative); }
-			if (left + width > this.Width) { throw new System.OverflowException(string.Format(System.Globalization.CultureInfo.InvariantCulture, Resources.ExceptionOperationWouldResultInWriteAtLocationWhichIsBeyondEndOfPaper, left + width - 1, this.Width - 1)); }
+			if (left + width > Width) { throw new System.OverflowException(string.Format(System.Globalization.CultureInfo.InvariantCulture, Resources.ExceptionOperationWouldResultInWriteAtLocationWhichIsBeyondEndOfPaper, left + width - 1, Width - 1)); }
 
 
 			List<string> wrappedContent = new List<string>();
@@ -141,17 +141,17 @@ namespace Medo.Drawing.Printing {
 
 
 			int addLineCount = 0;
-			if ((lineIndex >= this._lines.Count) || (this._lines.Count == 0)) { //add new line
-				lineIndex = this._lines.Count;
+			if ((lineIndex >= _lines.Count) || (_lines.Count == 0)) { //add new line
+				lineIndex = _lines.Count;
 				addLineCount = newContent.Length;
 			} else if (lineIndex < 0) { //check last line
-				lineIndex = this._lastLine;
-				addLineCount = System.Math.Max(0, newContent.Length - (this._lines.Count - lineIndex));
+				lineIndex = _lastLine;
+				addLineCount = System.Math.Max(0, newContent.Length - (_lines.Count - lineIndex));
 			} else { //use existing line.
-				addLineCount = System.Math.Max(0, newContent.Length - (this._lines.Count - lineIndex));
+				addLineCount = System.Math.Max(0, newContent.Length - (_lines.Count - lineIndex));
 			}
 			for (int i = 0; i < addLineCount; ++i) {
-				this._lines.Add((new string('\0', this.Width)).ToCharArray());
+				_lines.Add((new string('\0', Width)).ToCharArray());
 			}
 
 
@@ -160,13 +160,13 @@ namespace Medo.Drawing.Printing {
 				for (int j = 0; j < width; ++j) {
 					int y = left + j;
 					if (newContent[i][j] != '\0') {
-						this._lines[x][y] = newContent[i][j];
+						_lines[x][y] = newContent[i][j];
 					}
 				}
 			}
 
 
-			this._lastLine = lineIndex;
+			_lastLine = lineIndex;
 			return lineIndex;
 		}
 
@@ -175,7 +175,7 @@ namespace Medo.Drawing.Printing {
 		/// Adds new line.
 		/// </summary>
 		public int WriteLine() {
-			return Write(int.MaxValue, string.Empty, 0, this.Width, System.Windows.Forms.HorizontalAlignment.Left, true);
+			return Write(int.MaxValue, string.Empty, 0, Width, System.Windows.Forms.HorizontalAlignment.Left, true);
 		}
 
 		/// <summary>
@@ -183,7 +183,7 @@ namespace Medo.Drawing.Printing {
 		/// </summary>
 		/// <param name="text">Text to write</param>
 		public int WriteLine(string text) {
-			return Write(int.MaxValue, text, 0, this.Width, System.Windows.Forms.HorizontalAlignment.Left, true);
+			return Write(int.MaxValue, text, 0, Width, System.Windows.Forms.HorizontalAlignment.Left, true);
 		}
 
 		/// <summary>
@@ -192,7 +192,7 @@ namespace Medo.Drawing.Printing {
 		/// <param name="text">Text to write</param>
 		/// <param name="alignment">Alignment of text.</param>
 		public int WriteLine(string text, System.Windows.Forms.HorizontalAlignment alignment) {
-			return Write(int.MaxValue, text, 0, this.Width, alignment, true);
+			return Write(int.MaxValue, text, 0, Width, alignment, true);
 		}
 
 		/// <summary>
@@ -202,16 +202,16 @@ namespace Medo.Drawing.Printing {
 		/// <param name="alignment">Alignment of text.</param>
 		/// <param name="wordWrap">If false, text will not be wrapped to next line in case it is too long to fit on one line.</param>
 		public int WriteLine(string text, System.Windows.Forms.HorizontalAlignment alignment, bool wordWrap) {
-			return Write(int.MaxValue, text, 0, this.Width, alignment, wordWrap);
+			return Write(int.MaxValue, text, 0, Width, alignment, wordWrap);
 		}
 
 
-		private int _width;
+		private readonly int _width;
 		/// <summary>
 		/// Gets with of paper in characters.
 		/// </summary>
 		public int Width {
-			get { return this._width; }
+			get { return _width; }
 		}
 
 
@@ -220,8 +220,8 @@ namespace Medo.Drawing.Printing {
 		/// </summary>
 		public override string ToString() {
 			System.Text.StringBuilder sb = new System.Text.StringBuilder();
-			for (int i = 0; i < this._lines.Count; ++i) {
-				sb.AppendLine(new string(this._lines[i]).Replace('\0', ' '));
+			for (int i = 0; i < _lines.Count; ++i) {
+				sb.AppendLine(new string(_lines[i]).Replace('\0', ' '));
 			}
 			return sb.ToString();
 		}
@@ -232,7 +232,7 @@ namespace Medo.Drawing.Printing {
 		/// Clean up any resources being used.
 		/// </summary>
 		public void Dispose() {
-			this.Dispose(true);
+			Dispose(true);
 			System.GC.SuppressFinalize(this);
 		}
 

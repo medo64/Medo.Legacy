@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2013-03-13: Updated for Elsidi [L 2013-03-13].
 //2013-01-14: Updated for Elsidi [K 2013-01-14].
@@ -23,7 +23,7 @@ namespace Medo.Device {
     /// </summary>
     public class Elsidi : IDisposable {
 
-        private SerialPort _serial;
+        private readonly SerialPort _serial;
         private const byte BS = 0x08; //Return home
         private const byte HT = 0x09; //Command mode
         private const byte LF = 0x0A; //Next line
@@ -37,11 +37,12 @@ namespace Medo.Device {
         /// Creates new instance.
         /// </summary>
         /// <param name="portName">The port to use.</param>
-        public Elsidi(String portName) {
-            this._serial = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);
-            this._serial.NewLine = System.Convert.ToChar(0x0A).ToString(); //LF
-            this._serial.ReadTimeout = 500;
-            this._serial.WriteTimeout = 500;
+        public Elsidi(string portName) {
+            _serial = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One) {
+                NewLine = System.Convert.ToChar(0x0A).ToString(), //LF
+                ReadTimeout = 500,
+                WriteTimeout = 500
+            };
         }
 
 
@@ -49,37 +50,37 @@ namespace Medo.Device {
         /// Opens serial port.
         /// </summary>
         public void Open() {
-            this._serial.DtrEnable = true;
-            this._serial.RtsEnable = true;
-            this._serial.Open();
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+            _serial.DtrEnable = true;
+            _serial.RtsEnable = true;
+            _serial.Open();
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
         }
 
         /// <summary>
         /// Closes serial port.
         /// </summary>
         public void Close() {
-            this._serial.DtrEnable = false;
-            this._serial.RtsEnable = false;
-            this._serial.Close();
+            _serial.DtrEnable = false;
+            _serial.RtsEnable = false;
+            _serial.Close();
         }
 
 
         /// <summary>
         /// Gets or sets timeout for read operations.
         /// </summary>
-        public Int32 ReadTimeout {
-            get { return this._serial.ReadTimeout; }
-            set { this._serial.ReadTimeout = value; }
+        public int ReadTimeout {
+            get { return _serial.ReadTimeout; }
+            set { _serial.ReadTimeout = value; }
         }
 
         /// <summary>
         /// Gets or sets timeout for write operations.
         /// </summary>
-        public Int32 WriteTimeout {
-            get { return this._serial.WriteTimeout; }
-            set { this._serial.WriteTimeout = value; }
+        public int WriteTimeout {
+            get { return _serial.WriteTimeout; }
+            set { _serial.WriteTimeout = value; }
         }
 
 
@@ -88,15 +89,15 @@ namespace Medo.Device {
         /// Returns true if operation succeeded.
         /// </summary>
         /// <param name="text">ASCII text.</param>
-        public Boolean SendText(String text) {
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+        public bool SendText(string text) {
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
 
             var buffer = ASCIIEncoding.ASCII.GetBytes(text);
             for (int i = 0; i < buffer.Length; i++) {
                 if ((buffer[i] >= 0x08) && (buffer[i] <= 0x0F)) { buffer[i] -= 0x08; }
-                this._serial.Write(buffer, i, 1);
-                var ret = this._serial.ReadByte();
+                _serial.Write(buffer, i, 1);
+                var ret = _serial.ReadByte();
                 if (ret != buffer[i]) { return false; }
             }
 
@@ -108,13 +109,13 @@ namespace Medo.Device {
         /// Returns true if operation succeeded.
         /// </summary>
         /// <param name="instruction">Instruction.</param>
-        public Boolean SendInstruction(Byte instruction) {
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+        public bool SendInstruction(byte instruction) {
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
 
             var buffer = new byte[] { FF, instruction };
-            this._serial.Write(buffer, 0, buffer.Length);
-            var ret = this._serial.ReadByte();
+            _serial.Write(buffer, 0, buffer.Length);
+            var ret = _serial.ReadByte();
             return (ret == LF);
         }
 
@@ -125,13 +126,13 @@ namespace Medo.Device {
         /// Make the entry mode increment (I/D=“High”).
         /// Returns true if operation succeeded.
         /// </summary>
-        public Boolean ClearDisplay() {
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+        public bool ClearDisplay() {
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
 
             var buffer = new byte[] { VT };
-            this._serial.Write(buffer, 0, buffer.Length);
-            var ret = this._serial.ReadByte();
+            _serial.Write(buffer, 0, buffer.Length);
+            var ret = _serial.ReadByte();
             return (ret == LF);
         }
 
@@ -142,13 +143,13 @@ namespace Medo.Device {
         /// Contents of DDRAM does not change.
         /// Returns true if operation succeeded.
         /// </summary>
-        public Boolean ReturnHome() {
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+        public bool ReturnHome() {
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
 
             var buffer = new byte[] { BS };
-            this._serial.Write(buffer, 0, buffer.Length);
-            var ret = this._serial.ReadByte();
+            _serial.Write(buffer, 0, buffer.Length);
+            var ret = _serial.ReadByte();
             return (ret == LF);
         }
 
@@ -158,7 +159,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="incrementAddress">If true, DDRAM/CGRAM address will be incremented on every write.</param>
         /// <param name="shiftWholeDisplay">If true, whole display will shift when data is written to.</param>
-        public Boolean ChangeEntryMode(Boolean incrementAddress, Boolean shiftWholeDisplay) {
+        public bool ChangeEntryMode(bool incrementAddress, bool shiftWholeDisplay) {
             byte instruction = 0x04;
             if (incrementAddress) { instruction = (byte)(instruction | 0x02); }
             if (shiftWholeDisplay) { instruction = (byte)(instruction | 0x01); }
@@ -172,7 +173,7 @@ namespace Medo.Device {
         /// <param name="displayOn">If true, display will be on.</param>
         /// <param name="cursorOn">If true, cursor will be displayed.</param>
         /// <param name="cursorBlinkOn">If true, cursor will blink.</param>
-        public Boolean ChangeDisplay(Boolean displayOn, Boolean cursorOn, Boolean cursorBlinkOn) {
+        public bool ChangeDisplay(bool displayOn, bool cursorOn, bool cursorBlinkOn) {
             byte instruction = 0x08;
             if (displayOn) { instruction = (byte)(instruction | 0x04); }
             if (cursorOn) { instruction = (byte)(instruction | 0x02); }
@@ -206,7 +207,7 @@ namespace Medo.Device {
         /// <param name="lineCount">Number of lines to use. It can be 1 or 2.</param>
         /// <param name="highResolution">If true, 5x11 dot mode is used for characters, otherwise standard 5x8 is used.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Bus width can only be 4 or 8 bits. -or- Line count must be either 1 or 2.</exception>
-        public Boolean ChangeFunction(Int32 busWidth, Int32 lineCount, Boolean highResolution) {
+        public bool ChangeFunction(int busWidth, int lineCount, bool highResolution) {
             if ((busWidth != 4) && (busWidth != 8)) { throw new ArgumentOutOfRangeException("busWidth", "Bus width can only be 4 or 8 bits."); }
             if ((lineCount != 1) && (lineCount != 2)) { throw new ArgumentOutOfRangeException("lineCount", "Line count must be either 1 or 2."); }
             byte instruction = 0x20;
@@ -222,7 +223,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="address">CGRAM address (0-63).</param>
         /// <exception cref="System.ArgumentOutOfRangeException">CGRAM address must be between 0 and 63.</exception>
-        public Boolean ChangeCgramAddress(Int32 address) {
+        public bool ChangeCgramAddress(int address) {
             if ((address < 0) || (address > 63)) { throw new ArgumentOutOfRangeException("address", "CGRAM address must be between 0 and 63."); }
             return SendInstruction((byte)(0x40 | address));
         }
@@ -234,7 +235,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="address">DDRAM address (0-127)</param>
         /// <exception cref="System.ArgumentOutOfRangeException">DDRAM address must be between 0 and 127.</exception>
-        public Boolean ChangeDdramAddress(Int32 address) {
+        public bool ChangeDdramAddress(int address) {
             if ((address < 0) || (address > 127)) { throw new ArgumentOutOfRangeException("address", "DDRAM address must be between 0 and 127."); }
             return SendInstruction((byte)(0x80 | address));
         }
@@ -246,9 +247,8 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="command">Command character.</param>
         /// <param name="commandData">Command data.</param>
-        public Boolean SendTextCommand(Char command, String commandData) {
-            byte[] bytes;
-            return SendTextCommand(command, commandData, out bytes);
+        public bool SendTextCommand(char command, string commandData) {
+            return SendTextCommand(command, commandData, out var bytes);
         }
 
         /// <summary>
@@ -258,9 +258,9 @@ namespace Medo.Device {
         /// <param name="command">Command character.</param>
         /// <param name="commandData">Command data.</param>
         /// <param name="responseBytes">Command response bytes.</param>
-        private Boolean SendTextCommand(Char command, String commandData, out Byte[] responseBytes) {
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+        private bool SendTextCommand(char command, string commandData, out byte[] responseBytes) {
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
 
             var bufferList = new List<byte>(new byte[] { HT });
             bufferList.AddRange(ASCIIEncoding.ASCII.GetBytes(command.ToString()));
@@ -272,12 +272,12 @@ namespace Medo.Device {
             }
             bufferList.Add(LF);
             var buffer = bufferList.ToArray();
-            this._serial.Write(buffer, 0, buffer.Length);
+            _serial.Write(buffer, 0, buffer.Length);
 
-            var response = new List<Byte>();
+            var response = new List<byte>();
             var isValid = false;
             while (true) {
-                var singleInt = this._serial.ReadByte();
+                var singleInt = _serial.ReadByte();
                 if (singleInt != -1) {
                     var singleByte = (byte)singleInt;
                     response.Add(singleByte);
@@ -299,13 +299,13 @@ namespace Medo.Device {
         /// Moves cursor to next line.
         /// Returns true if operation succeeded.
         /// </summary>
-        public Boolean NextLine() {
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+        public bool NextLine() {
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
 
             var buffer = new byte[] { LF };
-            this._serial.Write(buffer, 0, buffer.Length);
-            var ret = this._serial.ReadByte();
+            _serial.Write(buffer, 0, buffer.Length);
+            var ret = _serial.ReadByte();
             return (ret == LF);
         }
 
@@ -313,13 +313,13 @@ namespace Medo.Device {
         /// All further content will be executed on secondary display.
         /// Returns true if operation succeeded.
         /// </summary>
-        public Boolean SwitchToSecondaryDisplay() {
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+        public bool SwitchToSecondaryDisplay() {
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
 
             var buffer = new byte[] { SO };
-            this._serial.Write(buffer, 0, buffer.Length);
-            var ret = this._serial.ReadByte();
+            _serial.Write(buffer, 0, buffer.Length);
+            var ret = _serial.ReadByte();
             return (ret == LF);
         }
 
@@ -327,13 +327,13 @@ namespace Medo.Device {
         /// All further content will be executed on primary display.
         /// Returns true if operation succeeded.
         /// </summary>
-        public Boolean SwitchToPrimaryDisplay() {
-            this._serial.DiscardInBuffer();
-            this._serial.DiscardOutBuffer();
+        public bool SwitchToPrimaryDisplay() {
+            _serial.DiscardInBuffer();
+            _serial.DiscardOutBuffer();
 
             var buffer = new byte[] { SI };
-            this._serial.Write(buffer, 0, buffer.Length);
-            var ret = this._serial.ReadByte();
+            _serial.Write(buffer, 0, buffer.Length);
+            var ret = _serial.ReadByte();
             return (ret == LF);
         }
 
@@ -342,12 +342,10 @@ namespace Medo.Device {
         /// Returns contrast percent currently set.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might be perceivably slower than the time that is required to get the value of a field.")]
-        public Int32 GetContrast() {
-            byte[] bytes;
-            if (SendTextCommand('c', "", out bytes)) {
+        public int GetContrast() {
+            if (SendTextCommand('c', "", out var bytes)) {
                 var percentText = ASCIIEncoding.ASCII.GetString(bytes);
-                int percent;
-                if (int.TryParse(percentText, NumberStyles.Integer, CultureInfo.InvariantCulture, out percent)) {
+                if (int.TryParse(percentText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var percent)) {
                     if ((percent >= 0) && (percent <= 100)) {
                         return percent;
                     }
@@ -362,7 +360,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="percent">Percent value.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Percent value must be between 0 and 100.</exception>
-        public Boolean SetContrast(Int32 percent) {
+        public bool SetContrast(int percent) {
             return SetContrast(percent, false);
         }
 
@@ -373,7 +371,7 @@ namespace Medo.Device {
         /// <param name="percent">Percent value.</param>
         /// <param name="save">If true, value should be saved as a default.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Percent value must be between 0 and 100.</exception>
-        public Boolean SetContrast(Int32 percent, Boolean save) {
+        public bool SetContrast(int percent, bool save) {
             if ((percent < 0) || (percent > 100)) { throw new ArgumentOutOfRangeException("percent", "Percent value must be between 0 and 100."); }
             return SendTextCommand((save ? 'C' : 'c'), percent.ToString(CultureInfo.InvariantCulture));
         }
@@ -383,12 +381,10 @@ namespace Medo.Device {
         /// Returns backlight percent currently set.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might be perceivably slower than the time that is required to get the value of a field.")]
-        public Int32 GetBacklight() {
-            byte[] bytes;
-            if (SendTextCommand('b', "", out bytes)) {
+        public int GetBacklight() {
+            if (SendTextCommand('b', "", out var bytes)) {
                 var percentText = ASCIIEncoding.ASCII.GetString(bytes);
-                int percent;
-                if (int.TryParse(percentText, NumberStyles.Integer, CultureInfo.InvariantCulture, out percent)) {
+                if (int.TryParse(percentText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var percent)) {
                     if ((percent >= 0) && (percent <= 100)) {
                         return percent;
                     }
@@ -403,7 +399,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="percent">Percent value.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Percent value must be between 0 and 100.</exception>
-        public Boolean SetBacklight(Int32 percent) {
+        public bool SetBacklight(int percent) {
             return SetBacklight(percent, false);
         }
 
@@ -414,7 +410,7 @@ namespace Medo.Device {
         /// <param name="percent">Percent value.</param>
         /// <param name="save">If true, value should be saved as a default.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Percent value must be between 0 and 100.</exception>
-        public Boolean SetBacklight(Int32 percent, Boolean save) {
+        public bool SetBacklight(int percent, bool save) {
             if ((percent < 0) || (percent > 100)) { throw new ArgumentOutOfRangeException("percent", "Percent value must be between 0 and 100."); }
             return SendTextCommand((save ? 'B' : 'b'), percent.ToString(CultureInfo.InvariantCulture));
         }
@@ -426,12 +422,10 @@ namespace Medo.Device {
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might be perceivably slower than the time that is required to get the value of a field.")]
         public Size GetDisplaySize() {
-            byte[] bytesWidth, bytesHeight;
-            if (SendTextCommand('w', "", out bytesWidth) && SendTextCommand('h', "", out bytesHeight)) {
+            if (SendTextCommand('w', "", out var bytesWidth) && SendTextCommand('h', "", out var bytesHeight)) {
                 var widthText = ASCIIEncoding.ASCII.GetString(bytesWidth);
                 var heightText = ASCIIEncoding.ASCII.GetString(bytesHeight);
-                int width, height;
-                if (int.TryParse(widthText, NumberStyles.Integer, CultureInfo.InvariantCulture, out width) && int.TryParse(heightText, NumberStyles.Integer, CultureInfo.InvariantCulture, out height)) {
+                if (int.TryParse(widthText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var width) && int.TryParse(heightText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var height)) {
                     return new Size(width, height);
                 }
             }
@@ -445,7 +439,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="size">Display size.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Display height must be between 1 and 4 rows. -or- Display width must be between 1 and 128 columns. -or- Display cannot have more than 256 characters.</exception>
-        public Boolean SetDisplaySize(Size size) {
+        public bool SetDisplaySize(Size size) {
             return SetDisplaySize(size, false);
         }
 
@@ -457,7 +451,7 @@ namespace Medo.Device {
         /// <param name="size">Display size.</param>
         /// <param name="save">If true, value should be saved as a default.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Display height must be between 1 and 4 rows. -or- Display width must be between 1 and 128 columns. -or- Display cannot have more than 256 characters.</exception>
-        public Boolean SetDisplaySize(Size size, Boolean save) {
+        public bool SetDisplaySize(Size size, bool save) {
             if ((size.Height < 1) || (size.Height > 4)) { throw new ArgumentOutOfRangeException("size", "Display height must be between 1 and 4 rows."); }
             if ((size.Width < 1) || (size.Width > 128)) { throw new ArgumentOutOfRangeException("size", "Display width must be between 1 and 128 columns."); }
             if ((size.Width * size.Height) > 256) { throw new ArgumentOutOfRangeException("size", "Display cannot have more than 256 characters."); }
@@ -474,12 +468,10 @@ namespace Medo.Device {
         /// Available only on Elsidi revision L and above.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method might be perceivably slower than the time that is required to get the value of a field.")]
-        public Int32 GetDisplayBusWidth() {
-            byte[] bytes;
-            if (SendTextCommand('d', "", out bytes)) {
+        public int GetDisplayBusWidth() {
+            if (SendTextCommand('d', "", out var bytes)) {
                 var numberText = ASCIIEncoding.ASCII.GetString(bytes);
-                int number;
-                if (int.TryParse(numberText, NumberStyles.Integer, CultureInfo.InvariantCulture, out number)) {
+                if (int.TryParse(numberText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number)) {
                     if ((number == 4) || (number == 8)) {
                         return number;
                     }
@@ -495,7 +487,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="busWidth">Display bus width. Must be either 4 (4-bit) or 8 (8-bit).</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Bus width must be either 4 or 8.</exception>
-        public Boolean SetDisplayBusWidth(Int32 busWidth) {
+        public bool SetDisplayBusWidth(int busWidth) {
             return SetDisplayBusWidth(busWidth, false);
         }
 
@@ -507,7 +499,7 @@ namespace Medo.Device {
         /// <param name="busWidth">Display bus width. Must be either 4 (4-bit) or 8 (8-bit).</param>
         /// <param name="save">If true, value should be saved as a default.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Bus width must be either 4 or 8.</exception>
-        public Boolean SetDisplayBusWidth(Int32 busWidth, Boolean save) {
+        public bool SetDisplayBusWidth(int busWidth, bool save) {
             if ((busWidth != 4) && (busWidth != 8)) { throw new ArgumentOutOfRangeException("busWidth", "Bus width must be either 4 or 8."); }
             return SendTextCommand((save ? 'D' : 'd'), busWidth.ToString(CultureInfo.InvariantCulture));
         }
@@ -519,7 +511,7 @@ namespace Medo.Device {
         /// Clean up any resources being used.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -529,7 +521,7 @@ namespace Medo.Device {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (true) {
-                this._serial.Dispose();
+                _serial.Dispose();
             }
         }
 

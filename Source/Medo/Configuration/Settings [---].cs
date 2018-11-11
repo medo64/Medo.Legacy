@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2017-04-29: Obsoleted.
 //2013-04-13: Writing null deletes the item and general refactoring.
@@ -57,7 +57,7 @@ namespace Medo.Configuration {
         /// <summary>
         /// Gets/sets subkey used for registry storage.
         /// </summary>
-        public static String SubkeyPath {
+        public static string SubkeyPath {
             get {
                 lock (SyncRoot) {
                     if (Settings._subkeyPath == null) {
@@ -98,7 +98,7 @@ namespace Medo.Configuration {
         /// <summary>
         /// Gets/sets whether settings should be written to registry.
         /// </summary>
-        public static Boolean NoRegistryWrites { get; set; }
+        public static bool NoRegistryWrites { get; set; }
 
         /// <summary>
         /// Clears all cached data so on next access re-read of configuration data will occur.
@@ -118,7 +118,7 @@ namespace Medo.Configuration {
         /// <param name="key">Key.</param>
         /// <param name="defaultValue">The value to return if key does not exist.</param>
         /// <exception cref="ArgumentNullException">Key cannot be null.</exception>
-        public static String Read(String key, String defaultValue) {
+        public static string Read(string key, string defaultValue) {
             if (key == null) { throw new ArgumentNullException("key", Resources.ExceptionKeyCannotBeNull); }
 
             lock (SyncRoot) {
@@ -152,7 +152,7 @@ namespace Medo.Configuration {
         /// <param name="key">Key.</param>
         /// <param name="value">The value to write. If value is null, it will be deleted.</param>
         /// <exception cref="ArgumentNullException">Key cannot be null.</exception>
-        public static void Write(String key, String value) {
+        public static void Write(string key, string value) {
             if (key == null) { throw new ArgumentNullException("key", Resources.ExceptionKeyCannotBeNull); }
 
             lock (SyncRoot) {
@@ -186,7 +186,7 @@ namespace Medo.Configuration {
         /// <param name="defaultValue">The value to return if key does not exist.</param>
         /// <exception cref="System.FormatException">Input string was not in a correct format.</exception>
         /// <exception cref="ArgumentNullException">Key cannot be null.</exception>
-        public static Int32 Read(String key, Int32 defaultValue) {
+        public static int Read(string key, int defaultValue) {
             if (key == null) { throw new ArgumentNullException("key", Resources.ExceptionKeyCannotBeNull); }
 
             lock (SyncRoot) {
@@ -220,7 +220,7 @@ namespace Medo.Configuration {
         /// <param name="key">Key.</param>
         /// <param name="value">The value to write.</param>
         /// <exception cref="ArgumentNullException">Key cannot be null.</exception>
-        public static void Write(String key, Int32 value) {
+        public static void Write(string key, int value) {
             if (key == null) { throw new ArgumentNullException("key", Resources.ExceptionKeyCannotBeNull); }
 
             lock (SyncRoot) {
@@ -250,7 +250,7 @@ namespace Medo.Configuration {
         /// <param name="defaultValue">The value to return if key does not exist.</param>
         /// <exception cref="System.FormatException">Input string was not in a correct format.</exception>
         /// <exception cref="ArgumentNullException">Key cannot be null.</exception>
-        public static Boolean Read(String key, Boolean defaultValue) {
+        public static bool Read(string key, bool defaultValue) {
             if (key == null) { throw new ArgumentNullException("key", Resources.ExceptionKeyCannotBeNull); }
 
             if (Cache.Contains(key)) { return GetBoolean(Cache.Read(key), defaultValue); }
@@ -284,7 +284,7 @@ namespace Medo.Configuration {
         /// <param name="key">Key.</param>
         /// <param name="value">The value to write.</param>4
         /// <exception cref="ArgumentNullException">Key cannot be null.</exception>
-        public static void Write(String key, Boolean value) {
+        public static void Write(string key, bool value) {
             Write(key, value ? 1 : 0);
         }
 
@@ -299,7 +299,7 @@ namespace Medo.Configuration {
         /// <param name="key">Key.</param>
         /// <param name="defaultValue">The value to return if key does not exist.</param>
         /// <exception cref="ArgumentNullException">Key cannot be null.</exception>
-        public static Double Read(String key, Double defaultValue) {
+        public static double Read(string key, double defaultValue) {
             if (key == null) { throw new ArgumentNullException("key", Resources.ExceptionKeyCannotBeNull); }
             return GetDouble(Read(key, defaultValue.ToString(CultureInfo.InvariantCulture)), defaultValue);
         }
@@ -310,7 +310,7 @@ namespace Medo.Configuration {
         /// <param name="key">Key.</param>
         /// <param name="value">The value to write.</param>4
         /// <exception cref="ArgumentNullException">Key cannot be null.</exception>
-        public static void Write(String key, Double value) {
+        public static void Write(string key, double value) {
             if (key == null) { throw new ArgumentNullException("key", Resources.ExceptionKeyCannotBeNull); }
             Settings.Write(key, value.ToString(CultureInfo.InvariantCulture));
         }
@@ -534,7 +534,7 @@ namespace Medo.Configuration {
         /// </summary>
         /// <param name="key">Setting key.</param>
         /// <param name="value">Setting value.</param>
-        public static void SetDefaults(String key, String value) {
+        public static void SetDefaults(string key, string value) {
             Cache.Write(key, null);
             if (Settings.Defaults.ContainsKey(key)) {
                 Settings.Defaults[key] = value;
@@ -548,7 +548,7 @@ namespace Medo.Configuration {
         /// </summary>
         /// <param name="key">Setting key.</param>
         /// <param name="value">Setting value.</param>
-        public static void SetDefaults(String key, Int32 value) {
+        public static void SetDefaults(string key, int value) {
             SetDefaults(key, value.ToString(CultureInfo.InvariantCulture));
         }
 
@@ -557,7 +557,7 @@ namespace Medo.Configuration {
         /// </summary>
         /// <param name="key">Setting key.</param>
         /// <param name="value">Setting value.</param>
-        public static void SetDefaults(String key, Boolean value) {
+        public static void SetDefaults(string key, bool value) {
             SetDefaults(key, value ? 1 : 0);
         }
 
@@ -566,7 +566,7 @@ namespace Medo.Configuration {
         /// </summary>
         /// <param name="key">Setting key.</param>
         /// <param name="value">Setting value.</param>
-        public static void SetDefaults(String key, Double value) {
+        public static void SetDefaults(string key, double value) {
             SetDefaults(key, value.ToString(CultureInfo.InvariantCulture));
         }
 
@@ -575,7 +575,7 @@ namespace Medo.Configuration {
         /// Sets defaults to be used as last priority.
         /// </summary>
         /// <param name="defaults">Name/value collection of settings.</param>
-        public static void SetDefaults(IDictionary<String, String> defaults) {
+        public static void SetDefaults(IDictionary<string, string> defaults) {
             if (defaults != null) {
                 foreach (var item in defaults) {
                     SetDefaults(item.Key, item.Value);
@@ -619,7 +619,7 @@ namespace Medo.Configuration {
                                     value = (int)regValue;
                                     return true;
                                 case RegistryValueKind.String:
-                                    value = GetInt32(String.Format(CultureInfo.InvariantCulture, "{0}", regValue), default(int));
+                                    value = GetInt32(string.Format(CultureInfo.InvariantCulture, "{0}", regValue), default(int));
                                     return true;
                             }
                         }
@@ -642,7 +642,7 @@ namespace Medo.Configuration {
                                     value = (int)regValue != 0;
                                     return true;
                                 case RegistryValueKind.String:
-                                    value = GetBoolean(String.Format(CultureInfo.InvariantCulture, "{0}", regValue), default(bool));
+                                    value = GetBoolean(string.Format(CultureInfo.InvariantCulture, "{0}", regValue), default(bool));
                                     return true;
                             }
                         }
@@ -657,8 +657,7 @@ namespace Medo.Configuration {
         private static int GetInt32(string text, int defaultValue) {
             if (text == null) { return defaultValue; }
 
-            int value;
-            if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)) {
+            if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value)) {
                 return value;
             } else {
                 return defaultValue;
@@ -668,12 +667,10 @@ namespace Medo.Configuration {
         private static bool GetBoolean(string text, bool defaultValue) {
             if (text == null) { return defaultValue; }
 
-            bool valueBoolean;
-            if (bool.TryParse(text, out valueBoolean)) {
+            if (bool.TryParse(text, out var valueBoolean)) {
                 return valueBoolean;
             } else {
-                int valueInteger;
-                if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out valueInteger)) {
+                if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var valueInteger)) {
                     return (valueInteger != 0);
                 } else {
                     return defaultValue;
@@ -684,8 +681,7 @@ namespace Medo.Configuration {
         private static double GetDouble(string text, double defaultValue) {
             if (text == null) { return defaultValue; }
 
-            double value;
-            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value)) {
+            if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value)) {
                 return value;
             } else {
                 return defaultValue;

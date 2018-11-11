@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-12-22: Fixed high DPI mode.
 //2008-12-10: Modified to work at higher DPI.
@@ -45,9 +45,9 @@ namespace Medo.Windows.Forms {
 
         private void txtPassword_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyData == Keys.Enter) {
-                if (this.AcceptOnReturn) {
+                if (AcceptOnReturn) {
                     if (btnOK.Enabled) {
-                        this._form.DialogResult = DialogResult.OK;
+                        _form.DialogResult = DialogResult.OK;
                     }
                 } else {
                     btnOK.Select();
@@ -86,14 +86,14 @@ namespace Medo.Windows.Forms {
                 if (_form != null) {
                     return cmbUserName.Text;
                 } else {
-                    return this._defaultUserName;
+                    return _defaultUserName;
                 }
             }
             set {
                 if (_form != null) {
                     cmbUserName.Text = value;
                 } else {
-                    this._defaultUserName = value;
+                    _defaultUserName = value;
                 }
             }
         }
@@ -139,7 +139,7 @@ namespace Medo.Windows.Forms {
         /// </summary>
         /// <param name="users">List to fill</param>
         public void SetUsers(IEnumerable users) {
-            this._users = users;
+            _users = users;
         }
 
         /// <summary>
@@ -168,36 +168,40 @@ namespace Medo.Windows.Forms {
             }
 
 
-            cmbUserName = new ComboBox();
-            cmbUserName.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-            cmbUserName.AutoCompleteMode = AutoCompleteMode.Append;
-            cmbUserName.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            cmbUserName.DropDownStyle = ComboBoxStyle.DropDown;
-            cmbUserName.Font = defaultFont;
-            cmbUserName.Top = 7;
+            cmbUserName = new ComboBox {
+                Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right,
+                AutoCompleteMode = AutoCompleteMode.Append,
+                AutoCompleteSource = AutoCompleteSource.CustomSource,
+                DropDownStyle = ComboBoxStyle.DropDown,
+                Font = defaultFont,
+                Top = 7
+            };
             cmbUserName.KeyDown += new KeyEventHandler(cmbUserName_KeyDown);
             cmbUserName.TextChanged += new EventHandler(cmbUserName_TextChanged);
             cmbUserName.Leave += new EventHandler(cmbUserName_Leave);
 
-            Label lblUserName = new Label();
-            lblUserName.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-            lblUserName.AutoSize = true;
-            lblUserName.Font = defaultFont;
+            Label lblUserName = new Label {
+                Anchor = AnchorStyles.Left | AnchorStyles.Top,
+                AutoSize = true,
+                Font = defaultFont
+            };
             lblUserName.Location = new Point(7, cmbUserName.Top + (cmbUserName.Height - lblUserName.Height) / 2 - 1);
             lblUserName.Text = Resources.LabelUserName;
 
-            txtPassword = new TextBox();
-            txtPassword.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-            txtPassword.Font = defaultFont;
-            txtPassword.PasswordChar = '*';
-            txtPassword.Top = cmbUserName.Bottom + 7;
-            txtPassword.UseSystemPasswordChar = true;
+            txtPassword = new TextBox {
+                Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right,
+                Font = defaultFont,
+                PasswordChar = '*',
+                Top = cmbUserName.Bottom + 7,
+                UseSystemPasswordChar = true
+            };
             txtPassword.KeyDown += new KeyEventHandler(txtPassword_KeyDown);
 
-            Label lblPassword = new Label();
-            lblPassword.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-            lblPassword.AutoSize = true;
-            lblPassword.Font = defaultFont;
+            Label lblPassword = new Label {
+                Anchor = AnchorStyles.Left | AnchorStyles.Top,
+                AutoSize = true,
+                Font = defaultFont
+            };
             lblPassword.Location = new Point(7, txtPassword.Top + (txtPassword.Height - lblPassword.Height) / 2 - 1);
             lblPassword.Text = Resources.LabelPassword;
 
@@ -206,71 +210,73 @@ namespace Medo.Windows.Forms {
             txtPassword.Left = System.Math.Max(lblUserName.Right, lblPassword.Right) + 42;
             txtPassword.Width = lblPassword.Height * 14;
 
-            Button btnCancel = new Button();
-            btnCancel.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
-            btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Font = defaultFont;
-            btnCancel.Size = new Size(lblPassword.Height * 5, (int)(lblPassword.Height * 1.5));
-            btnCancel.Text = Resources.ButtonCancel;
+            Button btnCancel = new Button {
+                Anchor = AnchorStyles.Right | AnchorStyles.Bottom,
+                DialogResult = DialogResult.Cancel,
+                Font = defaultFont,
+                Size = new Size(lblPassword.Height * 5, (int)(lblPassword.Height * 1.5)),
+                Text = Resources.ButtonCancel
+            };
 
-            btnOK = new Button();
-            btnOK.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
-            btnOK.DialogResult = DialogResult.OK;
-            btnOK.Enabled = false;
-            btnOK.Font = defaultFont;
-            btnOK.Size = btnCancel.Size;
-            btnOK.Text = Resources.ButtonOK;
+            btnOK = new Button {
+                Anchor = AnchorStyles.Right | AnchorStyles.Bottom,
+                DialogResult = DialogResult.OK,
+                Enabled = false,
+                Font = defaultFont,
+                Size = btnCancel.Size,
+                Text = Resources.ButtonOK
+            };
 
-            this._form = new Form();
-            this._form.AutoScaleMode = AutoScaleMode.None;
-            this._form.CancelButton = btnCancel;
-            this._form.ClientSize = new Size(txtPassword.Right + 7, cmbUserName.Height + txtPassword.Height + btnCancel.Height + 35);
-            this._form.Controls.Add(cmbUserName);
-            this._form.Controls.Add(lblUserName);
-            this._form.Controls.Add(txtPassword);
-            this._form.Controls.Add(lblPassword);
-            this._form.Controls.Add(btnOK);
-            this._form.Controls.Add(btnCancel);
-            this._form.Font = defaultFont;
-            this._form.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this._form.MaximizeBox = false;
-            this._form.MinimizeBox = false;
-            this._form.ShowIcon = false;
-            this._form.ShowInTaskbar = false;
+            _form = new Form {
+                AutoScaleMode = AutoScaleMode.None,
+                CancelButton = btnCancel,
+                ClientSize = new Size(txtPassword.Right + 7, cmbUserName.Height + txtPassword.Height + btnCancel.Height + 35)
+            };
+            _form.Controls.Add(cmbUserName);
+            _form.Controls.Add(lblUserName);
+            _form.Controls.Add(txtPassword);
+            _form.Controls.Add(lblPassword);
+            _form.Controls.Add(btnOK);
+            _form.Controls.Add(btnCancel);
+            _form.Font = defaultFont;
+            _form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            _form.MaximizeBox = false;
+            _form.MinimizeBox = false;
+            _form.ShowIcon = false;
+            _form.ShowInTaskbar = false;
             if (frmOwner != null) {
-                this._form.StartPosition = FormStartPosition.CenterParent;
+                _form.StartPosition = FormStartPosition.CenterParent;
             } else {
-                this._form.StartPosition = FormStartPosition.CenterScreen;
+                _form.StartPosition = FormStartPosition.CenterScreen;
             }
-            this._form.Text = Resources.Title;
-            this._form.Shown += new EventHandler(frm_Shown);
+            _form.Text = Resources.Title;
+            _form.Shown += new EventHandler(frm_Shown);
 
-            btnCancel.Location = new Point(this._form.ClientRectangle.Right - btnCancel.Width - 7, this._form.ClientRectangle.Bottom - btnCancel.Height - 7);
-            btnOK.Location = new Point(btnCancel.Left - btnOK.Width - 7, this._form.ClientRectangle.Bottom - btnOK.Height - 7);
+            btnCancel.Location = new Point(_form.ClientRectangle.Right - btnCancel.Width - 7, _form.ClientRectangle.Bottom - btnCancel.Height - 7);
+            btnOK.Location = new Point(btnCancel.Left - btnOK.Width - 7, _form.ClientRectangle.Bottom - btnOK.Height - 7);
 
-            if (this._users != null) {
-                IEnumerator eUsers = this._users.GetEnumerator();
+            if (_users != null) {
+                IEnumerator eUsers = _users.GetEnumerator();
                 while (eUsers.MoveNext()) {
                     object iUser = eUsers.Current;
-                    IIdentity iIdentity = iUser as IIdentity;
-                    if (iIdentity != null) {
+                    if (iUser is IIdentity iIdentity) {
                         cmbUserName.AutoCompleteCustomSource.Add(iIdentity.Name);
                     }
                     cmbUserName.Items.Add(iUser);
                 }
             }
-            cmbUserName.Text = this._defaultUserName;
+            cmbUserName.Text = _defaultUserName;
 
 
             txtPassword.Text = "";
 
-            if (this._form.ShowDialog(owner) == DialogResult.OK) {
-                this.UserName = cmbUserName.Text;
-                this.Password = txtPassword.Text;
+            if (_form.ShowDialog(owner) == DialogResult.OK) {
+                UserName = cmbUserName.Text;
+                Password = txtPassword.Text;
                 return DialogResult.OK;
             } else {
-                this.UserName = null;
-                this.Password = null;
+                UserName = null;
+                Password = null;
                 return DialogResult.Cancel;
             }
         }
@@ -282,7 +288,7 @@ namespace Medo.Windows.Forms {
         /// Clean up any resources being used.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -292,10 +298,10 @@ namespace Medo.Windows.Forms {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this._form.Dispose();
-                this.cmbUserName.Dispose();
-                this.txtPassword.Dispose();
-                this.btnOK.Dispose();
+                _form.Dispose();
+                cmbUserName.Dispose();
+                txtPassword.Dispose();
+                btnOK.Dispose();
             }
         }
 

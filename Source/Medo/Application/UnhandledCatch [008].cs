@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-11-22: Changed default exception mode to CatchException.
 //2010-11-07: Compatible with Mono (ignoring FailFast).
@@ -112,7 +112,7 @@ namespace Medo.Application {
                     System.Windows.Forms.Application.ThreadException -= Application_ThreadException;
                     System.AppDomain.CurrentDomain.UnhandledException -= AppDomain_UnhandledException;
 
-                    if (ThreadException != null) { ThreadException(null, new ThreadExceptionEventArgs(exception)); }
+                    ThreadException?.Invoke(null, new ThreadExceptionEventArgs(exception));
                 }
 
                 System.Diagnostics.Trace.TraceError("Exit(E_UNEXPECTED): Unhandled exception has occurred.  {Medo.Application.UnhandledCatch}");
@@ -132,5 +132,4 @@ namespace Medo.Application {
         }
 
     }
-
 }

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2009-01-09: Added IsValidOib method.
 //2009-01-05: Initial version.
@@ -19,11 +19,10 @@ namespace Medo.Localization.Croatia {
         /// <param name="oib">OIB.</param>
         /// <exception cref="System.ArgumentNullException">Parameter cannot be null.</exception>
         public Oib(string oib) {
-            if (oib == null) { throw new ArgumentNullException("oib", "Parameter cannot be null."); }
-            this.Value = oib;
+            Value = oib ?? throw new ArgumentNullException("oib", "Parameter cannot be null.");
 
             if (oib.Length != 11) {
-                this.IsValid = false;
+                IsValid = false;
                 return;
             }
 
@@ -35,7 +34,7 @@ namespace Medo.Localization.Croatia {
                     sum *= 2;
                     if (sum >= 11) { sum -= 11; }
                 } else {
-                    this.IsValid = false;
+                    IsValid = false;
                     return;
                 }
             }
@@ -46,7 +45,7 @@ namespace Medo.Localization.Croatia {
             } else {
                 checkDigit = System.Convert.ToChar('0' + sum2);
             }
-            this.IsValid = (oib[10] == checkDigit);
+            IsValid = (oib[10] == checkDigit);
         }
 
 
@@ -77,8 +76,8 @@ namespace Medo.Localization.Croatia {
         /// Returns OIB if one is valid.
         /// </summary>
         public override string ToString() {
-            if (this.IsValid) {
-                return this.Value;
+            if (IsValid) {
+                return Value;
             } else {
                 return string.Empty;
             }

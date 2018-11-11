@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-05-28: Initial version.
 
@@ -43,9 +43,9 @@ namespace Medo.Windows {
         /// <param name="defaultText">Default text.</param>
         /// <param name="hintText">Hint text.</param>
         public InputWindow(string labelText, string defaultText, string hintText) {
-            this.LabelText = labelText;
-            this.DefaultText = defaultText;
-            this.HintText = hintText;
+            LabelText = labelText;
+            DefaultText = defaultText;
+            HintText = hintText;
         }
 
 
@@ -88,55 +88,55 @@ namespace Medo.Windows {
         public bool? ShowDialog(Window owner) {
             var inputStack = new StackPanel() { Margin = new Thickness(11), Orientation = Orientation.Horizontal };
 
-            var labelUser = new Label() { Content = this.LabelText, VerticalAlignment = VerticalAlignment.Center };
+            var labelUser = new Label() { Content = LabelText, VerticalAlignment = VerticalAlignment.Center };
             Grid.SetRow(labelUser, 0);
             Grid.SetColumn(labelUser, 0);
             inputStack.Children.Add(labelUser);
 
-            this._textBox = new TextBox() { VerticalAlignment = VerticalAlignment.Center, ToolTip = this.HintText, Width = 250 };
-            inputStack.Children.Add(this._textBox);
+            _textBox = new TextBox() { VerticalAlignment = VerticalAlignment.Center, ToolTip = HintText, Width = 250 };
+            inputStack.Children.Add(_textBox);
 
-            this._buttonOk = new Button() { Content = Localizations.Ok, Width = 75, Height = 23, Margin = new Thickness(0, 0, 7, 0), IsDefault = true };
+            _buttonOk = new Button() { Content = Localizations.Ok, Width = 75, Height = 23, Margin = new Thickness(0, 0, 7, 0), IsDefault = true };
             var buttonCancel = new Button() { Content = Localizations.Cancel, Width = 75, Height = 23, IsCancel = true };
 
             var buttonsStack = new StackPanel() { Margin = new Thickness(11), Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-            buttonsStack.Children.Add(this._buttonOk);
+            buttonsStack.Children.Add(_buttonOk);
             buttonsStack.Children.Add(buttonCancel);
 
             var windowStack = new StackPanel();
             windowStack.Children.Add(new Border() { Child = inputStack, Background = SystemColors.WindowBrush, BorderThickness = new Thickness(0) });
             windowStack.Children.Add(buttonsStack);
 
-            this._window = new Window() { FontFamily = SystemFonts.MessageFontFamily, FontSize = SystemFonts.MessageFontSize, FontWeight = SystemFonts.MessageFontWeight, MinWidth = 200, Background = SystemColors.ControlBrush };
+            _window = new Window() { FontFamily = SystemFonts.MessageFontFamily, FontSize = SystemFonts.MessageFontSize, FontWeight = SystemFonts.MessageFontWeight, MinWidth = 200, Background = SystemColors.ControlBrush };
 
             if (owner != null) {
-                this._window.Icon = owner.Icon;
-                this._window.Owner = owner;
-                this._window.ShowInTaskbar = false;
-                if (owner.Topmost) { this._window.Topmost = true; }
-                this._window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                _window.Icon = owner.Icon;
+                _window.Owner = owner;
+                _window.ShowInTaskbar = false;
+                if (owner.Topmost) { _window.Topmost = true; }
+                _window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             } else {
-                this._window.Icon = GetAppIcon(Assembly.GetEntryAssembly());
-                this._window.Owner = null;
-                this._window.ShowInTaskbar = true;
-                this._window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                _window.Icon = GetAppIcon(Assembly.GetEntryAssembly());
+                _window.Owner = null;
+                _window.ShowInTaskbar = true;
+                _window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             }
-            this._window.ResizeMode = ResizeMode.NoResize;
-            this._window.ShowActivated = true;
-            this._window.SizeToContent = SizeToContent.WidthAndHeight;
-            this._window.Title = Localizations.Title;
-            this._window.Content = windowStack;
+            _window.ResizeMode = ResizeMode.NoResize;
+            _window.ShowActivated = true;
+            _window.SizeToContent = SizeToContent.WidthAndHeight;
+            _window.Title = Localizations.Title;
+            _window.Content = windowStack;
 
-            this._buttonOk.Click += new RoutedEventHandler(buttonOk_Click);
-            this._window.Loaded += new RoutedEventHandler(window_Loaded);
+            _buttonOk.Click += new RoutedEventHandler(buttonOk_Click);
+            _window.Loaded += new RoutedEventHandler(window_Loaded);
 
-            return this._window.ShowDialog();
+            return _window.ShowDialog();
         }
 
         private void window_Loaded(object sender, RoutedEventArgs e) {
-            this._textBox.Text = this.DefaultText;
-            this._textBox.SelectAll();
-            this._textBox.Focus();
+            _textBox.Text = DefaultText;
+            _textBox.SelectAll();
+            _textBox.Focus();
         }
 
         private void buttonOk_Click(object sender, RoutedEventArgs e) {
@@ -144,8 +144,8 @@ namespace Medo.Windows {
         }
 
         private void ButtonOkClick() {
-            this.SelectedText = this._textBox.Text;
-            this._window.DialogResult = true;
+            SelectedText = _textBox.Text;
+            _window.DialogResult = true;
         }
 
 
@@ -161,13 +161,15 @@ namespace Medo.Windows {
         }
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            static extern internal IntPtr LoadIcon(IntPtr hInstance, string lpIconName);
+            static extern internal IntPtr LoadIcon(IntPtr hInstance, String lpIconName);
 
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-            static extern internal IntPtr LoadLibrary(string lpFileName);
+            static extern internal IntPtr LoadLibrary(String lpFileName);
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
         private static class Localizations {

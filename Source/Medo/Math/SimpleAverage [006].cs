@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2011-03-05: Moved to Medo.Math.
 //2010-05-14: Changed namespace from Medo.Math.Averaging to Medo.Math.
@@ -39,15 +39,15 @@ namespace Medo.Math {
 		/// Resets average.
 		/// </summary>
 		public void Clear() {
-			this._itemsSum = 0;
-			this._itemsCount = 0;
+			_itemsSum = 0;
+			_itemsCount = 0;
 		}
 
 		/// <summary>
 		/// Gets whether there are items inside.
 		/// </summary>
 		public bool IsEmpty {
-			get { return this._itemsCount == 0; }
+			get { return _itemsCount == 0; }
 		}
 
 
@@ -56,10 +56,10 @@ namespace Medo.Math {
         /// </summary>
 		public double Average {
 			get {
-				if (this.IsEmpty) {
+				if (IsEmpty) {
 					return double.NaN;
 				} else {
-					return this._itemsSum / _itemsCount;
+					return _itemsSum / _itemsCount;
 				}
 			}
         }

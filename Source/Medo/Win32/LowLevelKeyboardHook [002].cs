@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2017-11-13: Fixed CallbackOnCollectedDelegate exception due to GC collecting callback function.
 //2017-11-12: Initial version.
@@ -28,17 +28,17 @@ namespace Medo.Win32 {
         /// </summary>
         /// <exception cref="Win32Exception"></exception>
         public void Hook() {
-            if (this.HookHandle.IsInvalid || this.HookHandle.IsClosed) {
-                if (this.LowLevelKeyboardProcedure == null) { //needs to be in variable so GC doesn't collect it
-                    this.LowLevelKeyboardProcedure = new NativeMethods.LowLevelKeyboardProc(this.KeyboardHookProc);
+            if (HookHandle.IsInvalid || HookHandle.IsClosed) {
+                if (LowLevelKeyboardProcedure == null) { //needs to be in variable so GC doesn't collect it
+                    LowLevelKeyboardProcedure = new NativeMethods.LowLevelKeyboardProc(KeyboardHookProc);
                 }
-                this.HookHandle = NativeMethods.SetWindowsHookEx(
+                HookHandle = NativeMethods.SetWindowsHookEx(
                     idHook: NativeMethods.WH_KEYBOARD_LL,
-                    lpfn: this.LowLevelKeyboardProcedure,
+                    lpfn: LowLevelKeyboardProcedure,
                     hMod: IntPtr.Zero,
                     dwThreadId: 0);
 
-                if (this.HookHandle.IsInvalid) { throw new Win32Exception(); }
+                if (HookHandle.IsInvalid) { throw new Win32Exception(); }
             }
         }
 
@@ -46,8 +46,8 @@ namespace Medo.Win32 {
         /// Releases the keyboard hook.
         /// </summary>
         public void Unhook() {
-            if ((this.HookHandle.IsInvalid == false) && (this.HookHandle.IsClosed == false)) {
-                this.HookHandle.Close();
+            if ((HookHandle.IsInvalid == false) && (HookHandle.IsClosed == false)) {
+                HookHandle.Close();
             }
         }
 
@@ -58,14 +58,14 @@ namespace Medo.Win32 {
         public event EventHandler<LowLevelKeyboardHookCallbackEventArgs> KeyboardCallback;
 
         private void OnKeyboardCallback(LowLevelKeyboardHookCallbackEventArgs e) {
-            this.KeyboardCallback?.Invoke(this, e);
+            KeyboardCallback?.Invoke(this, e);
         }
 
 
         private NativeMethods.WindowsHookSafeHandle HookHandle = new NativeMethods.WindowsHookSafeHandle();
         private NativeMethods.LowLevelKeyboardProc LowLevelKeyboardProcedure;
 
-        private IntPtr KeyboardHookProc(Int32 nCode, IntPtr wParam, IntPtr lParam) {
+        private IntPtr KeyboardHookProc(int nCode, IntPtr wParam, IntPtr lParam) {
             var keyboardHookStruct = (NativeMethods.KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(NativeMethods.KBDLLHOOKSTRUCT));
 
             if (nCode == NativeMethods.HC_ACTION) {
@@ -86,7 +86,7 @@ namespace Medo.Win32 {
         /// Destroys the instance.
         /// </summary>
         ~LowLevelKeyboardHook() {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         /// <summary>
@@ -102,15 +102,16 @@ namespace Medo.Win32 {
         /// </summary>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.LowLevelKeyboardProcedure = null; //let GC collect it now
+                LowLevelKeyboardProcedure = null; //let GC collect it now
             }
-            this.Unhook();
+            Unhook();
         }
 
         #endregion
 
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             internal const Int32 WH_KEYBOARD_LL = 13;
             internal const Int32 HC_ACTION = 0;
@@ -133,7 +134,7 @@ namespace Medo.Win32 {
                 }
 
                 protected override bool ReleaseHandle() {
-                    return UnhookWindowsHookEx(this.handle);
+                    return UnhookWindowsHookEx(base.handle);
                 }
             }
 
@@ -149,7 +150,9 @@ namespace Medo.Win32 {
             private static extern Boolean UnhookWindowsHookEx(IntPtr idHook);
 
             [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-            internal static extern IntPtr CallNextHookEx(WindowsHookSafeHandle hhk, int nCode, IntPtr wParam, IntPtr lParam);
+            internal static extern IntPtr CallNextHookEx(WindowsHookSafeHandle hhk, Int32 nCode, IntPtr wParam, IntPtr lParam);
+
+#pragma warning restore IDE0049 // Simplify Names
         }
 
     }
@@ -167,13 +170,13 @@ namespace Medo.Win32 {
         /// <param name="flags">Key flags.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", MessageId = "flags", Justification = "Flags is used by Win32 on which this is based on.")]
         public LowLevelKeyboardHookCallbackEventArgs(int virtualKeyCode, int scanCode, int flags) {
-            this.VirtualKeyCode = virtualKeyCode;
-            this.ScanCode = scanCode;
-            this.IsExtended = (flags & 0x01) != 0;
-            this.IsInjectedFromLowerIntegrityLevel = (flags & 0x02) != 0;
-            this.IsInjected = (flags & 0x10) != 0;
-            this.IsAltPressed = (flags & 0x20) != 0;
-            this.IsPressed = (flags & 0x80) == 0;
+            VirtualKeyCode = virtualKeyCode;
+            ScanCode = scanCode;
+            IsExtended = (flags & 0x01) != 0;
+            IsInjectedFromLowerIntegrityLevel = (flags & 0x02) != 0;
+            IsInjected = (flags & 0x10) != 0;
+            IsAltPressed = (flags & 0x20) != 0;
+            IsPressed = (flags & 0x80) == 0;
         }
 
 

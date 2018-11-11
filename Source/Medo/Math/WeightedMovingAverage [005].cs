@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-05-14: Changed namespace from Medo.Math.Averaging to Medo.Math.
 //2008-04-11: Cleaned code to match FxCop 1.36 beta 2 (DoNotRaiseExceptionsInUnexpectedLocations).
@@ -18,7 +18,7 @@ namespace Medo.Math {
 	public class WeightedMovingAverage  {
 
 		private System.Collections.Generic.List<double> _items = new System.Collections.Generic.List<double>();
-		private int _maxCount;
+		private readonly int _maxCount;
 
 
 		/// <summary>
@@ -33,7 +33,7 @@ namespace Medo.Math {
 		/// </summary>
 		/// <param name="maxCount">Number of items to use for calculation.</param>
 		public WeightedMovingAverage(int maxCount) {
-			this._maxCount = maxCount;
+			_maxCount = maxCount;
 		}
 
 
@@ -42,9 +42,9 @@ namespace Medo.Math {
 		/// </summary>
 		/// <param name="value">Value to be added.</param>
 		public void Add(double value) {
-			this._items.Add(value);
-			while (this._items.Count > this._maxCount) {
-				this._items.RemoveAt(0);
+			_items.Add(value);
+			while (_items.Count > _maxCount) {
+				_items.RemoveAt(0);
 			}
 		}
 
@@ -52,14 +52,14 @@ namespace Medo.Math {
 		/// Resets average.
 		/// </summary>
 		public void Clear() {
-			this._items.Clear();
+			_items.Clear();
 		}
 
 		/// <summary>
 		/// Gets whether there are items inside.
 		/// </summary>
 		public bool IsEmpty {
-			get { return this._items.Count == 0; }
+			get { return _items.Count == 0; }
 		}
 
 
@@ -68,14 +68,14 @@ namespace Medo.Math {
 		/// </summary>
 		public double Average {
 			get{
-				if (this.IsEmpty) {
+				if (IsEmpty) {
 					return double.NaN;
 				} else {
-					int count = this._items.Count;
+					int count = _items.Count;
 					int divider = 0;
 					double sum = 0;
 					for (int i = 0; i < count; i++) {
-						sum += this._items[i] * (i + 1);
+						sum += _items[i] * (i + 1);
 						divider += (i + 1);
 					}
 					return sum / divider;

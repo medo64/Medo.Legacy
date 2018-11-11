@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-05-27: Design changes.
 //2010-05-19: Refactoring (CA1303:Do not pass literals as localized parameters).
@@ -184,13 +184,15 @@ namespace Medo.Windows {
 
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            static extern internal IntPtr LoadIcon(IntPtr hInstance, string lpIconName);
+            static extern internal IntPtr LoadIcon(IntPtr hInstance, String lpIconName);
 
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-            static extern internal IntPtr LoadLibrary(string lpFileName);
+            static extern internal IntPtr LoadLibrary(String lpFileName);
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
         private static class Localizations {

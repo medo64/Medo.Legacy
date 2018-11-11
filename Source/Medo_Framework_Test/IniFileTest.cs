@@ -386,16 +386,18 @@ namespace Test {
 
         [TestMethod()]
         public void IniFile_Property_Modify_Name() {
-            var property = new IniProperty("PN", "PV");
-            property.Name = "PNnew";
+            var property = new IniProperty("PN", "PV") {
+                Name = "PNnew"
+            };
             Assert.AreEqual("PNnew", property.Name);
             Assert.AreEqual("PV", property.Value);
         }
 
         [TestMethod()]
         public void IniFile_Property_Modify_Value() {
-            var property = new IniProperty("PN", "PV");
-            property.Value = "PVnew";
+            var property = new IniProperty("PN", "PV") {
+                Value = "PVnew"
+            };
             Assert.AreEqual("PN", property.Name);
             Assert.AreEqual("PVnew", property.Value);
         }
@@ -403,15 +405,17 @@ namespace Test {
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
         public void IniFile_Property_Modify_NameNull() {
-            var property = new IniProperty("PN", "PV");
-            property.Name = null;
+            var property = new IniProperty("PN", "PV") {
+                Name = null
+            };
         }
 
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
         public void IniFile_Property_Modify_ValueNull() {
-            var property = new IniProperty("PN", "PV");
-            property.Value = null;
+            var property = new IniProperty("PN", "PV") {
+                Value = null
+            };
         }
 
         #endregion

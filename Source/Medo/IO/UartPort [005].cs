@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
 //2011-08-04: Compatible with Mono.
@@ -60,16 +60,16 @@ namespace Medo.IO {
         /// <exception cref="System.ArgumentNullException">PortName cannot be null.</exception>
         public UartPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) {
             if (portName == null) { throw new ArgumentNullException("portName", "PortName cannot be null."); }
-            this.PortName = portName.Trim();
-            if (IsRunningOnMono == false) { this.PortName = this.PortName.ToUpperInvariant(); }
-            this.BaudRate = baudRate;
-            this.Parity = parity;
-            this.DataBits = dataBits;
-            this.StopBits = stopBits;
+            PortName = portName.Trim();
+            if (IsRunningOnMono == false) { PortName = PortName.ToUpperInvariant(); }
+            BaudRate = baudRate;
+            Parity = parity;
+            DataBits = dataBits;
+            StopBits = stopBits;
 
-            this.NewLine = "\n";
-            this.ReadTimeout = UartPort.InfiniteTimeout;
-            this.WriteTimeout = UartPort.InfiniteTimeout;
+            NewLine = "\n";
+            ReadTimeout = UartPort.InfiniteTimeout;
+            WriteTimeout = UartPort.InfiniteTimeout;
         }
 
 
@@ -130,9 +130,9 @@ namespace Medo.IO {
         public bool IsOpen {
             get {
                 if (IsRunningOnMono == false) {
-                    return (this.Handle != null) && (this.Handle.IsClosed == false) && (this.Handle.IsInvalid == false);
+                    return (Handle != null) && (Handle.IsClosed == false) && (Handle.IsInvalid == false);
                 } else {
-                    return (this.FrameworkSerialPort != null) && (this.FrameworkSerialPort.IsOpen);
+                    return (FrameworkSerialPort != null) && (FrameworkSerialPort.IsOpen);
                 }
             }
         }
@@ -144,12 +144,12 @@ namespace Medo.IO {
         /// <exception cref="System.IO.IOException">The port is in an invalid state. -or- An attempt to set the state of the underlying port failed.</exception>
         /// <exception cref="System.UnauthorizedAccessException">Access is denied to the port.</exception>
         public void Open() {
-            if (this.IsOpen) { throw new InvalidOperationException("Port is already open."); }
+            if (IsOpen) { throw new InvalidOperationException("Port is already open."); }
 
             if (IsRunningOnMono == false) {
 
-                var portName = (this.PortName.StartsWith(@"\\?\", StringComparison.Ordinal) ? "" : @"\\?\") + this.PortName;
-                this.Handle = NativeMethods.CreateFileW(
+                var portName = (PortName.StartsWith(@"\\?\", StringComparison.Ordinal) ? "" : @"\\?\") + PortName;
+                Handle = NativeMethods.CreateFileW(
                     portName,
                     NativeMethods.GENERIC_READ | NativeMethods.GENERIC_WRITE,
                     0, //exclusive access
@@ -159,7 +159,7 @@ namespace Medo.IO {
                     IntPtr.Zero
                     );
 
-                if (this.IsOpen == false) { throw new IOException("The port is in an invalid state."); }
+                if (IsOpen == false) { throw new IOException("The port is in an invalid state."); }
 
                 var config = new NativeMethods.COMMCONFIG();
                 config.dwSize = Marshal.SizeOf(config);
@@ -167,7 +167,7 @@ namespace Medo.IO {
                 config.wReserved = 0;
                 config.dcb = new NativeMethods.DCB();
                 config.dcb.DCBlength = Marshal.SizeOf(config.dcb);
-                config.dcb.BaudRate = this.BaudRate;
+                config.dcb.BaudRate = BaudRate;
                 config.dcb.fBinary = 1;
                 config.dcb.fParity = 0;
                 config.dcb.fOutxCtsFlow = 0;
@@ -185,8 +185,8 @@ namespace Medo.IO {
                 config.dcb.wReserved = 0;
                 config.dcb.XonLim = 0;
                 config.dcb.XoffLim = 0;
-                config.dcb.ByteSize = (byte)this.DataBits;
-                switch (this.Parity) {
+                config.dcb.ByteSize = (byte)DataBits;
+                switch (Parity) {
                     case Parity.None: config.dcb.Parity = NativeMethods.NOPARITY; break;
                     case Parity.Odd: config.dcb.Parity = NativeMethods.ODDPARITY; break;
                     case Parity.Even: config.dcb.Parity = NativeMethods.EVENPARITY; break;
@@ -194,7 +194,7 @@ namespace Medo.IO {
                     case Parity.Space: config.dcb.Parity = NativeMethods.SPACEPARITY; break;
                     default: throw new IOException("An attempt to set the state of the underlying port failed (invalid parity).");
                 }
-                switch (this.StopBits) {
+                switch (StopBits) {
                     case StopBits.One: config.dcb.StopBits = NativeMethods.ONESTOPBIT; break;
                     case StopBits.OnePointFive: config.dcb.StopBits = NativeMethods.ONE5STOPBITS; break;
                     case StopBits.Two: config.dcb.StopBits = NativeMethods.TWOSTOPBITS; break;
@@ -210,42 +210,44 @@ namespace Medo.IO {
                 config.dwProviderOffset = 0;
                 config.dwProviderSize = 0;
                 config.wcProviderData = null;
-                var resultConfigSet = NativeMethods.SetCommConfig(this.Handle, ref config, config.dwSize);
+                var resultConfigSet = NativeMethods.SetCommConfig(Handle, ref config, config.dwSize);
                 if (resultConfigSet != true) { throw new IOException("An attempt to set the state of the underlying port failed.", new Win32Exception()); }
 
-                var commTimeouts = new NativeMethods.COMMTIMEOUTS();
-                commTimeouts.ReadIntervalTimeout = NativeMethods.MAXDWORD;
-                commTimeouts.ReadTotalTimeoutMultiplier = (this.ReadTimeout == 0) ? 0 : -1;
-                commTimeouts.ReadTotalTimeoutConstant = (this.ReadTimeout != InfiniteTimeout) ? this.ReadTimeout : -2;
-                commTimeouts.WriteTotalTimeoutMultiplier = 0;
-                commTimeouts.WriteTotalTimeoutConstant = (this.ReadTimeout != InfiniteTimeout) ? this.WriteTimeout : 0;
-                var resultTimeouts = NativeMethods.SetCommTimeouts(this.Handle, ref commTimeouts);
+                var commTimeouts = new NativeMethods.COMMTIMEOUTS {
+                    ReadIntervalTimeout = NativeMethods.MAXDWORD,
+                    ReadTotalTimeoutMultiplier = (ReadTimeout == 0) ? 0 : -1,
+                    ReadTotalTimeoutConstant = (ReadTimeout != InfiniteTimeout) ? ReadTimeout : -2,
+                    WriteTotalTimeoutMultiplier = 0,
+                    WriteTotalTimeoutConstant = (ReadTimeout != InfiniteTimeout) ? WriteTimeout : 0
+                };
+                var resultTimeouts = NativeMethods.SetCommTimeouts(Handle, ref commTimeouts);
                 if (resultTimeouts != true) { throw new IOException("An attempt to set the state of the underlying port failed.", new Win32Exception()); }
 
             } else {
 
-                var portName = (this.PortName.StartsWith(@"\\?\", StringComparison.Ordinal) ? this.PortName.Remove(0, 4).Trim() : this.PortName.Trim());
-                this.FrameworkSerialPort = new SerialPort(portName, this.BaudRate, this.Parity, this.DataBits, this.StopBits);
-                this.FrameworkSerialPort.ReadTimeout = this.ReadTimeout;
-                this.FrameworkSerialPort.WriteTimeout = this.WriteTimeout;
-                this.FrameworkSerialPort.DtrEnable = true;
-                this.FrameworkSerialPort.RtsEnable = true;
-                this.FrameworkSerialPort.Open();
+                var portName = (PortName.StartsWith(@"\\?\", StringComparison.Ordinal) ? PortName.Remove(0, 4).Trim() : PortName.Trim());
+                FrameworkSerialPort = new SerialPort(portName, BaudRate, Parity, DataBits, StopBits) {
+                    ReadTimeout = ReadTimeout,
+                    WriteTimeout = WriteTimeout,
+                    DtrEnable = true,
+                    RtsEnable = true
+                };
+                FrameworkSerialPort.Open();
 
             }
 
-            this.Purge();
+            Purge();
         }
 
         /// <summary>
         /// Closes the port connection.
         /// </summary>
         public void Close() {
-            if (this.IsOpen) {
+            if (IsOpen) {
                 if (IsRunningOnMono == false) {
-                    this.Handle.Close();
+                    Handle.Close();
                 } else {
-                    this.FrameworkSerialPort.Close();
+                    FrameworkSerialPort.Close();
                 }
             }
         }
@@ -259,13 +261,13 @@ namespace Medo.IO {
                 if (IsRunningOnMono == false) {
                     var errorFlags = IntPtr.Zero;
                     var stats = new NativeMethods.COMSTAT();
-                    var result = NativeMethods.ClearCommError(this.Handle, ref errorFlags, ref stats);
+                    var result = NativeMethods.ClearCommError(Handle, ref errorFlags, ref stats);
                     if (result != true) {
                         throw new InvalidOperationException("Cannot read state (native error " + Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture) + ").");
                     }
                     return (int)stats.cbInQue;
                 } else {
-                    return this.FrameworkSerialPort.BytesToRead;
+                    return FrameworkSerialPort.BytesToRead;
                 }
             }
         }
@@ -276,13 +278,13 @@ namespace Medo.IO {
         /// <exception cref="System.InvalidOperationException">Port is not open.</exception>
         /// <exception cref="System.IO.IOException">Communication error.</exception>
         public void Purge() {
-            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            if (IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             if (IsRunningOnMono == false) {
-                var result = NativeMethods.PurgeComm(this.Handle, NativeMethods.PURGE_TXABORT | NativeMethods.PURGE_TXCLEAR | NativeMethods.PURGE_RXABORT | NativeMethods.PURGE_RXCLEAR);
+                var result = NativeMethods.PurgeComm(Handle, NativeMethods.PURGE_TXABORT | NativeMethods.PURGE_TXCLEAR | NativeMethods.PURGE_RXABORT | NativeMethods.PURGE_RXCLEAR);
                 if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
             } else {
-                this.FrameworkSerialPort.DiscardInBuffer();
-                this.FrameworkSerialPort.DiscardOutBuffer();
+                FrameworkSerialPort.DiscardInBuffer();
+                FrameworkSerialPort.DiscardOutBuffer();
             }
         }
 
@@ -292,12 +294,12 @@ namespace Medo.IO {
         /// <exception cref="System.InvalidOperationException">Port is not open.</exception>
         /// <exception cref="System.IO.IOException">Communication error.</exception>
         public void Flush() {
-            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            if (IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             if (IsRunningOnMono == false) {
-                var result = NativeMethods.FlushFileBuffers(this.Handle);
+                var result = NativeMethods.FlushFileBuffers(Handle);
                 if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
             } else {
-                this.FrameworkSerialPort.BaseStream.Flush();
+                FrameworkSerialPort.BaseStream.Flush();
             }
         }
 
@@ -307,12 +309,12 @@ namespace Medo.IO {
         /// <exception cref="System.InvalidOperationException">Port is not open.</exception>
         /// <exception cref="System.IO.IOException">Communication error.</exception>
         public void DiscardInBuffer() {
-            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            if (IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             if (IsRunningOnMono == false) {
-                var result = NativeMethods.PurgeComm(this.Handle, NativeMethods.PURGE_RXABORT | NativeMethods.PURGE_RXCLEAR);
+                var result = NativeMethods.PurgeComm(Handle, NativeMethods.PURGE_RXABORT | NativeMethods.PURGE_RXCLEAR);
                 if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
             } else {
-                this.FrameworkSerialPort.DiscardInBuffer();
+                FrameworkSerialPort.DiscardInBuffer();
             }
         }
 
@@ -322,12 +324,12 @@ namespace Medo.IO {
         /// <exception cref="System.InvalidOperationException">Port is not open.</exception>
         /// <exception cref="System.IO.IOException">Communication error.</exception>
         public void DiscardOutBuffer() {
-            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            if (IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             if (IsRunningOnMono == false) {
-                var result = NativeMethods.PurgeComm(this.Handle, NativeMethods.PURGE_TXABORT | NativeMethods.PURGE_TXCLEAR);
+                var result = NativeMethods.PurgeComm(Handle, NativeMethods.PURGE_TXABORT | NativeMethods.PURGE_TXCLEAR);
                 if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
             } else {
-                this.FrameworkSerialPort.DiscardOutBuffer();
+                FrameworkSerialPort.DiscardOutBuffer();
             }
         }
 
@@ -353,19 +355,19 @@ namespace Medo.IO {
         /// <exception cref="System.TimeoutException">The operation did not complete before the time-out period ended.</exception>
         /// <exception cref="System.IO.IOException">Communication error.</exception>
         public int Read(byte[] buffer, int offset, int count) {
-            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            if (IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             if (buffer == null) { throw new ArgumentNullException("buffer", "The buffer passed is null."); }
             if ((offset < 0) || (count < 0) || (offset + count > buffer.Length)) { throw new ArgumentOutOfRangeException("offset", "The offset or count is outside of valid buffer region."); }
             if (IsRunningOnMono == false) {
                 var nPtrRead = IntPtr.Zero;
                 var overlapped = new NativeOverlapped();
-                var result = NativeMethods.ReadFile(this.Handle, buffer, count, ref nPtrRead, ref overlapped);
+                var result = NativeMethods.ReadFile(Handle, buffer, count, ref nPtrRead, ref overlapped);
                 if (result != true) { throw new IOException("Communication error.", new Win32Exception()); }
                 var nRead = nPtrRead.ToInt32();
                 if (nRead < count) { throw new TimeoutException("The operation did not complete before the time-out period ended."); }
                 return nRead;
             } else {
-                return this.FrameworkSerialPort.Read(buffer, offset, count);
+                return FrameworkSerialPort.Read(buffer, offset, count);
             }
         }
 
@@ -376,19 +378,19 @@ namespace Medo.IO {
             var sb = new StringBuilder();
             var buffer = new byte[1];
             for (; ; ) {
-                this.Read(buffer);
+                Read(buffer);
                 sb.Append(ASCIIEncoding.ASCII.GetString(buffer));
-                if (sb.Length >= this.NewLine.Length) {
+                if (sb.Length >= NewLine.Length) {
                     bool isNewLine = true;
-                    for (int i = 0; i < this.NewLine.Length; ++i) {
-                        if (sb[sb.Length - this.NewLine.Length + i] != this.NewLine[i]) {
+                    for (int i = 0; i < NewLine.Length; ++i) {
+                        if (sb[sb.Length - NewLine.Length + i] != NewLine[i]) {
                             isNewLine = false;
                         }
                     }
                     if (isNewLine) { break; }
                 }
             }
-            return sb.ToString(0, sb.Length - this.NewLine.Length);
+            return sb.ToString(0, sb.Length - NewLine.Length);
         }
 
 
@@ -414,7 +416,7 @@ namespace Medo.IO {
         /// <exception cref="System.TimeoutException">The operation did not complete before the time-out period ended.</exception>
         /// <exception cref="System.IO.IOException">Communication error.</exception>
         public int Write(byte[] buffer, int offset, int count) {
-            if (this.IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
+            if (IsOpen == false) { throw new InvalidOperationException("Port is not open."); }
             if (buffer == null) { throw new ArgumentNullException("buffer", "The buffer passed is null."); }
             if ((offset < 0) || (count < 0) || (offset + count > buffer.Length)) { throw new ArgumentOutOfRangeException("offset", "The offset or count is outside of valid buffer region."); }
 
@@ -426,13 +428,13 @@ namespace Medo.IO {
                 }
                 var nPtrWritten = IntPtr.Zero;
                 var overlapped = new NativeOverlapped();
-                var result = NativeMethods.WriteFile(this.Handle, buffer, count, ref nPtrWritten, ref overlapped);
+                var result = NativeMethods.WriteFile(Handle, buffer, count, ref nPtrWritten, ref overlapped);
                 if (result != true) { throw new Win32Exception("Communication error.", new Win32Exception()); }
                 var nWriten = nPtrWritten.ToInt32();
                 if (nWriten < count) { throw new TimeoutException("The operation did not complete before the time-out period ended."); }
                 return nWriten;
             } else {
-                this.FrameworkSerialPort.Write(buffer, offset, count);
+                FrameworkSerialPort.Write(buffer, offset, count);
                 return count;
             }
         }
@@ -442,7 +444,7 @@ namespace Medo.IO {
         /// </summary>
         /// <param name="text">The string to write to the output buffer.</param>
         public int WriteLine(string text) {
-            var buffer = ASCIIEncoding.ASCII.GetBytes(text + this.NewLine);
+            var buffer = ASCIIEncoding.ASCII.GetBytes(text + NewLine);
             return Write(buffer);
         }
 
@@ -450,6 +452,7 @@ namespace Medo.IO {
 
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             public const UInt32 FILE_SHARE_READ = 0x00000001;
             public const UInt32 FILE_SHARE_WRITE = 0x00000002;
@@ -526,48 +529,50 @@ namespace Medo.IO {
                 public Byte EvtChar;
                 public UInt16 wReserved1;
 
+#pragma warning disable IDE1006 // Naming Styles
                 public UInt32 fBinary {
-                    set { this.bitvector1 = ((UInt32)((value | this.bitvector1))); }
+                    set { bitvector1 = (value | bitvector1); }
                 }
                 public UInt32 fParity {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x2) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x2) | bitvector1); }
                 }
                 public UInt32 fOutxCtsFlow {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x4) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x4) | bitvector1); }
                 }
                 public UInt32 fOutxDsrFlow {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x8) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x8) | bitvector1); }
                 }
                 public UInt32 fDtrControl {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x10) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x10) | bitvector1); }
                 }
                 public UInt32 fDsrSensitivity {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x40) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x40) | bitvector1); }
                 }
                 public UInt32 fTXContinueOnXoff {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x80) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x80) | bitvector1); }
                 }
                 public UInt32 fOutX {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x100) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x100) | bitvector1); }
                 }
                 public UInt32 fInX {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x200) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x200) | bitvector1); }
                 }
                 public UInt32 fErrorChar {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x400) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x400) | bitvector1); }
                 }
                 public UInt32 fNull {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x800) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x800) | bitvector1); }
                 }
                 public UInt32 fRtsControl {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x1000) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x1000) | bitvector1); }
                 }
                 public UInt32 fAbortOnError {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x4000) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x4000) | bitvector1); }
                 }
                 public UInt32 fDummy2 {
-                    set { this.bitvector1 = ((UInt32)(((value * 0x8000) | this.bitvector1))); }
+                    set { bitvector1 = ((value * 0x8000) | bitvector1); }
                 }
+#pragma warning restore IDE1006 // Naming Styles
             }
 
 
@@ -615,6 +620,7 @@ namespace Medo.IO {
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern Boolean WriteFile([In()] CreateFileWHandle hFile, [In()] Byte[] lpBuffer, Int32 nNumberOfBytesToWrite, ref IntPtr lpNumberOfBytesWritten, ref NativeOverlapped lpOverlapped);
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
         private class CreateFileWHandle : SafeHandleZeroOrMinusOneIsInvalid {
@@ -624,7 +630,7 @@ namespace Medo.IO {
             }
 
             protected override bool ReleaseHandle() {
-                return NativeMethods.CloseHandle(this.handle);
+                return NativeMethods.CloseHandle(base.handle);
             }
 
             public override string ToString() {
@@ -638,7 +644,7 @@ namespace Medo.IO {
         /// Releases all resources.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -647,9 +653,9 @@ namespace Medo.IO {
         /// </summary>
         /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing) {
-            this.Close();
+            Close();
             if (disposing) {
-                this.Handle.Dispose();
+                Handle.Dispose();
             }
         }
 

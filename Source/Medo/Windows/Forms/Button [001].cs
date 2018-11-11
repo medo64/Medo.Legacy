@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-04-12: New version.
 
@@ -30,8 +30,8 @@ namespace Medo.Windows.Forms {
         [System.ComponentModel.Category("Appearance")]
         [System.ComponentModel.DefaultValue("Info")]
         public Color FocusedBackColor {
-            get { return this._focusedBackColor; }
-            set { this._focusedBackColor = value; }
+            get { return _focusedBackColor; }
+            set { _focusedBackColor = value; }
         }
 
         private Color _focusedForeColor = SystemColors.InfoText;
@@ -41,8 +41,8 @@ namespace Medo.Windows.Forms {
         [System.ComponentModel.Category("Appearance")]
         [System.ComponentModel.DefaultValue("InfoText")]
         public Color FocusedForeColor {
-            get { return this._focusedForeColor; }
-            set { this._focusedForeColor = value; }
+            get { return _focusedForeColor; }
+            set { _focusedForeColor = value; }
         }
 
 
@@ -55,11 +55,11 @@ namespace Medo.Windows.Forms {
         /// </summary>
         /// <param name="e">An System.EventArgs that contains the event data.</param>
         protected override void OnEnter(EventArgs e) {
-            this._lastBackColor = this.BackColor;
-            this._lastForeColor = this.ForeColor;
-            if (this.UseFocusColor) {
-                this.BackColor = this.FocusedBackColor;
-                this.ForeColor = this.FocusedForeColor;
+            _lastBackColor = BackColor;
+            _lastForeColor = ForeColor;
+            if (UseFocusColor) {
+                BackColor = FocusedBackColor;
+                ForeColor = FocusedForeColor;
             }
             base.OnEnter(e);
         }
@@ -69,8 +69,8 @@ namespace Medo.Windows.Forms {
         /// </summary>
         /// <param name="e">An System.EventArgs that contains the event data.</param>
         protected override void OnLeave(EventArgs e) {
-            this.BackColor = this._lastBackColor;
-            this.ForeColor = this._lastForeColor;
+            BackColor = _lastBackColor;
+            ForeColor = _lastForeColor;
             base.OnLeave(e);
         }
 

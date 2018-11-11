@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2014-12-20: Added support for .text files.
 //2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical).
@@ -244,8 +244,7 @@ namespace Medo.Windows.Forms {
                     form.Paint += Form_Paint;
 
                     if (owner != null) {
-                        Form formOwner = owner as Form;
-                        if ((formOwner != null) && (formOwner.TopMost == true)) {
+                        if ((owner is Form formOwner) && (formOwner.TopMost == true)) {
                             form.TopMost = false;
                             form.TopMost = true;
                         }
@@ -361,61 +360,61 @@ namespace Medo.Windows.Forms {
         private class PaintItem : IDisposable {
 
             public PaintItem(Image image, Point location) {
-                this._image = image;
-                this._location = location;
-                this._rectangle = new Rectangle(location, image.Size);
+                _image = image;
+                _location = location;
+                _rectangle = new Rectangle(location, image.Size);
             }
 
             public PaintItem(string title, Font font, int x, int y, int height, VerticalAlignment align, Graphics measurementGraphics) {
-                this._text = title;
-                this._font = font;
+                _text = title;
+                _font = font;
                 Size size = measurementGraphics.MeasureString(title, font, 600).ToSize();
                 switch (align) {
                     case VerticalAlignment.Top:
-                        this._location = new Point(x, y);
+                        _location = new Point(x, y);
                         break;
                     case VerticalAlignment.Center:
-                        this._location = new Point(x, y + (height - size.Height) / 2);
+                        _location = new Point(x, y + (height - size.Height) / 2);
                         break;
                     case VerticalAlignment.Bottom:
-                        this._location = new Point(x, y + height - size.Height);
+                        _location = new Point(x, y + height - size.Height);
                         break;
                 }
-                this._rectangle = new Rectangle(this.Location, size);
+                _rectangle = new Rectangle(Location, size);
             }
 
 
             private Image _image;
             public Image Image {
-                get { return this._image; }
+                get { return _image; }
             }
 
-            private string _text;
+            private readonly string _text;
             public string Text {
-                get { return this._text; }
+                get { return _text; }
             }
 
             private Font _font;
             public Font Font {
-                get { return this._font; }
+                get { return _font; }
             }
 
             private Point _location;
             public Point Location {
-                get { return this._location; }
+                get { return _location; }
             }
 
             private Rectangle _rectangle;
             public Rectangle Rectangle {
-                get { return this._rectangle; }
+                get { return _rectangle; }
             }
 
 
             public void Paint(Graphics graphics) {
-                if (this.Image != null) {
-                    graphics.DrawImage(this.Image, this.Rectangle);
-                } else if (this.Text != null) {
-                    graphics.DrawString(this.Text, this.Font, SystemBrushes.ControlText, this.Location);
+                if (Image != null) {
+                    graphics.DrawImage(Image, Rectangle);
+                } else if (Text != null) {
+                    graphics.DrawString(Text, Font, SystemBrushes.ControlText, Location);
                 }
             }
 
@@ -428,15 +427,15 @@ namespace Medo.Windows.Forms {
             /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
             protected virtual void Dispose(bool disposing) {
                 if (disposing) {
-                    if (this.Image != null) {
-                        this.Image.Dispose();
-                        this._image = null;
+                    if (Image != null) {
+                        Image.Dispose();
+                        _image = null;
                     }
-                    if (this.Font != null) {
-                        if (!this.Font.IsSystemFont) {
-                            this.Font.Dispose();
+                    if (Font != null) {
+                        if (!Font.IsSystemFont) {
+                            Font.Dispose();
                         }
-                        this._font = null;
+                        _font = null;
                     }
                 }
             }
@@ -501,6 +500,7 @@ namespace Medo.Windows.Forms {
 
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             #region API
 
@@ -524,7 +524,7 @@ namespace Medo.Windows.Forms {
             #endregion
 
 
-            internal static Bitmap GetIconBitmap(String executablePath) {
+            internal static Bitmap GetIconBitmap(string executablePath) {
                 if (!AboutBox.IsRunningOnMono) {
                     var hLibrary = LoadLibrary(executablePath);
                     if (!hLibrary.Equals(IntPtr.Zero)) {
@@ -538,7 +538,7 @@ namespace Medo.Windows.Forms {
                 return null;
             }
 
-            internal static String AssocQueryString(String extension) {
+            internal static string AssocQueryString(string extension) {
                 if (!AboutBox.IsRunningOnMono) {
                     var sbExe = new StringBuilder(1024);
                     var len = sbExe.Capacity;
@@ -548,9 +548,8 @@ namespace Medo.Windows.Forms {
                 }
                 return null;
             }
-
+#pragma warning restore IDE0049 // Simplify Names
         }
 
     }
-
 }

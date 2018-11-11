@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2007-10-30: New version.
 
@@ -34,7 +34,7 @@ namespace Medo {
 		/// Destroys instance and changes current cursor to previous value.
 		/// </summary>
 		~WaitCursor() {
-			this.Dispose(false);
+			Dispose(false);
 		}
 
 
@@ -44,7 +44,7 @@ namespace Medo {
 		/// Clean up any resources being used.
 		/// </summary>
 		public void Dispose() {
-			this.Dispose(true);
+			Dispose(true);
 			System.GC.SuppressFinalize(this);
 		}
 

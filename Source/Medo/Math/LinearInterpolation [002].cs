@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2011-03-13: Changed Add method.
 //            Line is approximated between two points when calculating adjustments below or above.

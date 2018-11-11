@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-11-24: Removing link demands.
 //2008-04-12: New version.
@@ -39,8 +39,8 @@ namespace Medo.Windows.Forms {
         [System.ComponentModel.Category("Appearance")]
         [System.ComponentModel.DefaultValue("Info")]
         public Color FocusedBackColor {
-            get { return this._focusedBackColor; }
-            set { this._focusedBackColor = value; }
+            get { return _focusedBackColor; }
+            set { _focusedBackColor = value; }
         }
 
         private Color _focusedForeColor = SystemColors.InfoText;
@@ -50,8 +50,8 @@ namespace Medo.Windows.Forms {
         [System.ComponentModel.Category("Appearance")]
         [System.ComponentModel.DefaultValue("InfoText")]
         public Color FocusedForeColor {
-            get { return this._focusedForeColor; }
-            set { this._focusedForeColor = value; }
+            get { return _focusedForeColor; }
+            set { _focusedForeColor = value; }
         }
 
 
@@ -64,11 +64,11 @@ namespace Medo.Windows.Forms {
         /// </summary>
         /// <param name="e">An System.EventArgs that contains the event data.</param>
         protected override void OnEnter(EventArgs e) {
-            this._lastBackColor = this.BackColor;
-            this._lastForeColor = this.ForeColor;
-            if (this.UseFocusColor) {
-                this.BackColor = this.FocusedBackColor;
-                this.ForeColor = this.FocusedForeColor;
+            _lastBackColor = BackColor;
+            _lastForeColor = ForeColor;
+            if (UseFocusColor) {
+                BackColor = FocusedBackColor;
+                ForeColor = FocusedForeColor;
             }
             base.OnEnter(e);
         }
@@ -78,8 +78,8 @@ namespace Medo.Windows.Forms {
         /// </summary>
         /// <param name="e">An System.EventArgs that contains the event data.</param>
         protected override void OnLeave(EventArgs e) {
-            this.BackColor = this._lastBackColor;
-            this.ForeColor = this._lastForeColor;
+            BackColor = _lastBackColor;
+            ForeColor = _lastForeColor;
             base.OnLeave(e);
         }
 
@@ -89,9 +89,9 @@ namespace Medo.Windows.Forms {
         /// <param name="msg">A System.Windows.Forms.Message, passed by reference, that represents the Win32 message to process.</param>
         /// <param name="keyData">One of the System.Windows.Forms.Keys values that represents the key to process.</param>
         protected override bool ProcessCmdKey(ref System.Windows.Forms.Message msg, System.Windows.Forms.Keys keyData) {
-            if ((this.SelectNextControlOnReturn) && (keyData == System.Windows.Forms.Keys.Enter)) {
-                if (this.Parent != null) {
-                    this.Parent.SelectNextControl(this, true, true, true, true);
+            if ((SelectNextControlOnReturn) && (keyData == System.Windows.Forms.Keys.Enter)) {
+                if (Parent != null) {
+                    Parent.SelectNextControl(this, true, true, true, true);
                     return true;
                 }
             }
@@ -106,7 +106,7 @@ namespace Medo.Windows.Forms {
         protected override void WndProc(ref Message m) {
             if (m.Msg == NativeMethods.WM_ERASEBKGND) {
                 using (Graphics g = Graphics.FromHdc(m.WParam)) {
-                    g.FillRectangle(new SolidBrush(this.BackColor), this.ClientRectangle);
+                    g.FillRectangle(new SolidBrush(BackColor), ClientRectangle);
                 }
                 return;
             }
@@ -122,15 +122,17 @@ namespace Medo.Windows.Forms {
             get { return base.BackColor; }
             set {
                 base.BackColor = value;
-                this.Invalidate();
+                Invalidate();
             }
         }
 
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
-            internal const int WM_ERASEBKGND = 0x14;
+            internal const Int32 WM_ERASEBKGND = 0x14;
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
     }

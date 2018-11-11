@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-05-14: Changed namespace.
 //2008-11-14: Added boolean conversion.
@@ -21,7 +21,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Boolean&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Boolean? ExtToNullableBoolean(object value)
+        public static bool? ExtToNullableBoolean(object value)
         {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
@@ -32,7 +32,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Byte&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Byte? ExtToNullableByte(object value) {
+        public static byte? ExtToNullableByte(object value) {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
             return System.Convert.ToByte(value, CultureInfo.InvariantCulture);
@@ -42,7 +42,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Int16&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Int16? ExtToNullableInt16(object value) {
+        public static short? ExtToNullableInt16(object value) {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
             return System.Convert.ToInt16(value, CultureInfo.InvariantCulture);
@@ -52,7 +52,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Int32&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Int32? ExtToNullableInt32(object value) {
+        public static int? ExtToNullableInt32(object value) {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
             return System.Convert.ToInt32(value, CultureInfo.InvariantCulture);
@@ -62,7 +62,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Int64&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Int64? ExtToNullableInt64(object value) {
+        public static long? ExtToNullableInt64(object value) {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
             return System.Convert.ToInt64(value, CultureInfo.InvariantCulture);
@@ -73,7 +73,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Decimal&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Decimal? ExtToNullableDecimal(object value) {
+        public static decimal? ExtToNullableDecimal(object value) {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
             return System.Convert.ToDecimal(value, CultureInfo.InvariantCulture);
@@ -84,7 +84,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Single&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Single? ExtToNullableSingle(object value) {
+        public static float? ExtToNullableSingle(object value) {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
             return System.Convert.ToSingle(value, CultureInfo.InvariantCulture);
@@ -94,7 +94,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Double&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Double? ExtToNullableDouble(object value) {
+        public static double? ExtToNullableDouble(object value) {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
             return System.Convert.ToDouble(value, CultureInfo.InvariantCulture);
@@ -105,7 +105,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Char&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Char? ExtToNullableChar(object value) {
+        public static char? ExtToNullableChar(object value) {
             if (value == null) { return null; }
             if (System.Convert.IsDBNull(value)) { return null; }
             return System.Convert.ToChar(value, CultureInfo.InvariantCulture);
@@ -127,7 +127,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Boolean&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Boolean? ToNullableBoolean(this object value)
+        public static bool? ToNullableBoolean(this object value)
         {
             return ExtToNullableBoolean(value);
         }
@@ -136,7 +136,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Byte&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Byte? ToNullableByte(this object value) {
+        public static byte? ToNullableByte(this object value) {
             return ExtToNullableByte(value);
         }
 
@@ -144,7 +144,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Int16&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Int16? ToNullableInt16(this object value) {
+        public static short? ToNullableInt16(this object value) {
             return ExtToNullableInt16(value);
         }
 
@@ -152,7 +152,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Int32&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Int32? ToNullableInt32(this object value) {
+        public static int? ToNullableInt32(this object value) {
             return ExtToNullableInt32(value);
         }
 
@@ -160,7 +160,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Int64&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Int64? ToNullableInt64(this object value) {
+        public static long? ToNullableInt64(this object value) {
             return ExtToNullableInt64(value);
         }
 
@@ -169,7 +169,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Decimal&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Decimal? ToNullableDecimal(this object value) {
+        public static decimal? ToNullableDecimal(this object value) {
             return ExtToNullableDecimal(value);
         }
 
@@ -178,7 +178,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Single&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Single? ToNullableSingle(this object value) {
+        public static float? ToNullableSingle(this object value) {
             return ExtToNullableSingle(value);
         }
 
@@ -186,7 +186,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Double&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Double? ToNullableDouble(this object value) {
+        public static double? ToNullableDouble(this object value) {
             return ExtToNullableDouble(value);
         }
 
@@ -195,7 +195,7 @@ namespace Medo.Extensions.ConvertToNullableTypes {
         /// Returns Nullable&lt;Char&gt;.
         /// </summary>
         /// <param name="value">Value to convert.</param>
-        public static Char? ToNullableChar(this object value) {
+        public static char? ToNullableChar(this object value) {
             return ExtToNullableChar(value);
         }
 

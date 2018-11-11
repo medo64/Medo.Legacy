@@ -1,4 +1,4 @@
-//Copyright 2015 by Josip Medved <jmedved@jmedved.com> (www.medo64.com) MIT License
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2017-09-17: Adjusting for .NET Standard 2.0.
 //            Allowing custom DateTime for GetCode.
@@ -24,9 +24,9 @@ namespace Medo.Security.Cryptography {
         /// </summary>
         public OneTimePassword() {
             using (var rng = RandomNumberGenerator.Create()) {
-                rng.GetBytes(this.SecretBuffer);
+                rng.GetBytes(SecretBuffer);
             }
-            this.SecretLength = 20; //160 bits
+            SecretLength = 20; //160 bits
             ProtectSecret();
         }
 
@@ -38,10 +38,10 @@ namespace Medo.Security.Cryptography {
         /// <exception cref="System.ArgumentOutOfRangeException">Secret cannot be longer than 8192 bits (1024 bytes).</exception>
         public OneTimePassword(byte[] secret) {
             if (secret == null) { throw new ArgumentNullException("secret", "Secret cannot be null."); }
-            if (secret.Length > this.SecretBuffer.Length) { throw new ArgumentOutOfRangeException("secret", "Secret cannot be longer than 8192 bits (1024 bytes)."); }
+            if (secret.Length > SecretBuffer.Length) { throw new ArgumentOutOfRangeException("secret", "Secret cannot be longer than 8192 bits (1024 bytes)."); }
 
-            Buffer.BlockCopy(secret, 0, this.SecretBuffer, 0, secret.Length);
-            this.SecretLength = secret.Length;
+            Buffer.BlockCopy(secret, 0, SecretBuffer, 0, secret.Length);
+            SecretLength = secret.Length;
             ProtectSecret();
         }
 
@@ -55,8 +55,8 @@ namespace Medo.Security.Cryptography {
             if (secret == null) { throw new ArgumentNullException("secret", "Secret cannot be null."); }
 
             try {
-                FromBase32(secret, this.SecretBuffer, out var length);
-                this.SecretLength = length;
+                FromBase32(secret, SecretBuffer, out var length);
+                SecretLength = length;
             } catch (IndexOutOfRangeException) {
                 throw new ArgumentOutOfRangeException("secret", "Secret cannot be longer than 8192 bits (1024 bytes).");
             } catch (Exception) {
@@ -89,28 +89,28 @@ namespace Medo.Security.Cryptography {
             using (var ms = new MemoryStream()) {
                 using (var encryptor = aes.Value.CreateEncryptor(lazyRandomKey.Value, new byte[16]))
                 using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write)) {
-                    cs.Write(this.SecretBuffer, 0, this.SecretBuffer.Length);
+                    cs.Write(SecretBuffer, 0, SecretBuffer.Length);
                 }
-                Buffer.BlockCopy(ms.ToArray(), 0, this.SecretBuffer, 0, this.SecretBuffer.Length);
+                Buffer.BlockCopy(ms.ToArray(), 0, SecretBuffer, 0, SecretBuffer.Length);
             }
 #else
-            ProtectedMemory.Protect(this.SecretBuffer, MemoryProtectionScope.SameProcess);
+            ProtectedMemory.Protect(SecretBuffer, MemoryProtectionScope.SameProcess);
 #endif
         }
 
         private void UnprotectSecret() {
 #if NETSTANDARD1_6 || NETSTANDARD2_0
-            using (var ms = new MemoryStream(this.SecretBuffer)) {
+            using (var ms = new MemoryStream(SecretBuffer)) {
                 using (var decryptor = aes.Value.CreateDecryptor(lazyRandomKey.Value, new byte[16]))
                 using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read)) {
-                    var decryptedBuffer = new byte[this.SecretBuffer.Length];
+                    var decryptedBuffer = new byte[SecretBuffer.Length];
                     var decryptedLength = cs.Read(decryptedBuffer, 0, decryptedBuffer.Length);
-                    Buffer.BlockCopy(decryptedBuffer, 0, this.SecretBuffer, 0, this.SecretBuffer.Length);
+                    Buffer.BlockCopy(decryptedBuffer, 0, SecretBuffer, 0, SecretBuffer.Length);
                     Array.Clear(decryptedBuffer, 0, decryptedBuffer.Length);
                 }
             }
 #else
-            ProtectedMemory.Unprotect(this.SecretBuffer, MemoryProtectionScope.SameProcess);
+            ProtectedMemory.Unprotect(SecretBuffer, MemoryProtectionScope.SameProcess);
 #endif
         }
 
@@ -120,13 +120,13 @@ namespace Medo.Security.Cryptography {
         /// It is up to the caller to secure given byte array.
         /// </summary>
         public byte[] GetSecret() {
-            var buffer = new byte[this.SecretLength];
+            var buffer = new byte[SecretLength];
 
-            this.UnprotectSecret();
+            UnprotectSecret();
             try {
-                Buffer.BlockCopy(this.SecretBuffer, 0, buffer, 0, buffer.Length);
+                Buffer.BlockCopy(SecretBuffer, 0, buffer, 0, buffer.Length);
             } finally {
-                this.ProtectSecret();
+                ProtectSecret();
             }
 
             return buffer;
@@ -138,7 +138,7 @@ namespace Medo.Security.Cryptography {
         /// It is up to the caller to secure given string.
         /// </summary>
         public string GetBase32Secret() {
-            return this.GetBase32Secret(SecretFormatFlags.Spacing);
+            return GetBase32Secret(SecretFormatFlags.Spacing);
         }
 
         /// <summary>
@@ -147,11 +147,11 @@ namespace Medo.Security.Cryptography {
         /// </summary>
         /// <param name="format">Format of Base32 string.</param>
         public string GetBase32Secret(SecretFormatFlags format) {
-            this.UnprotectSecret();
+            UnprotectSecret();
             try {
-                return ToBase32(this.SecretBuffer, this.SecretLength, format);
+                return ToBase32(SecretBuffer, SecretLength, format);
             } finally {
-                this.ProtectSecret();
+                ProtectSecret();
             }
         }
 
@@ -167,10 +167,10 @@ namespace Medo.Security.Cryptography {
         /// </summary>
         /// <exception cref="System.ArgumentOutOfRangeException">Number of digits to return must be between 4 and 9.</exception>
         public int Digits {
-            get { return this._digits; }
+            get { return _digits; }
             set {
                 if ((value < 4) || (value > 9)) { throw new ArgumentOutOfRangeException("value", "Number of digits to return must be between 4 and 9."); }
-                this._digits = value;
+                _digits = value;
             }
         }
 
@@ -182,14 +182,14 @@ namespace Medo.Security.Cryptography {
         /// </summary>
         /// <exception cref="System.ArgumentOutOfRangeException">Time step must be between 15 and 300 seconds.</exception>
         public int TimeStep {
-            get { return this._timeStep; }
+            get { return _timeStep; }
             set {
                 if (value == 0) {
-                    this._timeStep = 0;
-                    this.Counter = 0;
+                    _timeStep = 0;
+                    Counter = 0;
                 } else {
                     if ((value < 15) || (value > 300)) { throw new ArgumentOutOfRangeException("value", "Time step must be between 15 and 300 seconds."); }
-                    this._timeStep = value;
+                    _timeStep = value;
                 }
             }
         }
@@ -205,16 +205,16 @@ namespace Medo.Security.Cryptography {
         /// <exception cref="System.NotSupportedException">Counter value can only be set in HOTP mode (time step is zero).</exception>
         public long Counter {
             get {
-                if (this.TimeStep == 0) {
-                    return this._counter;
+                if (TimeStep == 0) {
+                    return _counter;
                 } else {
-                    return GetTimeBasedCounter(DateTime.UtcNow, this.TimeStep);
+                    return GetTimeBasedCounter(DateTime.UtcNow, TimeStep);
                 }
             }
             set {
-                if (this.TimeStep == 0) {
+                if (TimeStep == 0) {
                     if (value < 0) { throw new ArgumentOutOfRangeException("value", "Counter value must be a positive number."); }
-                    this._counter = value;
+                    _counter = value;
                 } else {
                     throw new NotSupportedException("Counter value can only be set in HOTP mode (time step is zero).");
                 }
@@ -232,7 +232,7 @@ namespace Medo.Security.Cryptography {
         /// </summary>
         /// <exception cref="System.ArgumentOutOfRangeException">Unknown algorithm.</exception>
         public OneTimePasswordAlgorithm Algorithm {
-            get { return this._algorithm; }
+            get { return _algorithm; }
             set {
                 switch (value) {
                     case OneTimePasswordAlgorithm.Sha1:
@@ -240,7 +240,7 @@ namespace Medo.Security.Cryptography {
                     case OneTimePasswordAlgorithm.Sha512: break;
                     default: throw new ArgumentOutOfRangeException("value", "Unknown algorithm.");
                 }
-                this._algorithm = value;
+                _algorithm = value;
             }
         }
 
@@ -254,8 +254,8 @@ namespace Medo.Security.Cryptography {
         /// In HOTP mode (time step is zero), counter will be automatically increased. 
         /// </summary>
         public int GetCode() {
-            var code = GetCode(this.Digits, this.Counter);
-            if (this.TimeStep == 0) { this.Counter += 1; }
+            var code = GetCode(Digits, Counter);
+            if (TimeStep == 0) { Counter += 1; }
             return code;
         }
 
@@ -268,9 +268,9 @@ namespace Medo.Security.Cryptography {
         /// <exception cref="System.NotSupportedException">Cannot specify time in HOTP mode (time step is zero).</exception>
         public int GetCode(DateTime utcTime) {
             if (utcTime.Kind != DateTimeKind.Utc) { throw new ArgumentOutOfRangeException("utcTime", "Time must be in UTC."); }
-            if (this.TimeStep == 0) { throw new NotSupportedException("Cannot specify time in HOTP mode (time step is zero)."); }
+            if (TimeStep == 0) { throw new NotSupportedException("Cannot specify time in HOTP mode (time step is zero)."); }
 
-            return GetCode(this.Digits, OneTimePassword.GetTimeBasedCounter(utcTime, this.TimeStep));
+            return GetCode(Digits, OneTimePassword.GetTimeBasedCounter(utcTime, TimeStep));
         }
 
 
@@ -279,16 +279,16 @@ namespace Medo.Security.Cryptography {
         private int cachedCode;
 
         private int GetCode(int digits, long counter) {
-            if ((this.cachedCounter == counter) && (this.cachedDigits == digits)) { return this.cachedCode; } //to avoid recalculation if all is the same
+            if ((cachedCounter == counter) && (cachedDigits == digits)) { return cachedCode; } //to avoid recalculation if all is the same
 
             byte[] hash;
-            var secret = this.GetSecret();
+            var secret = GetSecret();
             try {
                 var counterBytes = BitConverter.GetBytes(counter);
                 if (BitConverter.IsLittleEndian) { Array.Reverse(counterBytes, 0, 8); }
                 HMAC hmac = null;
                 try {
-                    switch (this.Algorithm) {
+                    switch (Algorithm) {
                         case OneTimePasswordAlgorithm.Sha1: hmac = new HMACSHA1(secret); break;
                         case OneTimePasswordAlgorithm.Sha256: hmac = new HMACSHA256(secret); break;
                         case OneTimePasswordAlgorithm.Sha512: hmac = new HMACSHA512(secret); break;
@@ -307,9 +307,9 @@ namespace Medo.Security.Cryptography {
             var number = BitConverter.ToInt32(truncatedHash, 0);
             var code = number % DigitsDivisor[digits];
 
-            this.cachedCounter = counter;
-            this.cachedDigits = digits;
-            this.cachedCode = code;
+            cachedCounter = counter;
+            cachedDigits = digits;
+            cachedCode = code;
 
             return code;
         }
@@ -346,14 +346,14 @@ namespace Medo.Security.Cryptography {
         /// </summary>
         /// <param name="code">Code to validate.</param>
         public bool IsCodeValid(int code) {
-            var currCode = GetCode(this.Digits, this.Counter);
-            var prevCode = GetCode(this.Digits, this.Counter - 1);
+            var currCode = GetCode(Digits, Counter);
+            var prevCode = GetCode(Digits, Counter - 1);
 
             var isCurrValid = (code == currCode);
-            var isPrevValid = (code == prevCode) && (this.Counter > 0); //don't check previous code if counter is zero; but calculate it anyhow (to keep timing)
+            var isPrevValid = (code == prevCode) && (Counter > 0); //don't check previous code if counter is zero; but calculate it anyhow (to keep timing)
             var isValid = isCurrValid || isPrevValid;
-            if ((this.TimeStep == 0) && isValid) {
-                this.Counter++;
+            if ((TimeStep == 0) && isValid) {
+                Counter++;
             }
             return isValid;
         }
@@ -368,15 +368,15 @@ namespace Medo.Security.Cryptography {
         /// <exception cref="NotSupportedException">Cannot specify time in HOTP mode (time step is zero).</exception>
         public bool IsCodeValid(int code, DateTime utcTime) {
             if (utcTime.Kind != DateTimeKind.Utc) { throw new ArgumentOutOfRangeException("utcTime", "Time must be in UTC."); }
-            if (this.TimeStep == 0) { throw new NotSupportedException("Cannot specify time in HOTP mode (time step is zero)."); }
+            if (TimeStep == 0) { throw new NotSupportedException("Cannot specify time in HOTP mode (time step is zero)."); }
 
-            var counter = GetTimeBasedCounter(utcTime, this.TimeStep);
+            var counter = GetTimeBasedCounter(utcTime, TimeStep);
 
-            var currCode = GetCode(this.Digits, counter);
-            var prevCode = GetCode(this.Digits, counter - 1);
+            var currCode = GetCode(Digits, counter);
+            var prevCode = GetCode(Digits, counter - 1);
 
             var isCurrValid = (code == currCode);
-            var isPrevValid = (code == prevCode) && (this.Counter > 0); //don't check previous code if counter is zero; but calculate it anyhow (to keep timing)
+            var isPrevValid = (code == prevCode) && (Counter > 0); //don't check previous code if counter is zero; but calculate it anyhow (to keep timing)
             var isValid = isCurrValid || isPrevValid;
             return isValid;
         }

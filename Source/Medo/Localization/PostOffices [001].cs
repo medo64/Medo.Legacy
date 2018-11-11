@@ -1,17 +1,15 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-11-07: First version.
 
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Medo.Localization
-{
+namespace Medo.Localization {
 
     /// <summary>
     /// Class for searching through post office data.
@@ -24,17 +22,15 @@ namespace Medo.Localization
     /// &lt;/PostOffices&gt;
     /// </example>
     /// </summary>
-    public class PostOffices : IDisposable
-    {
+    public class PostOffices : IDisposable {
 
-        private XElement _document;
+        private readonly XElement _document;
 
         /// <summary>
         /// Creates new instance.
         /// </summary>
         /// <param name="xmlReader">XmlReader which contains post offices.</param>
-        public PostOffices(XmlReader xmlReader)
-        {
+        public PostOffices(XmlReader xmlReader) {
             _document = XElement.Load(xmlReader);
         }
 
@@ -43,10 +39,9 @@ namespace Medo.Localization
         /// Return post offices that are exact match to given code.
         /// </summary>
         /// <param name="code">Postal code.</param>
-        public IList<PostOffice> GetByExactCode(string code)
-        {
+        public IList<PostOffice> GetByExactCode(string code) {
             IEnumerable<XElement> items =
-                from element in this._document.Elements("PostOffice")
+                from element in _document.Elements("PostOffice")
                 where element.Attribute("code").Value == code
                 select element;
 
@@ -59,10 +54,9 @@ namespace Medo.Localization
         /// Return post offices that match start of given code.
         /// </summary>
         /// <param name="code">Postal code.</param>
-        public IList<PostOffice> GetByPartialCode(string code)
-        {
+        public IList<PostOffice> GetByPartialCode(string code) {
             IEnumerable<XElement> items =
-                from element in this._document.Elements("PostOffice")
+                from element in _document.Elements("PostOffice")
                 where element.Attribute("code").Value.StartsWith(code, StringComparison.CurrentCultureIgnoreCase)
                 select element;
 
@@ -75,10 +69,9 @@ namespace Medo.Localization
         /// Return post offices that match start of given name.
         /// </summary>
         /// <param name="name">Name.</param>
-        public IList<PostOffice> GetByPartialName(string name)
-        {
+        public IList<PostOffice> GetByPartialName(string name) {
             IEnumerable<XElement> items =
-                from element in this._document.Elements("PostOffice")
+                from element in _document.Elements("PostOffice")
                 where element.Attribute("name").Value.StartsWith(name, StringComparison.CurrentCultureIgnoreCase)
                 select element;
 
@@ -88,11 +81,9 @@ namespace Medo.Localization
         }
 
 
-        private static List<PostOffice> GetList(IEnumerable<XElement> items)
-        {
+        private static List<PostOffice> GetList(IEnumerable<XElement> items) {
             List<PostOffice> filteredList = new List<PostOffice>();
-            foreach (XElement iItem in items)
-            {
+            foreach (XElement iItem in items) {
                 string iCode = (string)iItem.Attribute("code");
                 string iName = (string)iItem.Attribute("name");
                 string iRegion = (string)iItem.Attribute("region");
@@ -103,17 +94,13 @@ namespace Medo.Localization
         }
 
 
-        private static int ComparisionByCode(PostOffice first, PostOffice second)
-        {
+        private static int ComparisionByCode(PostOffice first, PostOffice second) {
             int cCode = string.Compare(first.Code, second.Code, StringComparison.CurrentCultureIgnoreCase);
             if (cCode != 0) { return cCode; }
 
-            if (first.IsCentral && !second.IsCentral)
-            {
+            if (first.IsCentral && !second.IsCentral) {
                 return -1;
-            }
-            else if (!first.IsCentral && second.IsCentral)
-            {
+            } else if (!first.IsCentral && second.IsCentral) {
                 return 1;
             }
 
@@ -121,20 +108,16 @@ namespace Medo.Localization
         }
 
 
-        private static int ComparisionByName(PostOffice first, PostOffice second)
-        {
+        private static int ComparisionByName(PostOffice first, PostOffice second) {
             int cName = string.Compare(first.Name, second.Name, StringComparison.CurrentCultureIgnoreCase);
             if (cName != 0) { return cName; }
 
             int cCode = string.Compare(first.Code, second.Code, StringComparison.CurrentCultureIgnoreCase);
             if (cCode != 0) { return cCode; }
 
-            if (first.IsCentral && !second.IsCentral)
-            {
+            if (first.IsCentral && !second.IsCentral) {
                 return -1;
-            }
-            else if (!first.IsCentral && second.IsCentral)
-            {
+            } else if (!first.IsCentral && second.IsCentral) {
                 return 1;
             }
 
@@ -148,15 +131,13 @@ namespace Medo.Localization
         /// Releases the unmanaged resources and optionally releases the managed resources.
         /// </summary>
         /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
+        protected virtual void Dispose(bool disposing) {
         }
 
         /// <summary>
         /// Releases all resources.
         /// </summary>
-        public void Dispose()
-        {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -169,8 +150,7 @@ namespace Medo.Localization
     /// <summary>
     /// Structure for keeping post office data.
     /// </summary>
-    public struct PostOffice
-    {
+    public struct PostOffice {
 
         /// <summary>
         /// Create new instance.
@@ -180,12 +160,11 @@ namespace Medo.Localization
         /// <param name="region">Region.</param>
         /// <param name="isCentral">True if this is main post office.</param>
         public PostOffice(string code, string name, string region, bool isCentral)
-            : this()
-        {
-            this.Code = code;
-            this.Name = name;
-            this.Region = region;
-            this.IsCentral = isCentral;
+            : this() {
+            Code = code;
+            Name = name;
+            Region = region;
+            IsCentral = isCentral;
         }
 
         /// <summary>
@@ -213,12 +192,9 @@ namespace Medo.Localization
         /// Returns a value indicating whether this instance is equal to the other.
         /// </summary>
         /// <param name="obj">A object to compare to this instance.</param>
-        public override bool Equals(object obj)
-        {
-            if (obj is PostOffice)
-            {
-                PostOffice other = (PostOffice)obj;
-                return (string.Compare(this.Code, other.Code, StringComparison.Ordinal) == 0) && (string.Compare(this.Name, other.Name, StringComparison.Ordinal) == 0);
+        public override bool Equals(object obj) {
+            if (obj is PostOffice other) {
+                return (string.Compare(Code, other.Code, StringComparison.Ordinal) == 0) && (string.Compare(Name, other.Name, StringComparison.Ordinal) == 0);
             }
             return false;
         }
@@ -227,18 +203,16 @@ namespace Medo.Localization
         /// Returns the hash code for this instance.
         /// </summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
-        public override int GetHashCode()
-        {
-            return this.Code.GetHashCode();
+        public override int GetHashCode() {
+            return Code.GetHashCode();
         }
 
         /// <summary>
         /// Converts the value of this instance to its equivalent string representation.
         /// </summary>
         /// <returns>String that represents this instance.</returns>
-        public override string ToString()
-        {
-            return this.Name;
+        public override string ToString() {
+            return Name;
         }
 
 
@@ -248,8 +222,7 @@ namespace Medo.Localization
         /// </summary>
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
-        public static bool operator ==(PostOffice objA, PostOffice objB)
-        {
+        public static bool operator ==(PostOffice objA, PostOffice objB) {
             return objB.Equals(objA);
         }
 
@@ -258,8 +231,7 @@ namespace Medo.Localization
         /// </summary>
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
-        public static bool operator !=(PostOffice objA, PostOffice objB)
-        {
+        public static bool operator !=(PostOffice objA, PostOffice objB) {
             return !objA.Equals(objB);
         }
 

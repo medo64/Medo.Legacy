@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-05-26: Initial version.
 
@@ -24,27 +24,28 @@ namespace Medo.Device {
         private ManualResetEvent _cancelEvent;
         private SerialPort _serial;
         private readonly object _syncCodes = new object();
-        private Queue<string> _codes = new Queue<string>();
+        private readonly Queue<string> _codes = new Queue<string>();
 
         /// <summary>
         /// Creates new instance.
         /// </summary>
         /// <param name="portName">The port to use.</param>
         public GigatekPcr300F(string portName) {
-            this._serial = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);
-            this._serial.ReadTimeout = 15000;
+            _serial = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One) {
+                ReadTimeout = 15000
+            };
         }
 
         /// <summary>
         /// Opens connection toward device.
         /// </summary>
         public void Open() {
-            this._serial.Open();
+            _serial.Open();
 
-            this._cancelEvent = new ManualResetEvent(false);
-            this._thread = new Thread(Run) { IsBackground = true };
-            this._thread.Name = this.ToString() + " @ " + this._serial.PortName;
-            this._thread.Start();
+            _cancelEvent = new ManualResetEvent(false);
+            _thread = new Thread(Run) { IsBackground = true };
+            _thread.Name = ToString() + " @ " + _serial.PortName;
+            _thread.Start();
         }
 
         /// <summary>
@@ -54,8 +55,8 @@ namespace Medo.Device {
                 _cancelEvent.Set();
                 while (_thread.IsAlive) { Thread.Sleep(10); }
                 _thread = null;
-            this._cancelEvent.Dispose();
-            this._serial.Close();
+            _cancelEvent.Dispose();
+            _serial.Close();
         }
 
 
@@ -64,8 +65,8 @@ namespace Medo.Device {
         /// </summary>
         public bool HasCode {
             get {
-                lock (this._syncCodes) {
-                    return (this._codes.Count > 0);
+                lock (_syncCodes) {
+                    return (_codes.Count > 0);
                 }
             }
         }
@@ -74,8 +75,8 @@ namespace Medo.Device {
         /// Removes all codes read.
         /// </summary>
         public void Clear() {
-            lock (this._syncCodes) {
-                this._codes.Clear();
+            lock (_syncCodes) {
+                _codes.Clear();
             }
         }
 
@@ -88,9 +89,9 @@ namespace Medo.Device {
             var timer = new Stopwatch();
             timer.Start();
             while (timer.ElapsedMilliseconds < timeout) {
-                lock (this._syncCodes) {
-                    if (this._codes.Count > 0) {
-                        return this._codes.Dequeue();
+                lock (_syncCodes) {
+                    if (_codes.Count > 0) {
+                        return _codes.Dequeue();
                     }
                 }
                 Thread.Sleep(1);
@@ -103,9 +104,9 @@ namespace Medo.Device {
         /// </summary>
         public string Code {
             get {
-                lock (this._syncCodes) {
-                    if (this._codes.Count > 0) {
-                        return this._codes.Dequeue();
+                lock (_syncCodes) {
+                    if (_codes.Count > 0) {
+                        return _codes.Dequeue();
                     } else {
                         return null;
                     }
@@ -120,7 +121,7 @@ namespace Medo.Device {
         /// Clean up any resources being used.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -130,7 +131,7 @@ namespace Medo.Device {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.Close();
+                Close();
             }
         }
 
@@ -199,7 +200,7 @@ namespace Medo.Device {
                                 case ExpectedState.Escape: {
                                         if (input == 27) {
                                             var code = ASCIIEncoding.ASCII.GetString(dataBuffer.ToArray()).ToUpper(CultureInfo.InvariantCulture);
-                                            this._codes.Enqueue(code);
+                                            _codes.Enqueue(code);
                                         }
                                         expectedState = ExpectedState.Stx;
                                     } break;

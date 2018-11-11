@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-06-07: Replaced ShiftRight function with right shift (>>) operator.
 //            Implemented bit reversal via lookup table (http://graphics.stanford.edu/~seander/bithacks.html) and inlined byte bit reversal.
@@ -19,11 +19,11 @@ namespace Medo.Security.Checksum {
     /// </summary>
     public class Crc32 {
 
-        private uint[] _lookup = new uint[256];
+        private readonly uint[] _lookup = new uint[256];
         private uint _currDigest;
-        private uint _finalXorValue;
-        private bool _reverseIn;
-        private bool _reverseOut;
+        private readonly uint _finalXorValue;
+        private readonly bool _reverseIn;
+        private readonly bool _reverseOut;
 
 
         /// <summary>
@@ -91,10 +91,10 @@ namespace Medo.Security.Checksum {
         /// XFER        0x000000AF  0x00000000  false  false   0x00000000
         /// </remarks>
         public Crc32(int polynomial, int initialValue, bool reflectIn, bool reflectOut, int finalXorValue) {
-            this._currDigest = (uint)initialValue;
-            this._reverseIn = !reflectIn;
-            this._reverseOut = !reflectOut;
-            this._finalXorValue = (uint)finalXorValue;
+            _currDigest = (uint)initialValue;
+            _reverseIn = !reflectIn;
+            _reverseOut = !reflectOut;
+            _finalXorValue = (uint)finalXorValue;
 
             uint polynomialR = BitwiseReverse((uint)polynomial);
             for (int i = 0; i < 256; i++) {
@@ -108,7 +108,7 @@ namespace Medo.Security.Checksum {
                     }//if
                 }//for j
 
-                this._lookup[i] = crcValue;
+                _lookup[i] = crcValue;
             }//for i
         }
 
@@ -119,7 +119,7 @@ namespace Medo.Security.Checksum {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public void Append(byte[] value) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-            this.Append(value, 0, value.Length);
+            Append(value, 0, value.Length);
         }
 
         /// <summary>
@@ -132,10 +132,10 @@ namespace Medo.Security.Checksum {
         public void Append(byte[] value, int index, int length) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
             for (int i = index; i < index + length; i++) {
-                if (this._reverseIn) {
-                    this._currDigest = (uint)((this._currDigest >> 8) ^ this._lookup[(int)((this._currDigest & 0xff) ^ _lookupBitReverse[value[i]])]);
+                if (_reverseIn) {
+                    _currDigest = (uint)((_currDigest >> 8) ^ _lookup[(int)((_currDigest & 0xff) ^ _lookupBitReverse[value[i]])]);
                 } else {
-                    this._currDigest = (uint)((this._currDigest >> 8) ^ this._lookup[(int)((this._currDigest & 0xff) ^ (value[i]))]);
+                    _currDigest = (uint)((_currDigest >> 8) ^ _lookup[(int)((_currDigest & 0xff) ^ (value[i]))]);
                 }
             }
         }
@@ -147,9 +147,9 @@ namespace Medo.Security.Checksum {
         /// <param name="useAsciiEncoding">If True, ASCII encoding is used instead of Unicode.</param>
         public void Append(string value, bool useAsciiEncoding) {
             if (useAsciiEncoding) {
-                this.Append(System.Text.ASCIIEncoding.ASCII.GetBytes(value));
+                Append(System.Text.ASCIIEncoding.ASCII.GetBytes(value));
             } else {
-                this.Append(System.Text.UnicodeEncoding.Unicode.GetBytes(value));
+                Append(System.Text.UnicodeEncoding.Unicode.GetBytes(value));
             }//if
         }
 
@@ -158,14 +158,13 @@ namespace Medo.Security.Checksum {
         /// </summary>
         public int Digest {
             get {
-                if (this._reverseOut) {
-                    return (int)(BitwiseReverse(this._currDigest) ^ this._finalXorValue);
+                if (_reverseOut) {
+                    return (int)(BitwiseReverse(_currDigest) ^ _finalXorValue);
                 } else {
-                    return (int)(this._currDigest ^ this._finalXorValue);
+                    return (int)(_currDigest ^ _finalXorValue);
                 }
             }
         }
-
 
 
         /// <summary>

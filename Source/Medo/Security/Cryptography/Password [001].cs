@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2013-03-26: Initial version.
 
@@ -23,15 +23,15 @@ namespace Medo.Security.Cryptography {
         private static RandomNumberGenerator Rng = RandomNumberGenerator.Create();
         private static readonly char[] Base64Characters = new char[] { '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
-        private const Int32 MinimumSaltSize = 0;
-        private const Int32 MaximumSaltSize = 16;
-        private const Int32 MinimumIterationCount = 1000;
-        private const Int32 MaximumIterationCount = 999999999;
+        private const int MinimumSaltSize = 0;
+        private const int MaximumSaltSize = 16;
+        private const int MinimumIterationCount = 1000;
+        private const int MaximumIterationCount = 999999999;
 
-        private const Int32 Md5DefaultIterationCount = 1000;
-        private const Int32 Md5ApacheDefaultIterationCount = 1000;
-        private const Int32 Sha256DefaultIterationCount = 5000;
-        private const Int32 Sha512DefaultIterationCount = 5000;
+        private const int Md5DefaultIterationCount = 1000;
+        private const int Md5ApacheDefaultIterationCount = 1000;
+        private const int Sha256DefaultIterationCount = 5000;
+        private const int Sha512DefaultIterationCount = 5000;
 
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Medo.Security.Cryptography {
         /// </summary>
         /// <param name="password">Password to hash. It is converted to bytes using UTF8.</param>
         /// <exception cref="System.ArgumentNullException">Password cannot be null.</exception>
-        public static String Create(String password) {
+        public static string Create(string password) {
             return Create(password, 16, PasswordAlgorithm.Sha512);
         }
 
@@ -50,7 +50,7 @@ namespace Medo.Security.Cryptography {
         /// <param name="algorithm">Algorithm to use.</param>
         /// <exception cref="System.ArgumentNullException">Password cannot be null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Unknown algorithm.</exception>
-        public static String Create(String password, PasswordAlgorithm algorithm) {
+        public static string Create(string password, PasswordAlgorithm algorithm) {
             if ((algorithm == PasswordAlgorithm.MD5) || (algorithm == PasswordAlgorithm.MD5Apache)) {
                 return Create(password, 8, algorithm);
             } else {
@@ -66,7 +66,7 @@ namespace Medo.Security.Cryptography {
         /// <param name="algorithm">Algorithm to use.</param>
         /// <exception cref="System.ArgumentNullException">Password cannot be null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Unknown algorithm.</exception>
-        public static String Create(String password, Int32 saltSize, PasswordAlgorithm algorithm) {
+        public static string Create(string password, int saltSize, PasswordAlgorithm algorithm) {
             return Create(password, saltSize, algorithm, 0);
         }
 
@@ -79,7 +79,7 @@ namespace Medo.Security.Cryptography {
         /// <param name="iterationCount">Number of iterations. If value is 0 then default value is used.</param>
         /// <exception cref="System.ArgumentNullException">Password cannot be null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Unknown algorithm.</exception>
-        public static String Create(String password, Int32 saltSize, PasswordAlgorithm algorithm, Int32 iterationCount) {
+        public static string Create(string password, int saltSize, PasswordAlgorithm algorithm, int iterationCount) {
             if (password == null) { throw new ArgumentNullException("password", "Password cannot be null."); }
 
             if (saltSize < Password.MinimumSaltSize) { saltSize = Password.MinimumSaltSize; }
@@ -103,7 +103,7 @@ namespace Medo.Security.Cryptography {
         /// <param name="iterationCount">Number of iterations. If value is 0 then default value is used.</param>
         /// <exception cref="System.ArgumentNullException">Password cannot be null. -or- Salt cannot be null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Unknown algorithm.</exception>
-        public static String Create(Byte[] password, Byte[] salt, PasswordAlgorithm algorithm, Int32 iterationCount) {
+        public static string Create(byte[] password, byte[] salt, PasswordAlgorithm algorithm, int iterationCount) {
             if (password == null) { throw new ArgumentNullException("password", "Password cannot be null."); }
             if (salt == null) { throw new ArgumentNullException("salt", "Salt cannot be null."); }
 
@@ -129,7 +129,7 @@ namespace Medo.Security.Cryptography {
         /// <param name="password">Password to check.</param>
         /// <param name="passwordHash">Hashed password.</param>
         /// <exception cref="System.ArgumentNullException">Password cannot be null.</exception>
-        public static Boolean Verify(String password, String passwordHash) {
+        public static bool Verify(string password, string passwordHash) {
             if (password == null) { throw new ArgumentNullException("password", "Password cannot be null."); }
             return Verify(Password.Utf8WithoutBom.GetBytes(password), passwordHash);
         }
@@ -140,16 +140,11 @@ namespace Medo.Security.Cryptography {
         /// <param name="password">Password to check.</param>
         /// <param name="passwordHash">Hashed password.</param>
         /// <exception cref="System.ArgumentNullException">Password cannot be null.</exception>
-        public static Boolean Verify(Byte[] password, String passwordHash) {
+        public static bool Verify(byte[] password, string passwordHash) {
             if (password == null) { throw new ArgumentNullException("password", "Password cannot be null."); }
             if (passwordHash == null) { return false; }
 
-            string id;
-            int iterationCount;
-            byte[] salt;
-            string hash;
-
-            if (!(SplitHashedPassword(passwordHash, out id, out iterationCount, out salt, out hash))) { return false; }
+            if (!(SplitHashedPassword(passwordHash, out var id, out var iterationCount, out var salt, out var hash))) { return false; }
 
             string hashCalc;
             switch (id) { //algorithm
@@ -433,10 +428,7 @@ namespace Medo.Security.Cryptography {
         }
 
         private static bool SplitHashedPassword(string hashedPassword, out string hash) {
-            string id;
-            int iterationCount;
-            byte[] salt;
-            return SplitHashedPassword(hashedPassword, out id, out iterationCount, out salt, out hash);
+            return SplitHashedPassword(hashedPassword, out var id, out var iterationCount, out var salt, out hash);
         }
 
         private static bool SplitHashedPassword(string hashedPassword, out string id, out int iterationCount, out byte[] salt, out string hash) {

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-04-17: Changed namespace from Medo.IO.SerialDevices to Medo.Device.
 //2008-11-05: New version.
@@ -17,29 +17,30 @@ namespace Medo.Device {
     /// </summary>
     public class EltraEL4000 : IDisposable {
 
-        private SerialPort _serial;
+        private readonly SerialPort _serial;
 
         /// <summary>
         /// Creates new instance.
         /// </summary>
         /// <param name="portName">The port to use.</param>
         public EltraEL4000(string portName) {
-            this._serial = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);
-            this._serial.ReadTimeout = 15000;
+            _serial = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One) {
+                ReadTimeout = 15000
+            };
         }
 
         /// <summary>
         /// Opens serial port.
         /// </summary>
         public void Open() {
-            this._serial.Open();
+            _serial.Open();
         }
 
         /// <summary>
         /// Closes serial port.
         /// </summary>
         public void Close() {
-            this._serial.Close();
+            _serial.Close();
         }
 
         private byte[] _lastData;
@@ -47,7 +48,7 @@ namespace Medo.Device {
         /// Returns data from last command.
         /// </summary>
         public byte[] GetLastData() {
-            return this._lastData;
+            return _lastData;
         }
 
         private EltraCommandStatus _lastCommandStatus;
@@ -55,7 +56,7 @@ namespace Medo.Device {
         /// Gets status of last command.
         /// </summary>
         public EltraCommandStatus LastCommandStatus {
-            get { return this._lastCommandStatus; }
+            get { return _lastCommandStatus; }
         }
 
         private EltraErrorCodes _lastErrorCode;
@@ -64,7 +65,7 @@ namespace Medo.Device {
         /// Notice that some error codes are in fact status reports.
         /// </summary>
         public EltraErrorCodes LastErrorCode {
-            get { return this._lastErrorCode; }
+            get { return _lastErrorCode; }
         }
 
 
@@ -111,7 +112,7 @@ namespace Medo.Device {
         public string ReadBarcodeField() {
             WritePortCommand(0x43, null); //C
             if (ReadPortAnswer()) {
-                return System.Text.ASCIIEncoding.ASCII.GetString(this._lastData);
+                return System.Text.ASCIIEncoding.ASCII.GetString(_lastData);
             } else {
                 return null;
             }
@@ -152,7 +153,7 @@ namespace Medo.Device {
         public string GetInsideReadDataAndParkingUnderPrinter() {
             WritePortCommand(0x47, null); //G
             if (ReadPortAnswer()) {
-                return System.Text.ASCIIEncoding.ASCII.GetString(this._lastData);
+                return System.Text.ASCIIEncoding.ASCII.GetString(_lastData);
             } else {
                 return null;
             }
@@ -174,7 +175,7 @@ namespace Medo.Device {
         public string ReadSecondBarcodeField() {
             WritePortCommand(0x49, null); //I
             if (ReadPortAnswer()) {
-                return System.Text.ASCIIEncoding.ASCII.GetString(this._lastData);
+                return System.Text.ASCIIEncoding.ASCII.GetString(_lastData);
             } else {
                 return null;
             }
@@ -200,7 +201,7 @@ namespace Medo.Device {
         public string InsertTicketAndReadBarcodeField() {
             WritePortCommand(0x52, null); //R
             if (ReadPortAnswer()) {
-                return System.Text.ASCIIEncoding.ASCII.GetString(this._lastData);
+                return System.Text.ASCIIEncoding.ASCII.GetString(_lastData);
             } else {
                 return null;
             }
@@ -268,11 +269,12 @@ namespace Medo.Device {
             _lastErrorCode = EltraErrorCodes.None;
             _lastData = null;
 
-            List<byte> command = new List<byte>();
-            command.Add(0x12); //WUP
-            command.Add(0x02); //STX
-            command.Add(0x42); //DEST
-            command.Add(code); //CMD
+            List<byte> command = new List<byte> {
+                0x12, //WUP
+                0x02, //STX
+                0x42, //DEST
+                code //CMD
+            };
             if (data != null) {
                 command.AddRange(data); //DATA
             }
@@ -284,43 +286,44 @@ namespace Medo.Device {
 
             command.Add(0x04); //EOT
 
-            this._serial.Write(command.ToArray(), 0, command.Count);
+            _serial.Write(command.ToArray(), 0, command.Count);
         }
 
         private bool ReadPortAnswer() {
-            int value = this._serial.ReadByte(); //Check whether command was ok.
+            int value = _serial.ReadByte(); //Check whether command was ok.
             if (value != 0x06) { //ACK
-                this._lastCommandStatus = EltraCommandStatus.CommandError;
+                _lastCommandStatus = EltraCommandStatus.CommandError;
                 return false;
             }
 
             while (true) {
-                this._serial.Write(new byte[] { 0x12, 0x05 }, 0, 2); //WUP ENQ  Pool whether answer is ready.
+                _serial.Write(new byte[] { 0x12, 0x05 }, 0, 2); //WUP ENQ  Pool whether answer is ready.
 
-                value = this._serial.ReadByte();
+                value = _serial.ReadByte();
                 if (value == 0x10) { //DLE  No message to send.
                     System.Threading.Thread.Sleep(100); //just wait a little
                 } else if (value == 0x02) { //STX  Answer is ready.
-                    List<byte> buffer = new List<byte>();
-                    buffer.Add((byte)value);
+                    List<byte> buffer = new List<byte> {
+                        (byte)value
+                    };
                     do {
-                        value = this._serial.ReadByte();
+                        value = _serial.ReadByte();
                         buffer.Add((byte)value);
                     } while (value != 0x04); //EOT
                     if (buffer.Count < 10) {
-                        this._lastCommandStatus = EltraCommandStatus.Unknown;
+                        _lastCommandStatus = EltraCommandStatus.Unknown;
                         return false;
                     }
 
                     switch (buffer[3]) {
                         case 0x30: {
-                                this._lastCommandStatus = EltraCommandStatus.CommandAccepted;
+                                _lastCommandStatus = EltraCommandStatus.CommandAccepted;
                             } break;
                         case 0x52: {
-                                this._lastCommandStatus = EltraCommandStatus.CommandRefused;
+                                _lastCommandStatus = EltraCommandStatus.CommandRefused;
                             } break;
                         case 0x54: {
-                                this._lastCommandStatus = EltraCommandStatus.CommandNotAvailable;
+                                _lastCommandStatus = EltraCommandStatus.CommandNotAvailable;
                             } break;
                         default: throw new System.FormatException("Unknown answer status.");
                     }
@@ -328,187 +331,187 @@ namespace Medo.Device {
                     int errorCodesY = (buffer[5] & 0xF);
                     switch (buffer[2]) {
                         case 0x3C: //Insert Ticket. Ticket in Position
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.TicketNotPresentInMouth; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.TicketNotPresentInMouth; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x3F: //Send Sensor Status
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TicketInHomePosition; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.TicketInCentralPosition; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.TicketInTailPosition; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TicketInHomePosition; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.TicketInCentralPosition; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketInTailPosition; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x41: //Enable Ticket Insertion
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TicketInMouthPosition; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TicketInMouthPosition; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x42: //Disable Ticket Insertion
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x43: //Read Barcode Field
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.NoTicketInsideTheTransport; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.ReadError; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.NoTicketInsideTheTransport; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.ReadError; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x44: //Initialize Module
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.TicketInHomePosition; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.TicketInHomePosition; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x45: //Send Logical Status
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.TicketInTailPosition; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TicketInReadPosition; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.NoTicketInsideTheTransport; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.PhotocellFailure; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketInTailPosition; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TicketInReadPosition; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.NoTicketInsideTheTransport; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.PhotocellFailure; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x46: //Eject Ticket
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.NoTicketInsideTheTransport; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.TicketInMouthPosition; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.NoTicketInsideTheTransport; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.TicketInMouthPosition; }
                             break;
                         case 0x47: //Get Inside, Read Data and Parking under Printer
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.ReadError; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.TicketAlreadyUnderPrinter; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.TicketNotPresentInMouth; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.ReadError; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.TicketAlreadyUnderPrinter; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.TicketNotPresentInMouth; }
                             break;
                         case 0x48: //Hardware Reset
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x49: //Read 2nd Barcode Field
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.NoTicketInsideTheTransport; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.ReadError; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.NoTicketInsideTheTransport; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.ReadError; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x50: //Print Text on Ticket
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.JammingError; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.TicketInMouthPosition; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.JammingError; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.TicketInMouthPosition; }
                             break;
                         case 0x52: //Insert Ticket and Read Barcode Field
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.ReadError; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.TicketAlreadyUnderPrinter; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.TicketNotPresentInMouth; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.ReadError; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.TicketAlreadyUnderPrinter; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.TicketNotPresentInMouth; }
                             break;
                         case 0x56: //Validate Ticket
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.TicketUnderPrinter; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.VerifyError; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.JammingError; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.TicketInMouthPosition; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketUnderPrinter; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.VerifyError; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.JammingError; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.TicketInMouthPosition; }
                             break;
                         case 0x58: //Read Module Configuration
                             break;
                         case 0x59: //Peripheral Address Setting
                             break;
                         case 0x70: //Load Ticket under Printer
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x72: //Unload Ticket from Printer
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.TicketInReadPosition; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketInReadPosition; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         case 0x76: //Capture Ticket
-                            if ((errorCodesX & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.TransportFailure; }
-                            if ((errorCodesX & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesX & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x01) == 0x01) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x02) == 0x02) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x04) == 0x04) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if ((errorCodesY & 0x08) == 0x08) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.TransportFailure; }
+                            if ((errorCodesX & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesX & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x02) == 0x02) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x04) == 0x04) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if ((errorCodesY & 0x08) == 0x08) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                         default:
-                            if (errorCodesX != 0x00) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
-                            if (errorCodesY != 0x00) { this._lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if (errorCodesX != 0x00) { _lastErrorCode |= EltraErrorCodes.Unknown; }
+                            if (errorCodesY != 0x00) { _lastErrorCode |= EltraErrorCodes.Unknown; }
                             break;
                     }
-                    this._lastData = new byte[buffer.Count - 10];
-                    Array.Copy(buffer.ToArray(), 6, this._lastData, 0, this._lastData.Length);
-                    return (this._lastCommandStatus == EltraCommandStatus.CommandAccepted);
+                    _lastData = new byte[buffer.Count - 10];
+                    Array.Copy(buffer.ToArray(), 6, _lastData, 0, _lastData.Length);
+                    return (_lastCommandStatus == EltraCommandStatus.CommandAccepted);
                 }
             }
         }
@@ -532,7 +535,7 @@ namespace Medo.Device {
             /// </summary>
             /// <param name="initialValue">Starting digest.</param>
             public Lrc8(byte initialValue) {
-                this._currDigest = initialValue;
+                _currDigest = initialValue;
             }
 
 
@@ -544,7 +547,7 @@ namespace Medo.Device {
             /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
             public void Append(byte[] value) {
                 if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-                this.Append(value, 0, value.Length);
+                Append(value, 0, value.Length);
             }
 
             /// <summary>
@@ -558,7 +561,7 @@ namespace Medo.Device {
             public void Append(byte[] value, int index, int length) {
                 if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
                 for (int i = index; i < index + length; i++) {
-                    this._currDigest = (byte)(this._currDigest ^ value[i]);
+                    _currDigest = (byte)(_currDigest ^ value[i]);
                 }
             }
 
@@ -566,7 +569,7 @@ namespace Medo.Device {
             /// Gets current digest.
             /// </summary>
             public byte Digest {
-                get { return this._currDigest; }
+                get { return _currDigest; }
             }
 
             /// <summary>
@@ -575,8 +578,8 @@ namespace Medo.Device {
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "This is in order to have similar properties for all Medo.Security.Checksum namespace classes.")]
             public byte[] DigestAsAscii30 {
                 get {
-                    byte part1 = (byte)(0x30 + (this.Digest >> 4));
-                    byte part2 = (byte)(0x30 + (this.Digest & 0x0f));
+                    byte part1 = (byte)(0x30 + (Digest >> 4));
+                    byte part2 = (byte)(0x30 + (Digest & 0x0f));
                     return new byte[] { part1, part2 };
                 }
             }
@@ -597,7 +600,7 @@ namespace Medo.Device {
         /// Clean up any resources being used.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -607,7 +610,7 @@ namespace Medo.Device {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (true) {
-                this._serial.Dispose();
+                _serial.Dispose();
             }
         }
 

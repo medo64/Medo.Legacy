@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>  https://www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2018-09-01: New version.
 //2018-10-28: Fixed line reading when CR is not immediately returned.
@@ -52,20 +52,20 @@ namespace Medo.Device {
             if (portName == null) { throw new ArgumentNullException("portName", "PortName cannot be null."); }
             portName = portName.Trim().TrimEnd(':');
 
-            this.Uart = new SerialPort(portName, baudRate, parity, dataBits, stopBits) {
+            Uart = new SerialPort(portName, baudRate, parity, dataBits, stopBits) {
                 ReadTimeout = 100,
                 WriteTimeout = 100,
                 NewLine = "\0"
             };
 
-            this.Context = SynchronizationContext.Current;
-            this.Thread = new Thread(this.Run) {
+            Context = SynchronizationContext.Current;
+            Thread = new Thread(Run) {
                 CurrentCulture = CultureInfo.InvariantCulture,
                 IsBackground = true,
                 Name = "Cananka:" + portName,
                 Priority = ThreadPriority.AboveNormal
             };
-            this.CancelEvent = new ManualResetEvent(false);
+            CancelEvent = new ManualResetEvent(false);
         }
 
 
@@ -82,18 +82,18 @@ namespace Medo.Device {
         /// If SLCAN didn't return positive response, port is immediately closed.
         /// </summary>
         public bool Open() {
-            this.Uart.Open();
+            Uart.Open();
 
-            this.WriteCommand(new byte[] { (byte)'C', CR }); //first close
-            this.WriteCommand(new byte[] { (byte)'*', (byte)'r', CR }); //then clear debug (ignored on non-Cananka devices)
+            WriteCommand(new byte[] { (byte)'C', CR }); //first close
+            WriteCommand(new byte[] { (byte)'*', (byte)'r', CR }); //then clear debug (ignored on non-Cananka devices)
 
-            var response = this.WriteCommand(new byte[] { (byte)'O', CR });
+            var response = WriteCommand(new byte[] { (byte)'O', CR });
             if ((response != null) && response.IsPositive) {
-                this.Thread.Start();
+                Thread.Start();
                 return true;
             }
 
-            this.Uart.Close();
+            Uart.Close();
             return false;
         }
 
@@ -101,29 +101,29 @@ namespace Medo.Device {
         /// Gets if serial port is open.
         /// </summary>
         public bool IsOpen {
-            get { return this.Uart.IsOpen; }
+            get { return Uart.IsOpen; }
         }
 
         /// <summary>
         /// Closes the serial port.
         /// </summary>
         public void Close() {
-            if (this.IsOpen) {
-                this.WriteCommand(new byte[] { (byte)'C', CR });
+            if (IsOpen) {
+                WriteCommand(new byte[] { (byte)'C', CR });
 
                 //stop thread
-                this.CancelEvent.Set();
+                CancelEvent.Set();
                 var sw = Stopwatch.StartNew();
-                while (this.Thread.IsAlive && (sw.ElapsedMilliseconds < 500)) { Thread.Sleep(10); }
-                if (this.Thread.IsAlive) {
+                while (Thread.IsAlive && (sw.ElapsedMilliseconds < 500)) { Thread.Sleep(10); }
+                if (Thread.IsAlive) {
                     try {
-                        this.Thread.Abort();
-                        while (this.Thread.IsAlive) { Thread.Sleep(10); }
+                        Thread.Abort();
+                        while (Thread.IsAlive) { Thread.Sleep(10); }
                     } catch (ThreadStateException) { }
                 }
-                this.CancelEvent.Reset();
+                CancelEvent.Reset();
 
-                this.Uart.Close();
+                Uart.Close();
             }
         }
 
@@ -134,7 +134,7 @@ namespace Medo.Device {
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is more appropriate than property as it does more than simple field access.")]
         public CanankaStatus GetStatus() {
-            var response = this.WriteCommand(new byte[] { (byte)'F', CR });
+            var response = WriteCommand(new byte[] { (byte)'F', CR });
             return new CanankaStatus(response?.ToBytes());
         }
 
@@ -143,7 +143,7 @@ namespace Medo.Device {
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is more appropriate than property as it does more than simple field access.")]
         public CanankaVersion GetVersion() {
-            var response = this.WriteCommand(new byte[] { (byte)'V', CR });
+            var response = WriteCommand(new byte[] { (byte)'V', CR });
             return new CanankaVersion(response?.ToBytes());
         }
 
@@ -171,7 +171,7 @@ namespace Medo.Device {
             }
             bytes.Add(CR);
 
-            var response = this.WriteCommand(bytes.ToArray());
+            var response = WriteCommand(bytes.ToArray());
             return response?.IsPositive ?? false;
         }
 
@@ -190,8 +190,8 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="e">Arguments.</param>
         protected void OnMessageArrived(CanankaMessageEventArgs e) {
-            if (this.Context != null) {
-                this.Context.Post((object state) => {
+            if (Context != null) {
+                Context.Post((object state) => {
                     MessageArrived?.Invoke(this, state as CanankaMessageEventArgs);
                 }, e);
             } else {
@@ -207,7 +207,7 @@ namespace Medo.Device {
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method is more appropriate than property as it does more than simple field access.")]
         public CanankaExtendedStatus GetExtendedStatus() {
-            var response = this.WriteCommand(new byte[] { (byte)'*', (byte)'F', CR });
+            var response = WriteCommand(new byte[] { (byte)'*', (byte)'F', CR });
             return new CanankaExtendedStatus(response?.ToBytes());
         }
 
@@ -217,7 +217,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="state">Whether to turn on or off 5V power output.</param>
         public bool SetPower(bool state) {
-            var response = this.WriteCommand(new byte[] { (byte)'*', (byte)'P', state ? (byte)'1' : (byte)'0', CR });
+            var response = WriteCommand(new byte[] { (byte)'*', (byte)'P', state ? (byte)'1' : (byte)'0', CR });
             return (response.IsPositive);
         }
 
@@ -226,7 +226,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="state">Whether to turn on or off termination resistors.</param>
         public bool SetTermination(bool state) {
-            var response = this.WriteCommand(new byte[] { (byte)'*', (byte)'T', state ? (byte)'1' : (byte)'0', CR });
+            var response = WriteCommand(new byte[] { (byte)'*', (byte)'T', state ? (byte)'1' : (byte)'0', CR });
             return (response.IsPositive);
         }
 
@@ -237,7 +237,7 @@ namespace Medo.Device {
         /// <exception cref="ArgumentOutOfRangeException">Level must be between 0 (off) and 9 (highest).</exception>
         public bool SetLoad(int level) {
             if ((level < 0) || (level > 9)) { throw new ArgumentOutOfRangeException(nameof(level), "Level must be between 0 (off) and 9 (highest)."); }
-            var response = this.WriteCommand(new byte[] { (byte)'*', (byte)'L', (byte)(0x30 + level), CR });
+            var response = WriteCommand(new byte[] { (byte)'*', (byte)'L', (byte)(0x30 + level), CR });
             return (response.IsPositive);
         }
 
@@ -253,9 +253,9 @@ namespace Medo.Device {
         /// <param name="disposing">True if managed resources are to be disposed.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.Close();
-                this.Uart.Dispose();
-                this.CancelEvent.Dispose();
+                Close();
+                Uart.Dispose();
+                CancelEvent.Dispose();
             }
         }
 
@@ -263,7 +263,7 @@ namespace Medo.Device {
         /// Dispose used resources.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -273,20 +273,20 @@ namespace Medo.Device {
         #region Processing
 
         private ParsedResponseData WriteCommand(byte[] data) {
-            lock (this.UartLock) {
+            lock (UartLock) {
 #if DEBUG
-                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "[Cananka] -> {0}", this.ConvertBytesToText(data, data.Length)));
+                Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "[Cananka] -> {0}", ConvertBytesToText(data, data.Length)));
 #endif
-                this.Uart.Write(data, 0, data.Length);
+                Uart.Write(data, 0, data.Length);
 
                 var buffer = new byte[BufferSize];
                 var sw = Stopwatch.StartNew();
                 while (sw.ElapsedMilliseconds < 500) { //wait only 500ms for response to a command
                     try {
-                        while (this.Uart.BytesToRead > 0) {
-                            var readLength = this.Uart.Read(buffer, 0, buffer.Length);
+                        while (Uart.BytesToRead > 0) {
+                            var readLength = Uart.Read(buffer, 0, buffer.Length);
                             if (readLength > 0) {
-                                var response = this.ProcessRawBytesAndReturnResponse(buffer, readLength);
+                                var response = ProcessRawBytesAndReturnResponse(buffer, readLength);
                                 if (response != null) {
                                     return response;
                                 }
@@ -313,21 +313,21 @@ namespace Medo.Device {
 
         private ParsedResponseData ProcessRawBytesAndReturnResponse(byte[] buffer, int length) { //returns non-message response AFTER processing all the bytes
 #if DEBUG
-            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "[Cananka] <- {0}", this.ConvertBytesToText(buffer, length)));
+            Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "[Cananka] <- {0}", ConvertBytesToText(buffer, length)));
 #endif
 
             var nonMessageResponse = default(ParsedResponseData);
             for (var i = 0; i < length; i++) {
                 var curr = buffer[i];
-                this.ByteQueue.Enqueue(curr);
+                ByteQueue.Enqueue(curr);
                 if ((curr == CR) || (curr == BEL)) {
-                    var response = new ParsedResponseData(this.ByteQueue.ToArray());
-                    this.ByteQueue.Clear();
+                    var response = new ParsedResponseData(ByteQueue.ToArray());
+                    ByteQueue.Clear();
 
                     if (response.IsMessage) {
                         var message = response.ToMessage();
                         if (message != null) {
-                            this.MessageQueue.Enqueue(message);
+                            MessageQueue.Enqueue(message);
 #if DEBUG
                             Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "[Cananka] <= {0}", message.ToString()));
 #endif
@@ -345,7 +345,7 @@ namespace Medo.Device {
             var sb = new StringBuilder();
             for (var i = 0; i < length; i++) {
                 if (buffer[i] < 32) {
-                    sb.Append("<" + this.LowAscii[buffer[i]] + ">");
+                    sb.Append("<" + LowAscii[buffer[i]] + ">");
                 } else {
                     sb.Append(Encoding.ASCII.GetString(buffer, i, 1));
                 }
@@ -358,20 +358,20 @@ namespace Medo.Device {
         [DebuggerDisplay("{IsPositive ? \"OK\" : \"NOK\"}")]
         private class ParsedResponseData {
             public ParsedResponseData(byte[] data) {
-                this.RawData = data;
+                RawData = data;
             }
 
             private readonly byte[] RawData;
 
 
             public bool IsPositive {
-                get { return (this.RawData.Length > 0) && (this.RawData[this.RawData.Length - 1] == CR); }
+                get { return (RawData.Length > 0) && (RawData[RawData.Length - 1] == CR); }
             }
 
             public bool IsMessage {
                 get {
-                    if (this.RawData.Length > 0) {
-                        switch (this.RawData[0]) {
+                    if (RawData.Length > 0) {
+                        switch (RawData[0]) {
                             case (byte)'t':
                             case (byte)'T':
                             case (byte)'r':
@@ -384,7 +384,7 @@ namespace Medo.Device {
             }
 
             public CanankaMessage ToMessage() {
-                var buffer = this.RawData;
+                var buffer = RawData;
                 if (buffer.Length > 0) {
                     switch (buffer[0]) {
                         case (byte)'t':
@@ -404,9 +404,9 @@ namespace Medo.Device {
             }
 
             public byte[] ToBytes() {
-                if (this.RawData.Length > 0) {
-                    var data = new byte[this.RawData.Length - 1];
-                    Buffer.BlockCopy(this.RawData, 0, data, 0, data.Length);
+                if (RawData.Length > 0) {
+                    var data = new byte[RawData.Length - 1];
+                    Buffer.BlockCopy(RawData, 0, data, 0, data.Length);
                     return data;
                 } else {
                     return new byte[] { };
@@ -414,7 +414,7 @@ namespace Medo.Device {
             }
 
             public override string ToString() {
-                return Encoding.ASCII.GetString(this.ToBytes());
+                return Encoding.ASCII.GetString(ToBytes());
             }
 
 
@@ -467,24 +467,24 @@ namespace Medo.Device {
             var buffer = new byte[BufferSize];
 
             try {
-                while (!this.CancelEvent.WaitOne(0, false)) {
-                    lock (this.UartLock) {
+                while (!CancelEvent.WaitOne(0, false)) {
+                    lock (UartLock) {
                         try {
-                            while (this.Uart.BytesToRead > 0) {
-                                var readLength = this.Uart.Read(buffer, 0, buffer.Length);
+                            while (Uart.BytesToRead > 0) {
+                                var readLength = Uart.Read(buffer, 0, buffer.Length);
                                 if (readLength > 0) {
-                                    this.ProcessRawBytesAndReturnResponse(buffer, readLength);
+                                    ProcessRawBytesAndReturnResponse(buffer, readLength);
                                 }
                             }
                         } catch (TimeoutException) {
                         } catch (InvalidOperationException) { } //probably unplugged
 
-                        while (this.MessageQueue.Count > 0) {
-                            var e = new CanankaMessageEventArgs(this.MessageQueue.Dequeue());
-                            this.OnMessageArrived(e);
+                        while (MessageQueue.Count > 0) {
+                            var e = new CanankaMessageEventArgs(MessageQueue.Dequeue());
+                            OnMessageArrived(e);
                         }
 
-                        if (!this.Uart.IsOpen) { break; } //exit thread as port is closed
+                        if (!Uart.IsOpen) { break; } //exit thread as port is closed
                         Thread.Sleep(1);
                     }
                 }
@@ -527,14 +527,14 @@ namespace Medo.Device {
         internal CanankaStatus(byte[] data) {
             if ((data != null) && (data.Length >= 3) && (data[0] == (byte)'F')) {
                 if (byte.TryParse(Encoding.ASCII.GetString(data, 1, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var result)) {
-                    this.RxQueueFull = ((result & 0b00000001) != 0);
-                    this.TxQueueFull = ((result & 0b00000010) != 0);
-                    this.TxRxWarning = ((result & 0b00000100) != 0);
-                    this.RxOverflow = ((result & 0b00001000) != 0);
-                    this.ErrorPassive = ((result & 0b00100000) != 0);
-                    this.ArbitrationLost = ((result & 0b01000000) != 0);
-                    this.BusError = ((result & 0b10000000) != 0);
-                    this.IsValid = true;
+                    RxQueueFull = ((result & 0b00000001) != 0);
+                    TxQueueFull = ((result & 0b00000010) != 0);
+                    TxRxWarning = ((result & 0b00000100) != 0);
+                    RxOverflow = ((result & 0b00001000) != 0);
+                    ErrorPassive = ((result & 0b00100000) != 0);
+                    ArbitrationLost = ((result & 0b01000000) != 0);
+                    BusError = ((result & 0b10000000) != 0);
+                    IsValid = true;
                 }
             }
         }
@@ -594,13 +594,13 @@ namespace Medo.Device {
         /// </summary>
         public override string ToString() {
             var sb = new StringBuilder();
-            if (this.RxQueueFull) { sb.Append("R"); }
-            if (this.TxQueueFull) { sb.Append("T"); }
-            if (this.TxRxWarning) { sb.Append("W"); }
-            if (this.RxOverflow) { sb.Append("O"); }
-            if (this.ErrorPassive) { sb.Append("P"); }
-            if (this.ArbitrationLost) { sb.Append("A"); }
-            if (this.BusError) { sb.Append("E"); }
+            if (RxQueueFull) { sb.Append("R"); }
+            if (TxQueueFull) { sb.Append("T"); }
+            if (TxRxWarning) { sb.Append("W"); }
+            if (RxOverflow) { sb.Append("O"); }
+            if (ErrorPassive) { sb.Append("P"); }
+            if (ArbitrationLost) { sb.Append("A"); }
+            if (BusError) { sb.Append("E"); }
             if (sb.Length == 0) { sb.Append("OK"); }
             return sb.ToString();
         }
@@ -616,14 +616,14 @@ namespace Medo.Device {
         internal CanankaExtendedStatus(byte[] data) {
             if ((data != null) && (data.Length >= 4) && (data[0] == (byte)'*') && (data[1] == (byte)'F')) {
                 if (byte.TryParse(Encoding.ASCII.GetString(data, 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var result)) {
-                    this.BusState = (CanankaBusState)(result & 0b00000011);
-                    this.AutoPooling = ((result & 0b00000100) != 0);
-                    this.AnyErrors = ((result & 0b00001000) != 0);
-                    this.PowerEnabled = ((result & 0b00010000) != 0);
-                    this.TerminationEnabled = ((result & 0b00100000) != 0);
-                    this.AnyLoad = ((result & 0b01000000) != 0);
-                    this.AnyDebug = ((result & 0b10000000) != 0);
-                    this.IsValid = true;
+                    BusState = (CanankaBusState)(result & 0b00000011);
+                    AutoPooling = ((result & 0b00000100) != 0);
+                    AnyErrors = ((result & 0b00001000) != 0);
+                    PowerEnabled = ((result & 0b00010000) != 0);
+                    TerminationEnabled = ((result & 0b00100000) != 0);
+                    AnyLoad = ((result & 0b01000000) != 0);
+                    AnyDebug = ((result & 0b10000000) != 0);
+                    IsValid = true;
                 }
             }
         }
@@ -676,7 +676,7 @@ namespace Medo.Device {
         /// </summary>
         public override string ToString() {
             var sb = new StringBuilder();
-            switch (this.BusState) {
+            switch (BusState) {
                 case CanankaBusState.Closed:
                     sb.Append("C");
                     break;
@@ -690,11 +690,11 @@ namespace Medo.Device {
                     sb.Append("O");
                     break;
             }
-            if (this.AutoPooling) { sb.Append("X"); }
-            if (this.AnyErrors) { sb.Append("E"); }
-            if (this.PowerEnabled) { sb.Append("P"); }
-            if (this.TerminationEnabled) { sb.Append("T"); }
-            if (this.AnyDebug) { sb.Append("D"); }
+            if (AutoPooling) { sb.Append("X"); }
+            if (AnyErrors) { sb.Append("E"); }
+            if (PowerEnabled) { sb.Append("P"); }
+            if (TerminationEnabled) { sb.Append("T"); }
+            if (AnyDebug) { sb.Append("D"); }
             if ((sb.Length == 0) || ((sb.Length == 1) && (sb[0] == 'O'))) { sb.Append("OK"); }
             return sb.ToString();
         }
@@ -716,9 +716,9 @@ namespace Medo.Device {
                 var swMajor = swMajorOK ? data[3] - 0x30 : 0;
                 var swMinor = swMinorOK ? data[4] - 0x30 : 0;
 
-                this.IsValid = hwMajorOK && swMajorOK;
-                this.HardwareVersion = new Version(hwMajor, hwMinor);
-                this.SoftwareVersion = new Version(swMajor, swMinor);
+                IsValid = hwMajorOK && swMajorOK;
+                HardwareVersion = new Version(hwMajor, hwMinor);
+                SoftwareVersion = new Version(swMajor, swMinor);
             }
         }
 
@@ -750,14 +750,14 @@ namespace Medo.Device {
         /// </summary>
         public override string ToString() {
             var sb = new StringBuilder();
-            if (this.HardwareVersion != null && ((this.HardwareVersion.Major > 0) || (this.HardwareVersion.Minor > 0))) {
+            if (HardwareVersion != null && ((HardwareVersion.Major > 0) || (HardwareVersion.Minor > 0))) {
                 sb.Append("HW:");
-                sb.AppendFormat(CultureInfo.InvariantCulture, "{0}.{1}", this.HardwareVersion.Major, this.HardwareVersion.Minor);
+                sb.AppendFormat(CultureInfo.InvariantCulture, "{0}.{1}", HardwareVersion.Major, HardwareVersion.Minor);
             }
             if (sb.Length > 0) { sb.Append(" "); }
-            if (this.SoftwareVersion != null && ((this.SoftwareVersion.Major > 0) || (this.SoftwareVersion.Minor > 0))) {
+            if (SoftwareVersion != null && ((SoftwareVersion.Major > 0) || (SoftwareVersion.Minor > 0))) {
                 sb.Append("SW:");
-                sb.AppendFormat(CultureInfo.InvariantCulture, "{0}.{1}", this.SoftwareVersion.Major, this.SoftwareVersion.Minor);
+                sb.AppendFormat(CultureInfo.InvariantCulture, "{0}.{1}", SoftwareVersion.Major, SoftwareVersion.Minor);
             }
             return sb.ToString();
         }
@@ -790,11 +790,11 @@ namespace Medo.Device {
                 if (data.Length > 8) { throw new ArgumentOutOfRangeException(nameof(data), "Data cannot be longer than 8 bytes."); }
             }
 
-            this.Id = id;
-            this.Length = length;
-            this.IsExtended = isExtended;
-            this.IsRemoteRequest = isRemoteRequest;
-            this.Data = data;
+            Id = id;
+            Length = length;
+            IsExtended = isExtended;
+            IsRemoteRequest = isRemoteRequest;
+            Data = data;
         }
 
         /// <summary>
@@ -808,11 +808,11 @@ namespace Medo.Device {
             if (data == null) { data = new byte[0]; }
             if (data.Length > 8) { throw new ArgumentOutOfRangeException(nameof(data), "Data cannot be longer than 8 bytes."); }
 
-            this.Id = id;
-            this.Length = data.Length;
-            this.IsExtended = (id > 0x7FF);
-            this.IsRemoteRequest = false;
-            this.Data = data;
+            Id = id;
+            Length = data.Length;
+            IsExtended = (id > 0x7FF);
+            IsRemoteRequest = false;
+            Data = data;
         }
 
         /// <summary>
@@ -825,11 +825,11 @@ namespace Medo.Device {
             if ((id < 0x00000000) || (id > 0x1FFFFFFF)) { throw new ArgumentOutOfRangeException(nameof(id), "ID must be between 0 and 0x1FFFFFFF."); }
             if ((length < 0) || (length > 8)) { throw new ArgumentOutOfRangeException(nameof(length), "Length must be between 0 and 8 bytes."); }
 
-            this.Id = id;
-            this.Length = length;
-            this.IsExtended = (id > 0x7FF);
-            this.IsRemoteRequest = true;
-            this.Data = null;
+            Id = id;
+            Length = length;
+            IsExtended = (id > 0x7FF);
+            IsRemoteRequest = true;
+            Data = null;
         }
 
 
@@ -861,9 +861,9 @@ namespace Medo.Device {
         /// Null for remote request.
         /// </summary>
         public byte[] GetData() {
-            if (this.Data != null) {
-                var data = new byte[this.Data.Length];
-                Buffer.BlockCopy(this.Data, 0, data, 0, data.Length);
+            if (Data != null) {
+                var data = new byte[Data.Length];
+                Buffer.BlockCopy(Data, 0, data, 0, data.Length);
                 return data;
             }
             return null;
@@ -875,17 +875,17 @@ namespace Medo.Device {
         /// </summary>
         public override string ToString() {
             var sb = new StringBuilder();
-            if (this.IsExtended || (this.Id > 0x7FF)) {
-                sb.Append(this.Id.ToString("X8", CultureInfo.InvariantCulture));
+            if (IsExtended || (Id > 0x7FF)) {
+                sb.Append(Id.ToString("X8", CultureInfo.InvariantCulture));
             } else {
-                sb.Append(this.Id.ToString("X3", CultureInfo.InvariantCulture));
+                sb.Append(Id.ToString("X3", CultureInfo.InvariantCulture));
             }
             sb.Append("#");
-            if (this.IsRemoteRequest) {
+            if (IsRemoteRequest) {
                 sb.Append("R");
-                if (this.Length > 0) { sb.Append(this.Length.ToString(CultureInfo.InvariantCulture)); }
+                if (Length > 0) { sb.Append(Length.ToString(CultureInfo.InvariantCulture)); }
             } else {
-                foreach (var b in this.Data) {
+                foreach (var b in Data) {
                     sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
                 }
             }
@@ -904,7 +904,7 @@ namespace Medo.Device {
         /// <param name="message">Message.</param>
         /// <exception cref="ArgumentNullException">Message cannot be null.</exception>
         public CanankaMessageEventArgs(CanankaMessage message) {
-            this.Message = message ?? throw new ArgumentNullException(nameof(message), "Message cannot be null.");
+            Message = message ?? throw new ArgumentNullException(nameof(message), "Message cannot be null.");
         }
 
 

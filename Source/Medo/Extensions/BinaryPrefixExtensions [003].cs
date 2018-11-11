@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-05-14: Changed namespace.
 //2008-11-15: All methods now accept long instead of double (to be in sync with IO classes).

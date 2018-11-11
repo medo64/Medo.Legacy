@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-06-02: Updated host name discovery to handle non-ascii characters gracefully.
 //            Cleaned CA1822:MarkMembersAsStatic and CA1062:Validate arguments of public methods.
@@ -160,14 +160,14 @@ namespace Medo.Net {
             if (message == null) { message = string.Empty; }
 
 
-            this._facility = facility;
-            this._severity = severity;
-            this._timestamp = timestamp;
-            this._hostName = hostName;
-            this._applicationName = applicationName;
-            this._processId = processId;
-            this._messageId = messageId;
-            this._message = message;
+            _facility = facility;
+            _severity = severity;
+            _timestamp = timestamp;
+            _hostName = hostName;
+            _applicationName = applicationName;
+            _processId = processId;
+            _messageId = messageId;
+            _message = message;
 
             if (includeOrigin) {
                 SyslogStructuredData sd = new SyslogStructuredData("origin");
@@ -177,13 +177,13 @@ namespace Medo.Net {
                 }
                 sd.AddParameter("software", Assembly.GetEntryAssembly().GetName().Name);
                 sd.AddParameter("swVersion", Assembly.GetEntryAssembly().GetName().Version.ToString());
-                this.AddStructuredData(sd);
+                AddStructuredData(sd);
             }
         }
 
         private static string GetPrintableUSAscii(string text, int maximumLength) {
             var sb = new StringBuilder();
-            var normText = text.Normalize(NormalizationForm.FormD).Replace("–", "D").Replace("", "d");
+            var normText = text.Normalize(NormalizationForm.FormD).Replace("ƒê", "D").Replace("ƒë", "d");
             foreach (char c in normText) {
                 if (char.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark) {
                     int code = (int)c;
@@ -211,16 +211,16 @@ namespace Medo.Net {
         public void AddStructuredData(SyslogStructuredData structuredData) {
             if (structuredData == null) { throw new System.ArgumentNullException("structuredData", "Structured data cannot be null."); }
             if (structuredData.Count == 0) { throw new System.InvalidOperationException(Resources.ExceptionAtLeastOneParameterMustExist); }
-            for (int i = 0; i < this._structuredDatas.Count; i++) {
-                if (this._structuredDatas[i].Id == structuredData.Id) {
+            for (int i = 0; i < _structuredDatas.Count; i++) {
+                if (_structuredDatas[i].Id == structuredData.Id) {
                     for (int j = 0; j < structuredData.Count; j++) {
-                        this._structuredDatas[i].AddParameter(structuredData.GetName(j), structuredData.GetValue(j));
+                        _structuredDatas[i].AddParameter(structuredData.GetName(j), structuredData.GetValue(j));
                     }
                     return;
                 }
             }
 
-            this._structuredDatas.Add(structuredData);
+            _structuredDatas.Add(structuredData);
         }
 
         /// <summary>
@@ -231,14 +231,14 @@ namespace Medo.Net {
         /// <param name="parameterValue">Parametar value.</param>
         public void AddStructuredData(string ianaName, string parameterName, string parameterValue) {
             SyslogStructuredData sd = new SyslogStructuredData(ianaName);
-            for (int i = 0; i < this._structuredDatas.Count; i++) {
-                if (this._structuredDatas[i].Id == sd.Id) {
-                    this._structuredDatas[i].AddParameter(parameterName, parameterValue);
+            for (int i = 0; i < _structuredDatas.Count; i++) {
+                if (_structuredDatas[i].Id == sd.Id) {
+                    _structuredDatas[i].AddParameter(parameterName, parameterValue);
                     return;
                 }
             }
             sd.AddParameter(parameterName, parameterValue);
-            this._structuredDatas.Add(sd);
+            _structuredDatas.Add(sd);
         }
 
         /// <summary>
@@ -250,14 +250,14 @@ namespace Medo.Net {
         /// <param name="parameterValue">Parametar value.</param>
         public void AddStructuredData(string name, int enterpriseId, string parameterName, string parameterValue) {
             SyslogStructuredData sd = new SyslogStructuredData(name, enterpriseId);
-            for (int i = 0; i < this._structuredDatas.Count; i++) {
-                if (this._structuredDatas[i].Id == sd.Id) {
-                    this._structuredDatas[i].AddParameter(parameterName, parameterValue);
+            for (int i = 0; i < _structuredDatas.Count; i++) {
+                if (_structuredDatas[i].Id == sd.Id) {
+                    _structuredDatas[i].AddParameter(parameterName, parameterValue);
                     return;
                 }
             }
             sd.AddParameter(parameterName, parameterValue);
-            this._structuredDatas.Add(sd);
+            _structuredDatas.Add(sd);
         }
 
 
@@ -268,11 +268,11 @@ namespace Medo.Net {
         /// <param name="parameterName">Parametar name.</param>
         public string GetStructuredData(string ianaName, string parameterName) {
             SyslogStructuredData sd = new SyslogStructuredData(ianaName);
-            for (int i = 0; i < this._structuredDatas.Count; i++) {
-                if (this._structuredDatas[i].Id == sd.Id) {
-                    for (int j = 0; j < this._structuredDatas[i].Count; j++) {
-                        if (string.Compare(parameterName, this._structuredDatas[i].GetName(j), System.StringComparison.Ordinal) == 0) {
-                            return this._structuredDatas[i].GetValue(j);
+            for (int i = 0; i < _structuredDatas.Count; i++) {
+                if (_structuredDatas[i].Id == sd.Id) {
+                    for (int j = 0; j < _structuredDatas[i].Count; j++) {
+                        if (string.Compare(parameterName, _structuredDatas[i].GetName(j), System.StringComparison.Ordinal) == 0) {
+                            return _structuredDatas[i].GetValue(j);
                         }
                     }
                 }
@@ -288,11 +288,11 @@ namespace Medo.Net {
         /// <param name="parameterName">Parametar name.</param>
         public string GetStructuredData(string name, int enterpriseId, string parameterName) {
             SyslogStructuredData sd = new SyslogStructuredData(name, enterpriseId);
-            for (int i = 0; i < this._structuredDatas.Count; i++) {
-                if (this._structuredDatas[i].Id == sd.Id) {
-                    for (int j = 0; j < this._structuredDatas[i].Count; j++) {
-                        if (string.Compare(parameterName, this._structuredDatas[i].GetName(j), System.StringComparison.Ordinal) == 0) {
-                            return this._structuredDatas[i].GetValue(j);
+            for (int i = 0; i < _structuredDatas.Count; i++) {
+                if (_structuredDatas[i].Id == sd.Id) {
+                    for (int j = 0; j < _structuredDatas[i].Count; j++) {
+                        if (string.Compare(parameterName, _structuredDatas[i].GetName(j), System.StringComparison.Ordinal) == 0) {
+                            return _structuredDatas[i].GetValue(j);
                         }
                     }
                 }
@@ -304,7 +304,7 @@ namespace Medo.Net {
         /// Returns array with all structured data fields.
         /// </summary>
         public SyslogStructuredData[] GetStructuredDataArray() {
-            return this._structuredDatas.ToArray();
+            return _structuredDatas.ToArray();
         }
 
 
@@ -313,8 +313,8 @@ namespace Medo.Net {
         /// Gets/sets facility designation.
         /// </summary>
         public SyslogFacilityCode Facility {
-            get { return this._facility; }
-            set { this._facility = value; }
+            get { return _facility; }
+            set { _facility = value; }
         }
 
         private SyslogSeverityCode _severity;
@@ -322,8 +322,8 @@ namespace Medo.Net {
         /// Gets/sets severity designation.
         /// </summary>
         public SyslogSeverityCode Severity {
-            get { return this._severity; }
-            set { this._severity = value; }
+            get { return _severity; }
+            set { _severity = value; }
         }
 
         private System.DateTime _timestamp;
@@ -331,8 +331,8 @@ namespace Medo.Net {
         /// Gets/sets timestamp.
         /// </summary>
         public System.DateTime Timestamp {
-            get { return this._timestamp; }
-            set { this._timestamp = value; }
+            get { return _timestamp; }
+            set { _timestamp = value; }
         }
 
         private string _hostName;
@@ -340,10 +340,10 @@ namespace Medo.Net {
         /// Gets/sets host name or null if it is unknown.
         /// </summary>
         public string HostName {
-            get { return this._hostName; }
+            get { return _hostName; }
             set {
                 if (!Helper.IsPrintUsAscii(value, 255)) { throw new System.ArgumentOutOfRangeException("value", Resources.ExceptionArgumentMustContainOnlyPrintableUsAsciiCharactersWithLengthOfNoMoreThan255Characters); }
-                this._hostName = value;
+                _hostName = value;
             }
         }
 
@@ -352,10 +352,10 @@ namespace Medo.Net {
         /// Gets application name or null if it is unknown.
         /// </summary>
         public string ApplicationName {
-            get { return this._applicationName; }
+            get { return _applicationName; }
             set {
                 if (!Helper.IsPrintUsAscii(value, 48)) { throw new System.ArgumentOutOfRangeException("value", Resources.ExceptionArgumentMustContainOnlyPrintableUsAsciiCharactersWithLengthOfNoMoreThan48Characters); }
-                this._applicationName = value;
+                _applicationName = value;
             }
         }
 
@@ -364,10 +364,10 @@ namespace Medo.Net {
         /// Gets/sets process Id or null if it is unknown.
         /// </summary>
         public string ProcessId {
-            get { return this._processId; }
+            get { return _processId; }
             set {
                 if (!Helper.IsPrintUsAscii(value, 128)) { throw new System.ArgumentOutOfRangeException("value", Resources.ExceptionArgumentMustContainOnlyPrintableUsAsciiCharactersWithLengthOfNoMoreThan128Characters); }
-                this._processId = value;
+                _processId = value;
             }
         }
 
@@ -377,10 +377,10 @@ namespace Medo.Net {
         /// </summary>
         /// <exception cref="System.ArgumentOutOfRangeException">Argument must contain only printable US ASCII characters.</exception>
         public string MessageId {
-            get { return this._messageId; }
+            get { return _messageId; }
             set {
                 if (!Helper.IsPrintUsAscii(value, 32)) { throw new System.ArgumentOutOfRangeException("value", Resources.ExceptionArgumentMustContainOnlyPrintableUsAsciiCharactersWithLengthOfNoMoreThan32Characters); }
-                this._messageId = value;
+                _messageId = value;
             }
         }
 
@@ -389,8 +389,8 @@ namespace Medo.Net {
         /// Gets/sets message.
         /// </summary>
         public string Message {
-            get { return this._message; }
-            set { this._message = value; }
+            get { return _message; }
+            set { _message = value; }
         }
 
 
@@ -400,14 +400,14 @@ namespace Medo.Net {
         /// Returns string representation of this class.
         /// </summary>
         public override string ToString() {
-            return System.Text.UTF8Encoding.UTF8.GetString(this.ToByteArray());
+            return System.Text.UTF8Encoding.UTF8.GetString(ToByteArray());
         }
 
         /// <summary>
         /// Returns string representation of this class.
         /// </summary>
         public string ToBsdString() {
-            return System.Text.UTF8Encoding.UTF8.GetString(this.ToBsdByteArray());
+            return System.Text.UTF8Encoding.UTF8.GetString(ToBsdByteArray());
         }
 
         #endregion
@@ -420,34 +420,34 @@ namespace Medo.Net {
             System.Collections.Generic.List<byte> sb = new System.Collections.Generic.List<byte>();
 
             sb.AddRange(Helper.ToAscii("<"));
-            sb.AddRange(Helper.ToAscii(((int)this._facility * 8 + (int)this._severity).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(((int)_facility * 8 + (int)_severity).ToString(System.Globalization.CultureInfo.InvariantCulture)));
             sb.AddRange(Helper.ToAscii(">"));
             sb.AddRange(Helper.ToAscii("1"));
             sb.AddRange(Helper.ToAscii(" "));
-            sb.AddRange(Helper.ToAscii(this._timestamp.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'ffffff'Z'", System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(_timestamp.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'ffffff'Z'", System.Globalization.CultureInfo.InvariantCulture)));
             sb.AddRange(Helper.ToAscii(" "));
-            if (!string.IsNullOrEmpty(this._hostName)) { sb.AddRange(Helper.ToAscii(this._hostName)); } else { sb.AddRange(Helper.ToAscii("-")); }
+            if (!string.IsNullOrEmpty(_hostName)) { sb.AddRange(Helper.ToAscii(_hostName)); } else { sb.AddRange(Helper.ToAscii("-")); }
             sb.AddRange(Helper.ToAscii(" "));
-            if (!string.IsNullOrEmpty(this._applicationName)) { sb.AddRange(Helper.ToAscii(this._applicationName)); } else { sb.AddRange(Helper.ToAscii("-")); }
+            if (!string.IsNullOrEmpty(_applicationName)) { sb.AddRange(Helper.ToAscii(_applicationName)); } else { sb.AddRange(Helper.ToAscii("-")); }
             sb.AddRange(Helper.ToAscii(" "));
-            if (!string.IsNullOrEmpty(this._processId)) { sb.AddRange(Helper.ToAscii(this._processId)); } else { sb.AddRange(Helper.ToAscii("-")); }
+            if (!string.IsNullOrEmpty(_processId)) { sb.AddRange(Helper.ToAscii(_processId)); } else { sb.AddRange(Helper.ToAscii("-")); }
             sb.AddRange(Helper.ToAscii(" "));
-            if (!string.IsNullOrEmpty(this._messageId)) { sb.AddRange(Helper.ToAscii(this._messageId)); } else { sb.AddRange(Helper.ToAscii("-")); }
+            if (!string.IsNullOrEmpty(_messageId)) { sb.AddRange(Helper.ToAscii(_messageId)); } else { sb.AddRange(Helper.ToAscii("-")); }
             sb.AddRange(Helper.ToAscii(" "));
-            if (this._structuredDatas.Count > 0) {
-                for (int i = 0; i < this._structuredDatas.Count; i++) {
-                    sb.AddRange(this._structuredDatas[i].ToByteArray());
+            if (_structuredDatas.Count > 0) {
+                for (int i = 0; i < _structuredDatas.Count; i++) {
+                    sb.AddRange(_structuredDatas[i].ToByteArray());
                 }
             } else {
                 sb.AddRange(Helper.ToAscii("-"));
             }
-            if (!string.IsNullOrEmpty(this._message)) {
+            if (!string.IsNullOrEmpty(_message)) {
                 sb.AddRange(Helper.ToAscii(" "));
-                if (Helper.IsAllAscii(this._message)) {
-                    sb.AddRange(Helper.ToAscii(this._message));
+                if (Helper.IsAllAscii(_message)) {
+                    sb.AddRange(Helper.ToAscii(_message));
                 } else {
                     sb.AddRange(new byte[] { 0xEF, 0xBB, 0xBF });
-                    sb.AddRange(Helper.ToUtf8(this._message));
+                    sb.AddRange(Helper.ToUtf8(_message));
                 }
             }
 
@@ -461,25 +461,25 @@ namespace Medo.Net {
         public byte[] ToBsdByteArray() {
             System.Collections.Generic.List<byte> sb = new System.Collections.Generic.List<byte>();
             sb.AddRange(Helper.ToAscii("<"));
-            sb.AddRange(Helper.ToAscii(((int)this._facility * 8 + (int)this._severity).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(((int)_facility * 8 + (int)_severity).ToString(System.Globalization.CultureInfo.InvariantCulture)));
             sb.AddRange(Helper.ToAscii(">"));
-            sb.AddRange(Helper.ToAscii(this._timestamp.ToString("MMM", System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(_timestamp.ToString("MMM", System.Globalization.CultureInfo.InvariantCulture)));
             sb.Add(32);
-            sb.AddRange(Helper.ToAscii(this._timestamp.Day.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2)));
+            sb.AddRange(Helper.ToAscii(_timestamp.Day.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2)));
             sb.Add(32);
-            sb.AddRange(Helper.ToAscii(this._timestamp.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(_timestamp.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
             sb.Add(32);
-            sb.AddRange(Helper.ToAscii(this._hostName));
+            sb.AddRange(Helper.ToAscii(_hostName));
             sb.Add(32);
-            if (!string.IsNullOrEmpty(this._applicationName)) {
-                sb.AddRange(Helper.ToAscii(this._applicationName));
-                if (!string.IsNullOrEmpty(this._processId)) {
-                    sb.AddRange(Helper.ToAscii("[" + this._processId + "]"));
+            if (!string.IsNullOrEmpty(_applicationName)) {
+                sb.AddRange(Helper.ToAscii(_applicationName));
+                if (!string.IsNullOrEmpty(_processId)) {
+                    sb.AddRange(Helper.ToAscii("[" + _processId + "]"));
                 }
                 sb.AddRange(Helper.ToAscii(":"));
                 sb.Add(32);
             }
-            sb.AddRange(Helper.ToAscii(this._message));
+            sb.AddRange(Helper.ToAscii(_message));
             return sb.ToArray();
         }
 
@@ -776,18 +776,17 @@ namespace Medo.Net {
         public static SyslogMessage ParseBsd(byte[] messageBuffer, System.Net.IPEndPoint endpoint) {
             if (messageBuffer == null) { return null; }
 
-            SyslogMessage ret = new SyslogMessage();
-
-            ret._processId = string.Empty;
-            ret._applicationName = string.Empty;
+            SyslogMessage ret = new SyslogMessage {
+                _processId = string.Empty,
+                _applicationName = string.Empty
+            };
 
             string rawMessage = System.Text.ASCIIEncoding.ASCII.GetString(messageBuffer, 0, messageBuffer.Length);
             int priL = rawMessage.IndexOf("<", System.StringComparison.Ordinal);
             int priR = rawMessage.IndexOf(">", System.StringComparison.Ordinal);
             if ((priL == 0) && (priR > priL)) { //Valid PRI?
                 string priStr = rawMessage.Substring(priL + 1, priR - priL - 1);
-                int priInt = 0;
-                if (int.TryParse(priStr, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out priInt) == true) {
+                if (int.TryParse(priStr, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var priInt) == true) {
                     if ((priInt >= 0) && (priInt <= 191)) { //Valid PRI
                         int priFacility = priInt / 8;
                         int priSeverity = priInt % 8;
@@ -797,8 +796,7 @@ namespace Medo.Net {
 
                         if (messageBuffer.Length > (priR + 15)) { //Check Timestamp
                             string timestampStr = rawMessage.Substring(priR + 1, 15);
-                            System.DateTime timestamp;
-                            if (!System.DateTime.TryParseExact(timestampStr, "MMM dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out timestamp)) {
+                            if (!System.DateTime.TryParseExact(timestampStr, "MMM dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeLocal, out var timestamp)) {
                                 timestamp = System.DateTime.MinValue;
                             }
 
@@ -1064,7 +1062,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Argument cannot be null or empty.</exception>
         public SyslogStructuredData(string ianaName) {
             if (string.IsNullOrEmpty(ianaName)) { throw new System.ArgumentNullException("ianaName", Resources.ExceptionArgumentCannotBeNullOrEmpty); }
-            this._id = ianaName;
+            _id = ianaName;
         }
 
         /// <summary>
@@ -1077,7 +1075,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentOutOfRangeException">Argument must contain only printable US ASCII characters.</exception>
         public SyslogStructuredData(string ianaName, string parameterName1, string parameterValue1)
             : this(ianaName) {
-            this.AddParameter(parameterName1, parameterValue1);
+            AddParameter(parameterName1, parameterValue1);
         }
 
         /// <summary>
@@ -1092,8 +1090,8 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentOutOfRangeException">Argument must contain only printable US ASCII characters.</exception>
         public SyslogStructuredData(string ianaName, string parameterName1, string parameterValue1, string parameterName2, string parameterValue2)
             : this(ianaName) {
-            this.AddParameter(parameterName1, parameterValue1);
-            this.AddParameter(parameterName2, parameterValue2);
+            AddParameter(parameterName1, parameterValue1);
+            AddParameter(parameterName2, parameterValue2);
         }
 
         /// <summary>
@@ -1110,9 +1108,9 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentOutOfRangeException">Argument must contain only printable US ASCII characters.</exception>
         public SyslogStructuredData(string ianaName, string parameterName1, string parameterValue1, string parameterName2, string parameterValue2, string parameterName3, string parameterValue3)
             : this(ianaName) {
-            this.AddParameter(parameterName1, parameterValue1);
-            this.AddParameter(parameterName2, parameterValue2);
-            this.AddParameter(parameterName3, parameterValue3);
+            AddParameter(parameterName1, parameterValue1);
+            AddParameter(parameterName2, parameterValue2);
+            AddParameter(parameterName3, parameterValue3);
         }
 
 
@@ -1124,7 +1122,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Argument cannot be null or empty.</exception>
         public SyslogStructuredData(string name, int enterpriseId) {
             if (string.IsNullOrEmpty(name)) { throw new System.ArgumentNullException("name", Resources.ExceptionArgumentCannotBeNullOrEmpty); }
-            this._id = name + "@" + enterpriseId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            _id = name + "@" + enterpriseId.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -1137,7 +1135,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Argument cannot be null or empty.</exception>
         public SyslogStructuredData(string name, int enterpriseId, string parameterName1, string parameterValue1)
             : this(name, enterpriseId) {
-            this.AddParameter(parameterName1, parameterValue1);
+            AddParameter(parameterName1, parameterValue1);
         }
 
         /// <summary>
@@ -1152,8 +1150,8 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Argument cannot be null or empty.</exception>
         public SyslogStructuredData(string name, int enterpriseId, string parameterName1, string parameterValue1, string parameterName2, string parameterValue2)
             : this(name, enterpriseId) {
-            this.AddParameter(parameterName1, parameterValue1);
-            this.AddParameter(parameterName2, parameterValue2);
+            AddParameter(parameterName1, parameterValue1);
+            AddParameter(parameterName2, parameterValue2);
         }
 
         /// <summary>
@@ -1170,18 +1168,18 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Argument cannot be null or empty.</exception>
         public SyslogStructuredData(string name, int enterpriseId, string parameterName1, string parameterValue1, string parameterName2, string parameterValue2, string parameterName3, string parameterValue3)
             : this(name, enterpriseId) {
-            this.AddParameter(parameterName1, parameterValue1);
-            this.AddParameter(parameterName2, parameterValue2);
-            this.AddParameter(parameterName3, parameterValue3);
+            AddParameter(parameterName1, parameterValue1);
+            AddParameter(parameterName2, parameterValue2);
+            AddParameter(parameterName3, parameterValue3);
         }
 
 
-        private string _id;
+        private readonly string _id;
         /// <summary>
         /// Gets Id of this class.
         /// </summary>
         public string Id {
-            get { return this._id; }
+            get { return _id; }
         }
 
 
@@ -1192,7 +1190,7 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="index">Index.</param>
         public string GetName(int index) {
-            return this._params[index].Key;
+            return _params[index].Key;
         }
 
         /// <summary>
@@ -1200,7 +1198,7 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="index">Index.</param>
         public string GetValue(int index) {
-            return this._params[index].Value;
+            return _params[index].Value;
         }
 
         /// <summary>
@@ -1208,7 +1206,7 @@ namespace Medo.Net {
         /// </summary>
         public int Count {
             get {
-                return this._params.Count;
+                return _params.Count;
             }
         }
 
@@ -1222,7 +1220,7 @@ namespace Medo.Net {
         public void AddParameter(string parameterName, string parameterValue) {
             if (string.IsNullOrEmpty(parameterName)) { throw new System.ArgumentNullException("parameterName", Resources.ExceptionArgumentCannotBeNullOrEmpty); }
             if (!Helper.IsPrintUsAscii(parameterName, 32, new char[] { '=', ' ', ']', '"' })) { throw new System.ArgumentOutOfRangeException("parameterName", Resources.ExceptionArgumentMustContainOnlyPrintableUsAsciiCharactersWithLengthOfNoMoreThan32CharactersAndNoXXXIsAllowed); }
-            this._params.Add(new System.Collections.Generic.KeyValuePair<string, string>(parameterName, parameterValue));
+            _params.Add(new System.Collections.Generic.KeyValuePair<string, string>(parameterName, parameterValue));
         }
 
 
@@ -1232,7 +1230,7 @@ namespace Medo.Net {
         /// Returns string representation of this class.
         /// </summary>
         public override string ToString() {
-            return System.Text.UTF8Encoding.UTF8.GetString(this.ToByteArray());
+            return System.Text.UTF8Encoding.UTF8.GetString(ToByteArray());
         }
 
         #endregion
@@ -1243,18 +1241,18 @@ namespace Medo.Net {
         /// </summary>
         /// <exception cref="System.InvalidOperationException">At least one parameter must exist.</exception>
         public byte[] ToByteArray() {
-            if (this._params.Count == 0) { throw new System.InvalidOperationException(Resources.ExceptionAtLeastOneParameterMustExist); }
+            if (_params.Count == 0) { throw new System.InvalidOperationException(Resources.ExceptionAtLeastOneParameterMustExist); }
             System.Collections.Generic.List<byte> sb = new System.Collections.Generic.List<byte>();
 
             sb.AddRange(Helper.ToAscii("["));
-            sb.AddRange(Helper.ToAscii(this._id));
+            sb.AddRange(Helper.ToAscii(_id));
 
-            for (int i = 0; i < this._params.Count; i++) {
+            for (int i = 0; i < _params.Count; i++) {
                 sb.AddRange(Helper.ToAscii(" "));
-                sb.AddRange(Helper.ToAscii(this._params[i].Key));
+                sb.AddRange(Helper.ToAscii(_params[i].Key));
                 sb.AddRange(Helper.ToAscii("="));
                 sb.AddRange(Helper.ToAscii("\""));
-                sb.AddRange(Helper.ToUtf8(this._params[i].Value.Replace(@"\", @"\\").Replace("\"", "\\\"").Replace(@"]", @"\]")));
+                sb.AddRange(Helper.ToUtf8(_params[i].Value.Replace(@"\", @"\\").Replace("\"", "\\\"").Replace(@"]", @"\]")));
                 sb.AddRange(Helper.ToAscii("\""));
             }
 

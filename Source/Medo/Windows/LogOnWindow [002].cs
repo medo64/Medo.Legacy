@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-05-27: Design changes.
 //2010-05-19: Initial version.
@@ -41,8 +41,8 @@ namespace Medo.Windows {
         /// <param name="users">Predefined users.</param>
         /// <param name="selectedUserName">Pre-selected user name.</param>
         public LogOnWindow(IEnumerable<IIdentity> users, string selectedUserName) {
-            this.Users = users;
-            this.SelectedUserName = selectedUserName;
+            Users = users;
+            SelectedUserName = selectedUserName;
         }
 
 
@@ -98,81 +98,81 @@ namespace Medo.Windows {
             Grid.SetColumn(labelUser, 0);
             contentGrid.Children.Add(labelUser);
 
-            this._comboUser = new ComboBox() { VerticalAlignment = VerticalAlignment.Center, IsEditable = true };
-            foreach (var user in this.Users) {
-                this._comboUser.Items.Add(user);
+            _comboUser = new ComboBox() { VerticalAlignment = VerticalAlignment.Center, IsEditable = true };
+            foreach (var user in Users) {
+                _comboUser.Items.Add(user);
             }
-            Grid.SetRow(this._comboUser, 0);
-            Grid.SetColumn(this._comboUser, 2);
-            contentGrid.Children.Add(this._comboUser);
+            Grid.SetRow(_comboUser, 0);
+            Grid.SetColumn(_comboUser, 2);
+            contentGrid.Children.Add(_comboUser);
 
             var labelPassword = new Label() { Content = Localizations.Password, VerticalAlignment = VerticalAlignment.Center };
             Grid.SetRow(labelPassword, 2);
             Grid.SetColumn(labelPassword, 0);
             contentGrid.Children.Add(labelPassword);
-            this._textPassword = new PasswordBox() { VerticalAlignment = VerticalAlignment.Center };
-            Grid.SetRow(this._textPassword, 2);
-            Grid.SetColumn(this._textPassword, 2);
-            contentGrid.Children.Add(this._textPassword);
+            _textPassword = new PasswordBox() { VerticalAlignment = VerticalAlignment.Center };
+            Grid.SetRow(_textPassword, 2);
+            Grid.SetColumn(_textPassword, 2);
+            contentGrid.Children.Add(_textPassword);
 
-            this._buttonLogOn = new Button() { Content = "Log on", Width = 75, Height = 23, Margin = new Thickness(0, 0, 7, 0) };
+            _buttonLogOn = new Button() { Content = "Log on", Width = 75, Height = 23, Margin = new Thickness(0, 0, 7, 0) };
             var buttonCancel = new Button() { Content = "Cancel", Width = 75, Height = 23, IsCancel = true };
 
             var buttonsStack = new StackPanel() { Margin = new Thickness(11), Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-            buttonsStack.Children.Add(this._buttonLogOn);
+            buttonsStack.Children.Add(_buttonLogOn);
             buttonsStack.Children.Add(buttonCancel);
 
             var windowStack = new StackPanel();
             windowStack.Children.Add(new Border() { Child = contentGrid, Background = SystemColors.WindowBrush, BorderThickness = new Thickness(0) });
             windowStack.Children.Add(buttonsStack);
 
-            this._window = new Window() { FontFamily = SystemFonts.MessageFontFamily, FontSize = SystemFonts.MessageFontSize, FontWeight = SystemFonts.MessageFontWeight, MinWidth = 200, Background = SystemColors.ControlBrush };
+            _window = new Window() { FontFamily = SystemFonts.MessageFontFamily, FontSize = SystemFonts.MessageFontSize, FontWeight = SystemFonts.MessageFontWeight, MinWidth = 200, Background = SystemColors.ControlBrush };
 
             if (owner != null) {
-                this._window.Icon = owner.Icon;
-                this._window.Owner = owner;
-                this._window.ShowInTaskbar = false;
-                if (owner.Topmost) { this._window.Topmost = true; }
-                this._window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                _window.Icon = owner.Icon;
+                _window.Owner = owner;
+                _window.ShowInTaskbar = false;
+                if (owner.Topmost) { _window.Topmost = true; }
+                _window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             } else {
-                this._window.Icon = GetAppIcon(Assembly.GetEntryAssembly());
-                this._window.Owner = null;
-                this._window.ShowInTaskbar = true;
-                this._window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                _window.Icon = GetAppIcon(Assembly.GetEntryAssembly());
+                _window.Owner = null;
+                _window.ShowInTaskbar = true;
+                _window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             }
-            this._window.ResizeMode = ResizeMode.NoResize;
-            this._window.ShowActivated = true;
-            this._window.SizeToContent = SizeToContent.WidthAndHeight;
-            this._window.Title = "Log on";
-            this._window.Content = windowStack;
+            _window.ResizeMode = ResizeMode.NoResize;
+            _window.ShowActivated = true;
+            _window.SizeToContent = SizeToContent.WidthAndHeight;
+            _window.Title = "Log on";
+            _window.Content = windowStack;
 
-            this._comboUser.KeyDown += new KeyEventHandler(_comboUser_KeyDown);
-            this._textPassword.KeyDown += new KeyEventHandler(_textPassword_KeyDown);
-            this._buttonLogOn.Click += new RoutedEventHandler(_buttonLogOn_Click);
-            this._window.Loaded += new RoutedEventHandler(window_Loaded);
+            _comboUser.KeyDown += new KeyEventHandler(_comboUser_KeyDown);
+            _textPassword.KeyDown += new KeyEventHandler(_textPassword_KeyDown);
+            _buttonLogOn.Click += new RoutedEventHandler(_buttonLogOn_Click);
+            _window.Loaded += new RoutedEventHandler(window_Loaded);
 
-            return this._window.ShowDialog();
+            return _window.ShowDialog();
         }
 
         private void window_Loaded(object sender, RoutedEventArgs e) {
             var isUserSelected = false;
-            foreach (var item in this._comboUser.Items) {
-                if (item.Equals(this.SelectedUserName)) {
-                    this._comboUser.SelectedItem = item;
+            foreach (var item in _comboUser.Items) {
+                if (item.Equals(SelectedUserName)) {
+                    _comboUser.SelectedItem = item;
                     isUserSelected = true;
                     break;
                 }
             }
             if (isUserSelected) {
-                this._textPassword.Focus();
+                _textPassword.Focus();
             } else {
-                this._comboUser.Focus();
+                _comboUser.Focus();
             }
         }
 
         private void _comboUser_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter) {
-                this._textPassword.Focus();
+                _textPassword.Focus();
                 e.Handled = true;
             }
         }
@@ -189,22 +189,22 @@ namespace Medo.Windows {
         }
 
         private void LogonClick() {
-            this.SelectedUserName = this._comboUser.Text;
-            this.SelectedPassword = this._textPassword.Password;
+            SelectedUserName = _comboUser.Text;
+            SelectedPassword = _textPassword.Password;
 
-            if (this._comboUser.SelectedItem != null) {
-                foreach (IIdentity item in this._comboUser.Items) {
-                    if (item.Equals(this._comboUser.SelectedItem)) {
-                        this.SelectedUserName = item.Name;
-                        this.SelectedUser = item;
+            if (_comboUser.SelectedItem != null) {
+                foreach (IIdentity item in _comboUser.Items) {
+                    if (item.Equals(_comboUser.SelectedItem)) {
+                        SelectedUserName = item.Name;
+                        SelectedUser = item;
                         break;
                     }
                 }
             } else {
-                this.SelectedUser = null;
+                SelectedUser = null;
             }
 
-            this._window.DialogResult = true;
+            _window.DialogResult = true;
         }
 
 
@@ -220,13 +220,15 @@ namespace Medo.Windows {
         }
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            static extern internal IntPtr LoadIcon(IntPtr hInstance, string lpIconName);
+            static extern internal IntPtr LoadIcon(IntPtr hInstance, String lpIconName);
 
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-            static extern internal IntPtr LoadLibrary(string lpFileName);
+            static extern internal IntPtr LoadLibrary(String lpFileName);
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
         private static class Localizations {
@@ -234,7 +236,7 @@ namespace Medo.Windows {
             internal static string UserName {
                 get {
                     if (Thread.CurrentThread.CurrentUICulture.Name.StartsWith("hr-", StringComparison.OrdinalIgnoreCase)) {
-                        return "KorisniËko ime:";
+                        return "Korisniƒçko ime:";
                     } else {
                         return "User name:";
                     }

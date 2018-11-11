@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2011-03-05: Moved to Medo.Math.
 //2010-05-14: Changed namespace from Medo.Math.Averaging to Medo.Math.
@@ -18,7 +18,7 @@ namespace Medo.Math {
 	/// </remarks>
 	public class ExponentialMovingAverage {
 
-		private double _smoothingFactor;
+		private readonly double _smoothingFactor;
 		private double _value;
 		private bool _isFilled;
 
@@ -37,9 +37,9 @@ namespace Medo.Math {
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "count+1", Justification = "This will not overflow.")]
 		public ExponentialMovingAverage(int count) {
 			if (count == int.MaxValue) {
-				this._smoothingFactor = 2.0 / (int.MaxValue);
+				_smoothingFactor = 2.0 / (int.MaxValue);
 			} else {
-				this._smoothingFactor = 2.0 / (count + 1);
+				_smoothingFactor = 2.0 / (count + 1);
 			}
 		}
 
@@ -50,7 +50,7 @@ namespace Medo.Math {
 		/// <exception cref="System.ArgumentOutOfRangeException">Smoothing factor must be between 0 and 1.</exception>
 		public ExponentialMovingAverage(double smoothingFactor) {
 			if ((smoothingFactor < 0) || (smoothingFactor > 1)) { throw new System.ArgumentOutOfRangeException("smoothingFactor", Resources.ExceptionSmoothingFactorMustBeBetween0And1); }
-			this._smoothingFactor = smoothingFactor;
+			_smoothingFactor = smoothingFactor;
 		}
 
 		/// <summary>
@@ -59,10 +59,10 @@ namespace Medo.Math {
 		/// <param name="value">Value to be added.</param>
 		public void Add(double value) {
 			if (!_isFilled) {
-				this._value = value;
+				_value = value;
 				_isFilled = true;
 			} else {
-				this._value = this._value + this._smoothingFactor * (value - this._value);
+				_value = _value + _smoothingFactor * (value - _value);
 			}
 		}
 
@@ -70,14 +70,14 @@ namespace Medo.Math {
 		/// Resets average.
 		/// </summary>
 		public void Clear() {
-			this._isFilled = false;
+			_isFilled = false;
 		}
 
 		/// <summary>
 		/// Gets whether there are items inside.
 		/// </summary>
 		public bool IsEmpty {
-			get { return !this._isFilled; }
+			get { return !_isFilled; }
 		}
 
 
@@ -86,10 +86,10 @@ namespace Medo.Math {
 		/// </summary>
 		public double Average {
 			get {
-				if (this.IsEmpty) {
+				if (IsEmpty) {
 					return double.NaN;
 				} else {
-					return this._value;
+					return _value;
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2016-03-09: Initial version.
 
@@ -32,8 +32,8 @@ namespace Medo.Math {
         /// </summary>
         public double Minimum {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.Minimum;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.Minimum;
             }
         }
 
@@ -43,8 +43,8 @@ namespace Medo.Math {
         /// </summary>
         public double LowerSubmedian {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.LowerSubmedian;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.LowerSubmedian;
             }
         }
 
@@ -54,8 +54,8 @@ namespace Medo.Math {
         /// </summary>
         public double Median {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.Median;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.Median;
             }
         }
 
@@ -65,8 +65,8 @@ namespace Medo.Math {
         /// </summary>
         public double UpperSubmedian {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.UpperSubmedian;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.UpperSubmedian;
             }
         }
 
@@ -75,8 +75,8 @@ namespace Medo.Math {
         /// </summary>
         public double Maximum {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.Maximum;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.Maximum;
             }
         }
 
@@ -85,7 +85,7 @@ namespace Medo.Math {
         /// Gets the five-number summary of the data set.
         /// </summary>
         public double[] GetNumberSummary() {
-            return new double[] { this.Minimum, this.LowerSubmedian, this.Median, this.UpperSubmedian, this.Maximum };
+            return new double[] { Minimum, LowerSubmedian, Median, UpperSubmedian, Maximum };
         }
 
 
@@ -95,8 +95,8 @@ namespace Medo.Math {
         /// </summary>
         public double InterquartileRange {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.InterquartileRange;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.InterquartileRange;
             }
         }
 
@@ -107,8 +107,8 @@ namespace Medo.Math {
         /// </summary>
         public double LowerFence {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.LowerFence;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.LowerFence;
             }
         }
 
@@ -118,8 +118,8 @@ namespace Medo.Math {
         /// </summary>
         public double UpperFence {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.UpperFence;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.UpperFence;
             }
         }
 
@@ -130,8 +130,8 @@ namespace Medo.Math {
         /// </summary>
         public double LowerOuterFence {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.LowerOuterFence;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.LowerOuterFence;
             }
         }
 
@@ -141,8 +141,8 @@ namespace Medo.Math {
         /// </summary>
         public double UpperOuterFence {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.UpperOuterFence;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.UpperOuterFence;
             }
         }
 
@@ -152,8 +152,8 @@ namespace Medo.Math {
         /// </summary>
         public double MinimumNonOutlier {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.MinimumNonOutlier;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.MinimumNonOutlier;
             }
         }
 
@@ -162,8 +162,8 @@ namespace Medo.Math {
         /// </summary>
         public double MaximumNonOutlier {
             get {
-                if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-                return this.Cache.MaximumNonOutlier;
+                if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+                return Cache.MaximumNonOutlier;
             }
         }
 
@@ -173,16 +173,16 @@ namespace Medo.Math {
         /// </summary>
         /// <returns></returns>
         public IEnumerable<double> EnumerateLowerOutliers() {
-            if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-            return this.Cache.EnumerateLowerOutliers();
+            if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+            return Cache.EnumerateLowerOutliers();
         }
 
         /// <summary>
         /// Enumerates upper outliers.
         /// </summary>
         public IEnumerable<double> EnumerateUpperOutliers() {
-            if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-            return this.Cache.EnumerateUpperOutliers();
+            if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+            return Cache.EnumerateUpperOutliers();
         }
 
         /// <summary>
@@ -190,10 +190,10 @@ namespace Medo.Math {
         /// </summary>
         /// <returns></returns>
         public IEnumerable<double> EnumerateOutliers() {
-            foreach (var value in this.EnumerateLowerOutliers()) {
+            foreach (var value in EnumerateLowerOutliers()) {
                 yield return value;
             }
-            foreach (var value in this.EnumerateUpperOutliers()) {
+            foreach (var value in EnumerateUpperOutliers()) {
                 yield return value;
             }
         }
@@ -204,16 +204,16 @@ namespace Medo.Math {
         /// </summary>
         /// <returns></returns>
         public IEnumerable<double> EnumerateLowerExtremes() {
-            if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-            return this.Cache.EnumerateLowerExtremes();
+            if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+            return Cache.EnumerateLowerExtremes();
         }
 
         /// <summary>
         /// Enumerates upper extremes.
         /// </summary>
         public IEnumerable<double> EnumerateUpperExtremes() {
-            if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); }
-            return this.Cache.EnumerateUpperExtremes();
+            if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); }
+            return Cache.EnumerateUpperExtremes();
         }
 
         /// <summary>
@@ -221,10 +221,10 @@ namespace Medo.Math {
         /// </summary>
         /// <returns></returns>
         public IEnumerable<double> EnumerateExtremes() {
-            foreach (var value in this.EnumerateLowerExtremes()) {
+            foreach (var value in EnumerateLowerExtremes()) {
                 yield return value;
             }
-            foreach (var value in this.EnumerateUpperExtremes()) {
+            foreach (var value in EnumerateUpperExtremes()) {
                 yield return value;
             }
         }
@@ -241,9 +241,9 @@ namespace Medo.Math {
         /// <param name="item">The number to add.</param>
         /// <exception cref="ArgumentOutOfRangeException">Must use a real number.</exception>
         public void Add(double item) {
-            this.Items.Add(item);
+            Items.Add(item);
             if (double.IsInfinity(item) || double.IsNaN(item)) { throw new ArgumentOutOfRangeException(nameof(item), "Must use a real number."); }
-            this.Cache = null;
+            Cache = null;
         }
 
         /// <summary>
@@ -256,8 +256,8 @@ namespace Medo.Math {
             foreach (var item in items) {
                 if (double.IsInfinity(item) || double.IsNaN(item)) { throw new ArgumentOutOfRangeException(nameof(items), "Must use real numbers."); }
             }
-            this.Items.AddRange(items);
-            this.Cache = null;
+            Items.AddRange(items);
+            Cache = null;
         }
 
         /// <summary>
@@ -265,8 +265,8 @@ namespace Medo.Math {
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "While this class offers ICollection interface, it is not a collection as such.")]
         void ICollection<double>.Clear() {
-            this.Items.Clear();
-            this.Cache = null;
+            Items.Clear();
+            Cache = null;
         }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace Medo.Math {
         /// <returns>True if item is found in the collection; otherwise, false.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "While this class offers ICollection interface, it is not a collection as such.")]
         bool ICollection<double>.Contains(double item) {
-            return this.Items.Contains(item);
+            return Items.Contains(item);
         }
 
         /// <summary>
@@ -286,14 +286,14 @@ namespace Medo.Math {
         /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "While this class offers ICollection interface, it is not a collection as such.")]
         void ICollection<double>.CopyTo(double[] array, int arrayIndex) {
-            this.Items.CopyTo(array, arrayIndex);
+            Items.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
         /// Gets the number of elements contained in the collection.
         /// </summary>
         public int Count {
-            get { return this.Items.Count; }
+            get { return Items.Count; }
         }
 
         /// <summary>
@@ -311,8 +311,8 @@ namespace Medo.Math {
         /// <returns>True if item was successfully removed from the collection; otherwise, false. This method also returns false if item is not found in the original collection.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "While this class offers ICollection interface, it is not a collection as such.")]
         bool ICollection<double>.Remove(double item) {
-            if (this.Items.Remove(item)) {
-                this.Cache = null;
+            if (Items.Remove(item)) {
+                Cache = null;
                 return true;
             } else {
                 return false;
@@ -323,15 +323,15 @@ namespace Medo.Math {
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
         public IEnumerator<double> GetEnumerator() {
-            if (this.Cache == null) { this.Cache = new BoxAndWhiskersCache(this.Items); } //to sort items (by cache)
-            return this.Items.GetEnumerator();
+            if (Cache == null) { Cache = new BoxAndWhiskersCache(Items); } //to sort items (by cache)
+            return Items.GetEnumerator();
         }
 
         /// <summary>
         /// Exposes the enumerator, which supports a simple iteration over a non-generic collection.
         /// </summary>
         IEnumerator IEnumerable.GetEnumerator() {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         #endregion
@@ -344,7 +344,7 @@ namespace Medo.Math {
 
                 if (items.Count < 5) { throw new InvalidOperationException("Must have at least five values."); }
 
-                this.Items = items;
+                Items = items;
 
                 var iMedianU = items.Count / 2;
                 var iMedianL = (items.Count % 2 == 0) ? iMedianU - 1 : iMedianU;
@@ -355,18 +355,18 @@ namespace Medo.Math {
                 var iUpperSubmedianU = iMedianL + iMedianU / 2 + 1;
                 var iUpperSubmedianL = ((iMedianU % 2 == 0) ? iUpperSubmedianU - 1 : iUpperSubmedianU);
 
-                this.Minimum = items[0];
-                this.LowerSubmedian = (items[iLowerSubmedianL] + items[iLowerSubmedianU]) / 2;
-                this.Median = (items[iMedianL] + items[iMedianU]) / 2;
-                this.UpperSubmedian = (items[iUpperSubmedianL] + items[iUpperSubmedianU]) / 2;
-                this.Maximum = items[items.Count - 1];
+                Minimum = items[0];
+                LowerSubmedian = (items[iLowerSubmedianL] + items[iLowerSubmedianU]) / 2;
+                Median = (items[iMedianL] + items[iMedianU]) / 2;
+                UpperSubmedian = (items[iUpperSubmedianL] + items[iUpperSubmedianU]) / 2;
+                Maximum = items[items.Count - 1];
 
-                this.InterquartileRange = this.UpperSubmedian - this.LowerSubmedian;
+                InterquartileRange = UpperSubmedian - LowerSubmedian;
 
-                this.LowerFence = this.LowerSubmedian - 1.5 * this.InterquartileRange;
-                this.UpperFence = this.UpperSubmedian + 1.5 * this.InterquartileRange;
-                this.LowerOuterFence = this.LowerSubmedian - 3.0 * this.InterquartileRange;
-                this.UpperOuterFence = this.UpperSubmedian + 3.0 * this.InterquartileRange;
+                LowerFence = LowerSubmedian - 1.5 * InterquartileRange;
+                UpperFence = UpperSubmedian + 1.5 * InterquartileRange;
+                LowerOuterFence = LowerSubmedian - 3.0 * InterquartileRange;
+                UpperOuterFence = UpperSubmedian + 3.0 * InterquartileRange;
             }
 
 
@@ -389,40 +389,40 @@ namespace Medo.Math {
             internal double MinimumNonOutlier {
                 get {
                     CalculateOutlierIndices();
-                    return this.Items[this.MinimumNonOutlierIndex];
+                    return Items[MinimumNonOutlierIndex];
                 }
             }
 
             internal double MaximumNonOutlier {
                 get {
                     CalculateOutlierIndices();
-                    return this.Items[this.MaximumNonOutlierIndex];
+                    return Items[MaximumNonOutlierIndex];
                 }
             }
 
 
             internal IEnumerable<double> EnumerateLowerExtremes() {
-                for (var i = 0; i < this.MinimumNonExtremeIndex; i++) {
-                    yield return this.Items[i];
+                for (var i = 0; i < MinimumNonExtremeIndex; i++) {
+                    yield return Items[i];
                 }
             }
 
             internal IEnumerable<double> EnumerateUpperExtremes() {
-                for (var i = this.MaximumNonExtremeIndex + 1; i < this.Items.Count; i++) {
-                    yield return this.Items[i];
+                for (var i = MaximumNonExtremeIndex + 1; i < Items.Count; i++) {
+                    yield return Items[i];
                 }
             }
 
 
             internal IEnumerable<double> EnumerateLowerOutliers() {
-                for (var i = 0; i < this.MinimumNonOutlierIndex; i++) {
-                    yield return this.Items[i];
+                for (var i = 0; i < MinimumNonOutlierIndex; i++) {
+                    yield return Items[i];
                 }
             }
 
             internal IEnumerable<double> EnumerateUpperOutliers() {
-                for (var i = this.MaximumNonOutlierIndex + 1; i < this.Items.Count; i++) {
-                    yield return this.Items[i];
+                for (var i = MaximumNonOutlierIndex + 1; i < Items.Count; i++) {
+                    yield return Items[i];
                 }
             }
 
@@ -434,41 +434,41 @@ namespace Medo.Math {
             private int MaximumNonExtremeIndex;
 
             private void CalculateOutlierIndices() {
-                if (this.CalculatedOutlierIndices) { return; }
+                if (CalculatedOutlierIndices) { return; }
 
                 {
                     int i = 0;
-                    for (; i < this.Items.Count; i++) {
-                        if (this.Items[i] >= this.LowerOuterFence) {
-                            this.MinimumNonExtremeIndex = i;
+                    for (; i < Items.Count; i++) {
+                        if (Items[i] >= LowerOuterFence) {
+                            MinimumNonExtremeIndex = i;
                             break;
                         }
                     }
-                    for (; i < this.Items.Count; i++) {
-                        if (this.Items[i] >= this.LowerFence) {
-                            this.MinimumNonOutlierIndex = i;
+                    for (; i < Items.Count; i++) {
+                        if (Items[i] >= LowerFence) {
+                            MinimumNonOutlierIndex = i;
                             break;
                         }
                     }
                 }
 
                 {
-                    int i = this.Items.Count - 1;
+                    int i = Items.Count - 1;
                     for (; i >= 0; i--) {
-                        if (this.Items[i] <= this.UpperOuterFence) {
-                            this.MaximumNonExtremeIndex = i;
+                        if (Items[i] <= UpperOuterFence) {
+                            MaximumNonExtremeIndex = i;
                             break;
                         }
                     }
                     for (; i >= 0; i--) {
-                        if (this.Items[i] <= this.UpperFence) {
-                            this.MaximumNonOutlierIndex = i;
+                        if (Items[i] <= UpperFence) {
+                            MaximumNonOutlierIndex = i;
                             break;
                         }
                     }
                 }
 
-                this.CalculatedOutlierIndices = true;
+                CalculatedOutlierIndices = true;
             }
 
         }

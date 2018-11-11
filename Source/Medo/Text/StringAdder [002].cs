@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-04-11: Cleaned code to match FxCop 1.36 beta 2 (SpecifyIFormatProvider, SpecifyStringComparison).
 //2008-01-26: New version.
@@ -17,8 +17,8 @@ namespace Medo.Text {
 		/// Creates new instance with system defined separator.
 		/// </summary>
 		public StringAdder() {
-			this.StringBuilder = new System.Text.StringBuilder();
-			this.Separator = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator;
+			StringBuilder = new System.Text.StringBuilder();
+			Separator = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ListSeparator;
 		}
 
 		/// <summary>
@@ -26,8 +26,8 @@ namespace Medo.Text {
 		/// </summary>
 		/// <param name="separator">String to use for separating different values.</param>
 		public StringAdder(string separator) {
-			this.StringBuilder = new System.Text.StringBuilder();
-			this.Separator = separator;
+			StringBuilder = new System.Text.StringBuilder();
+			Separator = separator;
 		}
 
 
@@ -37,7 +37,7 @@ namespace Medo.Text {
 		/// </summary>
 		/// <param name="value">The System.String to append.</param>
 		public void Append(string value) {
-			Append(value, this.Separator);
+			Append(value, Separator);
 		}
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace Medo.Text {
 		/// <param name="value">The System.String to append.</param>
 		/// <param name="checkForExistingSeparator">If true, additional check is made to see if separator already exists.</param>
 		public void Append(string value, bool checkForExistingSeparator) {
-			this.Append(value, this.Separator, checkForExistingSeparator);
+			Append(value, Separator, checkForExistingSeparator);
 		}
 
 		/// <summary>
@@ -55,7 +55,7 @@ namespace Medo.Text {
 		/// <param name="value">The System.String to append.</param>
 		/// <param name="separator">Separator to be added before text.</param>
 		public void Append(string value, string separator) {
-			this.Append(value, separator, false);
+			Append(value, separator, false);
 		}
 
 		/// <summary>
@@ -67,13 +67,13 @@ namespace Medo.Text {
 		public void Append(string value, string separator, bool checkForExistingSeparator) {
 			if (value == null) { return; }
 			if (separator == null) { separator = string.Empty; }
-			if (this.StringBuilder.Length == 0) {
-				this.StringBuilder.Append(value);
+			if (StringBuilder.Length == 0) {
+				StringBuilder.Append(value);
 			} else {
-				if ((checkForExistingSeparator == false) || ((!this.StringBuilder.ToString().EndsWith(this.Separator, StringComparison.CurrentCulture)) && (!value.StartsWith(this.Separator, StringComparison.CurrentCulture)) && (!string.IsNullOrEmpty(value)))) {
-					this.StringBuilder.Append(separator);
+				if ((checkForExistingSeparator == false) || ((!StringBuilder.ToString().EndsWith(Separator, StringComparison.CurrentCulture)) && (!value.StartsWith(Separator, StringComparison.CurrentCulture)) && (!string.IsNullOrEmpty(value)))) {
+					StringBuilder.Append(separator);
 				}
-				this.StringBuilder.Append(value);
+				StringBuilder.Append(value);
 			}
 		}
 
@@ -95,11 +95,11 @@ namespace Medo.Text {
 		/// <param name="args">An array of objects to format.</param>
 		/// <returns>A reference to this instance with format appended. Any format specification in format is replaced by the string representation of the corresponding object argument.</returns>
 		public StringAdder AppendFormat(IFormatProvider provider, string format, params object[] args) {
-			if (this.StringBuilder.Length == 0) {
-				this._stringBuilder.AppendFormat(provider, format, args);
+			if (StringBuilder.Length == 0) {
+				_stringBuilder.AppendFormat(provider, format, args);
 			} else {
-				this.StringBuilder.Append(this.Separator);
-				this._stringBuilder.AppendFormat(provider, format, args);
+				StringBuilder.Append(Separator);
+				_stringBuilder.AppendFormat(provider, format, args);
 			}
 			return this;
 		}
@@ -110,7 +110,7 @@ namespace Medo.Text {
 		/// </summary>
 		/// <returns>String.</returns>
 		public new string ToString() {
-			return this.StringBuilder.ToString();
+			return StringBuilder.ToString();
 		}
 
 
@@ -120,8 +120,8 @@ namespace Medo.Text {
 		/// Gets or sets string to use for separating different values.
 		/// </summary>
 		public string Separator {
-			get { return this._separator; }
-			set { this._separator = value; }
+			get { return _separator; }
+			set { _separator = value; }
 		}
 
 		private System.Text.StringBuilder _stringBuilder;
@@ -129,8 +129,8 @@ namespace Medo.Text {
 		/// Gets underlying string builder.
 		/// </summary>
 		public System.Text.StringBuilder StringBuilder {
-			get { return this._stringBuilder; }
-			private set { this._stringBuilder = value; }
+			get { return _stringBuilder; }
+			private set { _stringBuilder = value; }
 		}
 
 	}

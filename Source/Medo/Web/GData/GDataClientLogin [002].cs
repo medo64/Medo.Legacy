@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2011-06-30: Compatible with .NET Framework 2.0.
 //2010-05-24: Initial version.
@@ -37,15 +37,14 @@ namespace Medo.Web.GData {
         /// <exception cref="System.ArgumentNullException">E-mail cannot be null. -or- Password cannot be null. -or- At least one account type must be specified.</exception>
         public GDataClientLogin(string email, string password, GDataAccountTypes accountType) {
             if (email == null) { throw new ArgumentNullException("email", "E-mail cannot be null."); }
-            if (password == null) { throw new ArgumentNullException("password", "Password cannot be null."); }
             if (accountType == 0) { throw new ArgumentOutOfRangeException("accountType", "At least one account type must be specified."); }
 
             if (!email.Contains("@")) { email += "@gmail.com"; } //for compatibility with gmail user names.
 
-            this.Email = email;
-            this.Password = password;
-            this.AccountType = accountType;
-            this.Source = GetDefaultSource();
+            Email = email;
+            Password = password ?? throw new ArgumentNullException("password", "Password cannot be null.");
+            AccountType = accountType;
+            Source = GetDefaultSource();
         }
 
 
@@ -240,20 +239,20 @@ namespace Medo.Web.GData {
         /// <exception cref="System.InvalidOperationException">Authorization failed. -or- Authorization token was not received.</exception>
         public string GetAuthorizationToken(string service) {
             StringBuilder postData = new StringBuilder();
-            if ((((this.AccountType & GDataAccountTypes.Hosted) == GDataAccountTypes.Hosted) && ((this.AccountType & GDataAccountTypes.Google) == GDataAccountTypes.Google))) {
+            if ((((AccountType & GDataAccountTypes.Hosted) == GDataAccountTypes.Hosted) && ((AccountType & GDataAccountTypes.Google) == GDataAccountTypes.Google))) {
                 postData.AppendFormat(CultureInfo.InvariantCulture, "accountType={0}", Uri.EscapeUriString("HOSTED_OR_GOOGLE"));
-            } else if ((this.AccountType & GDataAccountTypes.Hosted) == GDataAccountTypes.Hosted) {
+            } else if ((AccountType & GDataAccountTypes.Hosted) == GDataAccountTypes.Hosted) {
                 postData.AppendFormat(CultureInfo.InvariantCulture, "accountType={0}", Uri.EscapeUriString("HOSTED"));
-            } else if ((this.AccountType & GDataAccountTypes.Google) == GDataAccountTypes.Google) {
+            } else if ((AccountType & GDataAccountTypes.Google) == GDataAccountTypes.Google) {
                 postData.AppendFormat(CultureInfo.InvariantCulture, "accountType={0}", Uri.EscapeUriString("GOOGLE "));
             }
 
-            postData.AppendFormat(CultureInfo.InvariantCulture, "&Email={0}", Uri.EscapeUriString(this.Email));
-            postData.AppendFormat(CultureInfo.InvariantCulture, "&Passwd={0}", Uri.EscapeUriString(this.Password));
+            postData.AppendFormat(CultureInfo.InvariantCulture, "&Email={0}", Uri.EscapeUriString(Email));
+            postData.AppendFormat(CultureInfo.InvariantCulture, "&Passwd={0}", Uri.EscapeUriString(Password));
             if (service != null) {
                 postData.AppendFormat(CultureInfo.InvariantCulture, "&service={0}", Uri.EscapeUriString(service));
             }
-            postData.AppendFormat(CultureInfo.InvariantCulture, "&source={0}", Uri.EscapeUriString(this.Source));
+            postData.AppendFormat(CultureInfo.InvariantCulture, "&source={0}", Uri.EscapeUriString(Source));
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri("https://www.google.com/accounts/ClientLogin"));
             request.KeepAlive = false;
@@ -294,7 +293,7 @@ namespace Medo.Web.GData {
         /// Clean up any resources being used.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -340,10 +339,10 @@ namespace Medo.Web.GData {
             var sb = new StringBuilder();
             bool capitalizeNextChar = true;
             foreach (char c in text) {
-                if (Char.IsLetterOrDigit(c)) {
+                if (char.IsLetterOrDigit(c)) {
                     if (capitalizeNextChar) {
                         capitalizeNextChar = false;
-                        sb.Append(Char.ToUpperInvariant(c));
+                        sb.Append(char.ToUpperInvariant(c));
                     } else {
                         sb.Append(c);
                     }

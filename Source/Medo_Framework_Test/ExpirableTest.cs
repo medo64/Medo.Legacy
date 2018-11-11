@@ -57,8 +57,7 @@ namespace Test {
 
             Assert.IsFalse(x.Equals(null));
 
-            DateTime v2;
-            var r2 = x.TryGet(out v2);
+            var r2 = x.TryGet(out var v2);
             Assert.IsTrue(r2);
             Assert.AreEqual(v, v2);
 
@@ -67,8 +66,7 @@ namespace Test {
             Assert.IsTrue(x.Equals(DateTime.MinValue));
             Assert.AreEqual(DateTime.MinValue.ToString(), x.ToString());
 
-            DateTime v3;
-            var r3 = x.TryGet(out v3);
+            var r3 = x.TryGet(out var v3);
             Assert.IsFalse(r3);
             Assert.AreEqual(x.DefaultValue, v3);
         }
@@ -90,8 +88,7 @@ namespace Test {
 
             Assert.IsFalse(x.Equals(null));
 
-            string v2;
-            var r2 = x.TryGet(out v2);
+            var r2 = x.TryGet(out var v2);
             Assert.IsTrue(r2);
             Assert.AreEqual(v, v2);
 
@@ -100,8 +97,7 @@ namespace Test {
             Assert.IsTrue(x.Equals(null));
             Assert.AreEqual("", x.ToString());
 
-            string v3;
-            var r3 = x.TryGet(out v3);
+            var r3 = x.TryGet(out var v3);
             Assert.IsFalse(r3);
             Assert.AreEqual(x.DefaultValue, v3);
         }

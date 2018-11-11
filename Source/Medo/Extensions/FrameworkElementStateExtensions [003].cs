@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2010-05-14: Changed namespace.
 //2010-04-25: Changed code to be compatible with .NET 3.5.
@@ -56,7 +56,7 @@ namespace Medo.Extensions.FrameworkElementState {
 
         private const string _stateFileName = "Medo.Extensions.FrameworkElementStateExtensions.state";
         private static Dictionary<string, object> _stateDictionary;
-        private static IsolatedStorageFile _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
+        private static readonly IsolatedStorageFile _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
         private static readonly object _syncRoot = new object();
 
         private static void OpenDictionary() {
@@ -97,8 +97,7 @@ namespace Medo.Extensions.FrameworkElementState {
         private static double ReadSetting(FrameworkElement element, string property, double defaultValue) {
             lock (_syncRoot) {
                 var key = GetPath(element) + "." + property;
-                object value;
-                if (_stateDictionary.TryGetValue(key, out value)) {
+                if (_stateDictionary.TryGetValue(key, out var value)) {
                     if (value is double) {
                         return (double)value;
                     }
@@ -121,8 +120,7 @@ namespace Medo.Extensions.FrameworkElementState {
         private static WindowState ReadSetting(FrameworkElement element, string property, WindowState defaultValue) {
             lock (_syncRoot) {
                 var key = GetPath(element) + "." + property;
-                object value;
-                if (_stateDictionary.TryGetValue(key, out value)) {
+                if (_stateDictionary.TryGetValue(key, out var value)) {
                     if (value is WindowState) {
                         return (WindowState)value;
                     }
@@ -138,9 +136,8 @@ namespace Medo.Extensions.FrameworkElementState {
                 DependencyObject currentObject = element;
                 while (currentObject != null) {
                     if (path.Length > 0) { path.Append("."); }
-                    var currentElement = currentObject as FrameworkElement;
                     path.AppendFormat(currentObject.GetType().Name);
-                    if ((currentElement != null) && (!string.IsNullOrEmpty(currentElement.Name))) {
+                    if ((currentObject is FrameworkElement currentElement) && (!string.IsNullOrEmpty(currentElement.Name))) {
                         path.AppendFormat("!");
                         path.AppendFormat(currentElement.Name);
                     }

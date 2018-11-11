@@ -13,9 +13,9 @@ using Xunit.Abstractions;
 namespace Test {
     public class TwofishTests {
 
-        private readonly ITestOutputHelper output;
+        private readonly ITestOutputHelper Output;
 
-        public TwofishTests(ITestOutputHelper output) => this.output = output;
+        public TwofishTests(ITestOutputHelper output) => Output = output;
 
 
         [Fact(DisplayName = "TwoFish: Known Answers (ECB)")]
@@ -40,7 +40,7 @@ namespace Test {
                 MonteCarlo_ECB_E(test);
             }
             sw.Stop();
-            this.output.WriteLine("Duration: " + sw.ElapsedMilliseconds.ToString() + " ms");
+            Output.WriteLine("Duration: " + sw.ElapsedMilliseconds.ToString() + " ms");
         }
 
         [Fact(DisplayName = "TwoFish: Monte Carlo (ECB) Encrypt single")]
@@ -59,7 +59,7 @@ namespace Test {
                 MonteCarlo_ECB_D(test);
             }
             sw.Stop();
-            this.output.WriteLine("Duration: " + sw.ElapsedMilliseconds.ToString() + " ms");
+            Output.WriteLine("Duration: " + sw.ElapsedMilliseconds.ToString() + " ms");
         }
 
         [Fact(DisplayName = "TwoFish: Monte Carlo (ECB) Decrypt single")]
@@ -78,7 +78,7 @@ namespace Test {
                 MonteCarlo_CBC_E(test);
             }
             sw.Stop();
-            this.output.WriteLine("Duration: " + sw.ElapsedMilliseconds.ToString() + " ms");
+            Output.WriteLine("Duration: " + sw.ElapsedMilliseconds.ToString() + " ms");
         }
 
         [Fact(DisplayName = "TwoFish: Monte Carlo (CBC) Encrypt single")]
@@ -97,7 +97,7 @@ namespace Test {
                 MonteCarlo_CBC_D(test);
             }
             sw.Stop();
-            this.output.WriteLine("Duration: " + sw.ElapsedMilliseconds.ToString() + " ms");
+            Output.WriteLine("Duration: " + sw.ElapsedMilliseconds.ToString() + " ms");
         }
 
         [Fact(DisplayName = "TwoFish: Monte Carlo (CBC) Decrypt single")]
@@ -718,12 +718,12 @@ namespace Test {
         [DebuggerDisplay("{KeySize}:{Index}")]
         private struct TestBlock {
             internal TestBlock(int keySize, int index, byte[] key, byte[] iv, byte[] plainText, byte[] cipherText) {
-                this.KeySize = keySize;
-                this.Index = index;
-                this.Key = key;
-                this.IV = iv;
-                this.PlainText = plainText;
-                this.CipherText = cipherText;
+                KeySize = keySize;
+                Index = index;
+                Key = key;
+                IV = iv;
+                PlainText = plainText;
+                CipherText = cipherText;
             }
             internal int KeySize { get; }
             internal int Index { get; }

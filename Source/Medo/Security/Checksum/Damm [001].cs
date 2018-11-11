@@ -1,4 +1,4 @@
-//Copyright 2017 by Josip Medved <jmedved@jmedved.com> (www.medo64.com) MIT License
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2017-08-26: Initial version.
 
@@ -30,12 +30,12 @@ namespace Medo.Security.Checksum {
         /// <summary>
         /// Gets hash as number between 0 and 9.
         /// </summary>
-        public int HashAsNumber => this.CurrentChecksum;
+        public int HashAsNumber => CurrentChecksum;
 
         /// <summary>
         /// Gets hash as char.
         /// </summary>
-        public char HashAsChar => (char)(0x30 + this.CurrentChecksum);
+        public char HashAsChar => (char)(0x30 + CurrentChecksum);
 
 
         /// <summary>
@@ -131,9 +131,9 @@ namespace Medo.Security.Checksum {
             for (var i = ibStart; i < (ibStart + cbSize); i++) {
                 var b = array[i];
                 if ((b < 0x30) || (b > 0x39)) { throw new ArgumentOutOfRangeException(nameof(array), "Only numbers 0 to 9 are allowed."); }
-                var row = this.CurrentChecksum;
+                var row = CurrentChecksum;
                 var col = b - 0x30;
-                this.CurrentChecksum = Damm.AntisymmetricQuasigroup[row, col];
+                CurrentChecksum = Damm.AntisymmetricQuasigroup[row, col];
             }
         }
 
@@ -142,7 +142,7 @@ namespace Medo.Security.Checksum {
         /// </summary>
         /// <returns></returns>
         protected override byte[] HashFinal() {
-            return new byte[] { (byte)(0x30 + this.CurrentChecksum) };
+            return new byte[] { (byte)(0x30 + CurrentChecksum) };
         }
 
         #endregion

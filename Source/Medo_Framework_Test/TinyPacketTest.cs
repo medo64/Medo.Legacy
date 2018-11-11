@@ -15,9 +15,10 @@ namespace Test {
 
         [TestMethod()]
         public void TinyPacket_Encode_01() {
-            var target = new TinyPacket("Example", "Test");
-            target["Key1Text"] = "Value1Text";
-            target["Key2Text"] = "Value2Text";
+            var target = new TinyPacket("Example", "Test") {
+                ["Key1Text"] = "Value1Text",
+                ["Key2Text"] = "Value2Text"
+            };
 
             var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
 
@@ -26,9 +27,10 @@ namespace Test {
 
         [TestMethod()]
         public void TinyPacket_Decode_01() {
-            var data = new Dictionary<string, string>();
-            data.Add("Key1Text", "Value1Text");
-            data.Add("Key2Text", "Value2Text");
+            var data = new Dictionary<string, string> {
+                { "Key1Text", "Value1Text" },
+                { "Key2Text", "Value2Text" }
+            };
 
             TinyPacket actual = TinyPacket.Parse(UTF8Encoding.UTF8.GetBytes(@"Tiny Example Test {""Key1Text"":""Value1Text"",""Key2Text"":""Value2Text""}  "));
 
@@ -40,10 +42,11 @@ namespace Test {
 
         [TestMethod()]
         public void TinyPacket_Encode_02() {
-            var target = new TinyPacket("Example", "Test");
-            target["Key1"] = "A\n\rB";
-            target["Key2"] = "\0";
-            target["Key3"] = "\\";
+            var target = new TinyPacket("Example", "Test") {
+                ["Key1"] = "A\n\rB",
+                ["Key2"] = "\0",
+                ["Key3"] = "\\"
+            };
 
             var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
 
@@ -63,10 +66,11 @@ namespace Test {
 
         [TestMethod()]
         public void TinyPacket_Encode_NullItem_01() {
-            var target = new TinyPacket("Example", "Test");
-            target["A"] = "1";
-            target["B"] = null;
-            target["C"] = "2";
+            var target = new TinyPacket("Example", "Test") {
+                ["A"] = "1",
+                ["B"] = null,
+                ["C"] = "2"
+            };
 
             var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
 
@@ -139,9 +143,10 @@ namespace Test {
 
         [TestMethod()]
         public void TinyPacket_Encode_Indexer() {
-            var target = new TinyPacket("Example", "Test");
-            target["A"] = "0";
-            target["A"] = "1";
+            var target = new TinyPacket("Example", "Test") {
+                ["A"] = "0",
+                ["A"] = "1"
+            };
 
             var actual = UTF8Encoding.UTF8.GetString(target.GetBytes(null, omitIdentifiers: true));
 
@@ -315,7 +320,7 @@ namespace Test {
                 nEncodePlain += 1;
             }
             swEncodePlain.Stop();
-            this.TestContext.WriteLine(string.Format("TinyPacket.Encode.Plain: {0:#,##0}K packets/second", (double)nEncodePlain / swEncodePlain.ElapsedMilliseconds));
+            TestContext.WriteLine(string.Format("TinyPacket.Encode.Plain: {0:#,##0}K packets/second", (double)nEncodePlain / swEncodePlain.ElapsedMilliseconds));
 
             var nDecodePlain = 0;
             var swDecodePlain = Stopwatch.StartNew();
@@ -324,7 +329,7 @@ namespace Test {
                 nDecodePlain += 1;
             }
             swDecodePlain.Stop();
-            this.TestContext.WriteLine(string.Format("TinyPacket.Decode.Plain: {0:#,##0}K packets/second", (double)nDecodePlain / swDecodePlain.ElapsedMilliseconds));
+            TestContext.WriteLine(string.Format("TinyPacket.Decode.Plain: {0:#,##0}K packets/second", (double)nDecodePlain / swDecodePlain.ElapsedMilliseconds));
 
             var key = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
@@ -339,7 +344,7 @@ namespace Test {
                 nEncodeAes += 1;
             }
             swEncodeAes.Stop();
-            this.TestContext.WriteLine(string.Format("TinyPacket.Encode.AES: {0:#,##0}K packets/second", (double)nEncodeAes / swEncodeAes.ElapsedMilliseconds));
+            TestContext.WriteLine(string.Format("TinyPacket.Encode.AES: {0:#,##0}K packets/second", (double)nEncodeAes / swEncodeAes.ElapsedMilliseconds));
 
             Assert.AreEqual("Tiny128 ", Encoding.UTF8.GetString(bytes, 0, 8));
 
@@ -350,7 +355,7 @@ namespace Test {
                 nDecodeAes += 1;
             }
             swDecodeAes.Stop();
-            this.TestContext.WriteLine(string.Format("TinyPacket.Decode.AES: {0:#,##0}K packets/second", (double)nDecodeAes / swDecodeAes.ElapsedMilliseconds));
+            TestContext.WriteLine(string.Format("TinyPacket.Decode.AES: {0:#,##0}K packets/second", (double)nDecodeAes / swDecodeAes.ElapsedMilliseconds));
         }
 
     }

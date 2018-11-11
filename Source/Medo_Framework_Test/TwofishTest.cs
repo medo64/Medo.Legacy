@@ -714,12 +714,12 @@ namespace Test {
         [DebuggerDisplay("{KeySize}:{Index}")]
         private struct TestBlock {
             internal TestBlock(int keySize, int index, byte[] key, byte[] iv, byte[] plainText, byte[] cipherText) {
-                this.KeySize = keySize;
-                this.Index = index;
-                this.Key = key;
-                this.IV = iv;
-                this.PlainText = plainText;
-                this.CipherText = cipherText;
+                KeySize = keySize;
+                Index = index;
+                Key = key;
+                IV = iv;
+                PlainText = plainText;
+                CipherText = cipherText;
             }
             internal int KeySize { get; }
             internal int Index { get; }

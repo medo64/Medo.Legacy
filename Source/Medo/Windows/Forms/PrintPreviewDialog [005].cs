@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-04-11: Cleaned code to match FxCop 1.36 beta 2 (NormalizeStringsToUppercase).
 //2008-01-22: Returns DialogResult for ShowDialog methods.
@@ -29,63 +29,61 @@ namespace Medo.Windows.Forms {
 		/// </summary>
 		public PrintPreviewDialog()
 			: base() {
-			System.Windows.Forms.Form ppdForm = this as System.Windows.Forms.Form;
-			if (ppdForm != null) {
-				ppdForm.KeyPress += new System.Windows.Forms.KeyPressEventHandler(ppdForm_KeyPress);
-				ppdForm.Load += new System.EventHandler(ppdForm_Load);
-				ppdForm.Icon = Resources.TransparentIcon;
-				ppdForm.ShowIcon = true;
-				ppdForm.Text = Resources.Caption;
-				ppdForm.KeyPreview = true;
-				for (int i = 0; i < ppdForm.Controls.Count; i++) {
-					System.Windows.Forms.Control iControl = ppdForm.Controls[i];
-					System.Windows.Forms.ToolStrip iToolstrip = iControl as System.Windows.Forms.ToolStrip;
-					if (iToolstrip != null) {
-						for (int j = 0; j < iToolstrip.Items.Count; j++) {
-							System.Windows.Forms.ToolStripItem jItem = iToolstrip.Items[j];
-							switch (jItem.Name) {
-								case "printToolStripButton":
-									jItem.Text = Resources.Print;
-									break;
-								case "zoomToolStripSplitButton":
-									jItem.Text = Resources.Zoom;
-									break;
-								case "onepageToolStripButton":
-									jItem.Text = Resources.OnePage;
-									break;
-								case "twopagesToolStripButton":
-									jItem.Text = Resources.TwoPages;
-									break;
-								case "threepagesToolStripButton":
-									jItem.Text = Resources.ThreePages;
-									break;
-								case "fourpagesToolStripButton":
-									jItem.Text = Resources.FourPages;
-									break;
-								case "sixpagesToolStripButton":
-									jItem.Text = Resources.SixPages;
-									break;
-								case "closeToolStripButton":
-									jItem.Text = Resources.Close;
-									break;
-								case "pageToolStripLabel":
-									jItem.Text = Resources.Page;
-									break;
-								default:
-									break;
-							}//switch
-						}//for(j)
-					}//if
-				}//for(i)
-			}//if
-		}
+            if (this is System.Windows.Forms.Form ppdForm) {
+                ppdForm.KeyPress += new System.Windows.Forms.KeyPressEventHandler(ppdForm_KeyPress);
+                ppdForm.Load += new System.EventHandler(ppdForm_Load);
+                ppdForm.Icon = Resources.TransparentIcon;
+                ppdForm.ShowIcon = true;
+                ppdForm.Text = Resources.Caption;
+                ppdForm.KeyPreview = true;
+                for (int i = 0; i < ppdForm.Controls.Count; i++) {
+                    var iControl = ppdForm.Controls[i];
+                    if (iControl is System.Windows.Forms.ToolStrip iToolstrip) {
+                        for (int j = 0; j < iToolstrip.Items.Count; j++) {
+                            var jItem = iToolstrip.Items[j];
+                            switch (jItem.Name) {
+                                case "printToolStripButton":
+                                    jItem.Text = Resources.Print;
+                                    break;
+                                case "zoomToolStripSplitButton":
+                                    jItem.Text = Resources.Zoom;
+                                    break;
+                                case "onepageToolStripButton":
+                                    jItem.Text = Resources.OnePage;
+                                    break;
+                                case "twopagesToolStripButton":
+                                    jItem.Text = Resources.TwoPages;
+                                    break;
+                                case "threepagesToolStripButton":
+                                    jItem.Text = Resources.ThreePages;
+                                    break;
+                                case "fourpagesToolStripButton":
+                                    jItem.Text = Resources.FourPages;
+                                    break;
+                                case "sixpagesToolStripButton":
+                                    jItem.Text = Resources.SixPages;
+                                    break;
+                                case "closeToolStripButton":
+                                    jItem.Text = Resources.Close;
+                                    break;
+                                case "pageToolStripLabel":
+                                    jItem.Text = Resources.Page;
+                                    break;
+                                default:
+                                    break;
+                            }//switch
+                        }//for(j)
+                    }//if
+                }//for(i)
+            }//if
+        }
 
 
 		/// <summary>
 		/// Displays the control to the user.
 		/// </summary>
 		public new void Show() {
-			this.Show(null);
+			Show(null);
 		}
 
 		/// <summary>
@@ -116,7 +114,7 @@ namespace Medo.Windows.Forms {
 		/// <exception cref="System.InvalidOperationException">The current process is not running in user interactive mode. For more information, see System.Windows.Forms.SystemInformation.UserInteractive.</exception>
 		/// <exception cref="System.ArgumentException">The form specified in the owner parameter is the same as the form being shown.</exception>
 		public new DialogResult ShowDialog() {
-			return this.ShowDialog(null);
+			return ShowDialog(null);
 		}
 
 		/// <summary>
@@ -147,19 +145,17 @@ namespace Medo.Windows.Forms {
 
 		private void ppdForm_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e) {
 			if (e.KeyChar == System.Convert.ToChar(27)) {
-				System.Windows.Forms.Form form = sender as System.Windows.Forms.Form;
-				if (form != null) {
-					form.Close();
-				}
-			}
+                if (sender is System.Windows.Forms.Form form) {
+                    form.Close();
+                }
+            }
 		}
 
 		void ppdForm_Load(object sender, System.EventArgs e) {
-			System.Windows.Forms.Form form = sender as System.Windows.Forms.Form;
-			if (form != null) {
-				this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
-			}
-		}
+            if (sender is System.Windows.Forms.Form form) {
+                WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            }
+        }
 
 		#endregion
 
@@ -175,7 +171,7 @@ namespace Medo.Windows.Forms {
 			}
 
 			internal static string Zoom {
-				get { return GetInCurrentLanguage("Zoom", "Poveæanje"); }
+				get { return GetInCurrentLanguage("Zoom", "PoveÄ‡anje"); }
 			}
 
 			internal static string OnePage {
@@ -191,11 +187,11 @@ namespace Medo.Windows.Forms {
 			}
 
 			internal static string FourPages {
-				get { return GetInCurrentLanguage("Four pages", "Èetiri stranice"); }
+				get { return GetInCurrentLanguage("Four pages", "ÄŒetiri stranice"); }
 			}
 
 			internal static string SixPages {
-				get { return GetInCurrentLanguage("Six pages", "Šest stranica"); }
+				get { return GetInCurrentLanguage("Six pages", "Å est stranica"); }
 			}
 
 			internal static string Close {

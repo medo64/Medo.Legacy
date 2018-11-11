@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2015-03-30: Added option to disable all non-IPv6 traffic.
 //2015-03-29: System property .Host is sent even in encrypted messages.
@@ -54,7 +54,7 @@ namespace Medo.Net {
         /// Creates new instance.
         /// </summary>
         public TinyMessage()
-            : this(new IPEndPoint[] { 
+            : this(new IPEndPoint[] {
                 TinyMessage.DefaultIPv6MulticastEndpoint,
                 TinyMessage.DefaultIPv4MulticastEndpoint,
                 new IPEndPoint(IPAddress.IPv6Any, TinyMessage.DefaultPort),
@@ -77,8 +77,8 @@ namespace Medo.Net {
                 }
             }
 
-            this.PrivateLocalEndpoints = localEndpoints;
-            this.FilterDuplicates = true;
+            PrivateLocalEndpoints = localEndpoints;
+            FilterDuplicates = true;
         }
 
 
@@ -88,7 +88,7 @@ namespace Medo.Net {
         /// </summary>
         public IEnumerable<IPEndPoint> LocalEndpoints {
             get {
-                foreach (var endpoint in this.PrivateLocalEndpoints) {
+                foreach (var endpoint in PrivateLocalEndpoints) {
                     yield return new IPEndPoint(endpoint.Address, endpoint.Port); //to avoid somebody changing endpoint from outside
                 }
             }
@@ -100,11 +100,11 @@ namespace Medo.Net {
         /// </summary>
         /// <exception cref="System.ArgumentOutOfRangeException">Key must be 16 bytes (128 bits) in length.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Done intentionally to match common usage in other classes (e.g. RijndaelManaged).")]
-        public Byte[] Key {
-            get { return this._key; }
+        public byte[] Key {
+            get { return _key; }
             set {
                 if ((value != null) && (value.Length != 16)) { throw new ArgumentOutOfRangeException("value", "Key must be 16 bytes (128 bits) in length."); }
-                this._key = value;
+                _key = value;
             }
         }
 
@@ -113,14 +113,14 @@ namespace Medo.Net {
         /// Packets not matching given filter will not be reported in TinyPacketReceived event.
         /// If filter is null, all packets will be reported.
         /// </summary>
-        public String ProductFilter { get; set; }
+        public string ProductFilter { get; set; }
 
         /// <summary>
         /// Gets/sets filter for Operation field in the packet.
         /// Packets not matching given filter will not be reported in TinyPacketReceived event.
         /// If filter is null, all packets will be reported.
         /// </summary>
-        public String OperationFilter { get; set; }
+        public string OperationFilter { get; set; }
 
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Medo.Net {
         /// Encrypted packets will be filtered based on their IV.
         /// Unencrypted packets will not be filtered.
         /// </summary>
-        public Boolean FilterDuplicates { get; set; }
+        public bool FilterDuplicates { get; set; }
 
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace Medo.Net {
         /// Any address not IPv6 will be ignored.
         /// Needs to be set before using Send or Listen.
         /// </summary>
-        public Boolean UseOnlyIPv6 { get; set; }
+        public bool UseOnlyIPv6 { get; set; }
 
         /// <summary>
         /// Raises event when packet arrives.
@@ -151,21 +151,21 @@ namespace Medo.Net {
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Socket will be disposed in Close function.")]
         public void Listen() {
-            if (this.HasBegunListening) { throw new InvalidOperationException("Listening in progress."); }
-            this.HasBegunListening = true;
+            if (HasBegunListening) { throw new InvalidOperationException("Listening in progress."); }
+            HasBegunListening = true;
 
 #if DEBUG
             var sw = Stopwatch.StartNew();
 #endif
 
-            var endpoints = this.LocalEndpoints;
+            var endpoints = LocalEndpoints;
 
-            this.ListenCancelEvent = new ManualResetEvent(false);
-            var listeningData = new List<Tuple<IPEndPoint, Socket, IList<Object>, Thread, String>>();
+            ListenCancelEvent = new ManualResetEvent(false);
+            var listeningData = new List<Tuple<IPEndPoint, Socket, IList<object>, Thread, string>>();
 
             try {
                 foreach (var endpoint in endpoints) {
-                    if (this.UseOnlyIPv6 && (endpoint.AddressFamily != AddressFamily.InterNetworkV6)) { continue; } //skip all not IPv6
+                    if (UseOnlyIPv6 && (endpoint.AddressFamily != AddressFamily.InterNetworkV6)) { continue; } //skip all not IPv6
 
                     string tag;
                     if (endpoint.Address == IPAddress.IPv6Any) {
@@ -228,7 +228,7 @@ namespace Medo.Net {
 
                     var thread = new Thread(Run) { IsBackground = true, Name = "TinyMessage " + tag };
 
-                    var datum = new Tuple<IPEndPoint, Socket, IList<Object>, Thread, String>(endpoint, socket, multicastOptions, thread, tag);
+                    var datum = new Tuple<IPEndPoint, Socket, IList<object>, Thread, string>(endpoint, socket, multicastOptions, thread, tag);
                     Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Setup done.", tag));
 
                     thread.Start(datum);
@@ -240,7 +240,7 @@ namespace Medo.Net {
                 throw;
             }
 
-            this.ListeningData = listeningData.AsReadOnly();
+            ListeningData = listeningData.AsReadOnly();
 
 #if DEBUG
             sw.Stop();
@@ -252,10 +252,10 @@ namespace Medo.Net {
         /// Starts listeners on idependent threads.
         /// </summary>
         public async Task ListenAsync() {
-            if (this.HasBegunListening) { throw new InvalidOperationException("Listening in progress."); }
+            if (HasBegunListening) { throw new InvalidOperationException("Listening in progress."); }
 
             await Task.Run(() => {
-                this.Listen();
+                Listen();
             });
         }
 
@@ -264,21 +264,21 @@ namespace Medo.Net {
         /// Stops listeners.
         /// </summary>
         public void Close() {
-            if (this.IsListening == false) { return; } //only attempt close if all listening threads are setup.
+            if (IsListening == false) { return; } //only attempt close if all listening threads are setup.
 
 #if DEBUG
             var sw = Stopwatch.StartNew();
 #endif
 
-            this.ListenCancelEvent.Set();
+            ListenCancelEvent.Set();
 
-            Cleanup(this.ListeningData);
+            Cleanup(ListeningData);
 
-            this.ListenCancelEvent.Dispose();
-            this.ListenCancelEvent = null;
+            ListenCancelEvent.Dispose();
+            ListenCancelEvent = null;
 
-            this.ListeningData = null;
-            this.HasBegunListening = false;
+            ListeningData = null;
+            HasBegunListening = false;
 
 
 #if DEBUG
@@ -291,15 +291,15 @@ namespace Medo.Net {
         /// Stops listeners.
         /// </summary>
         public async Task CloseAsync() {
-            if (this.IsListening == false) { return; } //only attempt close if all listening threads are setup.
+            if (IsListening == false) { return; } //only attempt close if all listening threads are setup.
 
             await Task.Run(() => {
-                this.Close();
+                Close();
             });
         }
 
 
-        private static void Cleanup(IEnumerable<Tuple<IPEndPoint, Socket, IList<Object>, Thread, String>> listeningData) {
+        private static void Cleanup(IEnumerable<Tuple<IPEndPoint, Socket, IList<object>, Thread, string>> listeningData) {
 #if DEBUG
             var sw = Stopwatch.StartNew();
 #endif
@@ -308,7 +308,7 @@ namespace Medo.Net {
                 var endpoint = (IPEndPoint)item.Item1;
                 var socket = (Socket)item.Item2;
                 var multicastOptions = (IList<object>)item.Item3;
-                var tag = (String)item.Item5;
+                var tag = (string)item.Item5;
                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Socket cleanup.", tag));
 
                 if (endpoint.Address.IsIPv6Multicast) {
@@ -338,7 +338,7 @@ namespace Medo.Net {
             }
             foreach (var item in listeningData) {
                 var thread = (Thread)item.Item4;
-                var tag = (String)item.Item5;
+                var tag = (string)item.Item5;
                 Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Thread cleanup.", tag));
 
                 while (thread.IsAlive) { Task.Delay(100); }
@@ -357,24 +357,24 @@ namespace Medo.Net {
         /// <summary>
         /// Gets whether TinyMessage is in listening state.
         /// </summary>
-        public Boolean IsListening { get { return (this.ListeningData != null); } }
+        public bool IsListening { get { return (ListeningData != null); } }
 
         #endregion
 
 
         #region Receiving
 
-        private IEnumerable<Tuple<IPEndPoint, Socket, IList<Object>, Thread, String>> ListeningData;
+        private IEnumerable<Tuple<IPEndPoint, Socket, IList<object>, Thread, string>> ListeningData;
         private ManualResetEvent ListenCancelEvent = null;
 
         private void Run(object argument) {
-            var cancelEvent = this.ListenCancelEvent;
+            var cancelEvent = ListenCancelEvent;
             if (cancelEvent == null) { return; } //if cancel event has already been disposed, there must have been some exception
 
-            var data = (Tuple<IPEndPoint, Socket, IList<Object>, Thread, String>)argument;
+            var data = (Tuple<IPEndPoint, Socket, IList<object>, Thread, string>)argument;
             var endpoint = (IPEndPoint)data.Item1;
             var socket = (Socket)data.Item2;
-            var tag = (String)data.Item5;
+            var tag = (string)data.Item5;
 
             var buffer = new byte[16384];
             EndPoint remoteEP;
@@ -400,15 +400,15 @@ namespace Medo.Net {
                         }
                     }
 
-                    var receivedHandler = this.PacketReceived;
+                    var receivedHandler = PacketReceived;
                     if (receivedHandler != null) {
-                        var productFilter = this.ProductFilter;
-                        var operationFilter = this.OperationFilter;
+                        var productFilter = ProductFilter;
+                        var operationFilter = OperationFilter;
                         var remoteEndpoint = remoteEP as IPEndPoint;
 
                         var newBuffer = new byte[inCount];
                         Buffer.BlockCopy(buffer, 0, newBuffer, 0, inCount);
-                        var key = this.Key;
+                        var key = Key;
                         Task.Run(() => {
                             var packet = GetUniquePacket(tag, remoteEndpoint, newBuffer, key);
                             if (packet == null) { return; }
@@ -425,8 +425,7 @@ namespace Medo.Net {
                             var invokeArgs = new object[] { this, new TinyPacketEventArgs(packet, new IPEndPoint(endpoint.Address, endpoint.Port), remoteEndpoint) };
                             Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Raising event for packet {1}/{2} from {3}.", tag, packet.Product, packet.Operation, remoteEndpoint));
                             foreach (Delegate iDelegate in receivedHandler.GetInvocationList()) {
-                                ISynchronizeInvoke syncer = iDelegate.Target as ISynchronizeInvoke;
-                                if (syncer == null) {
+                                if (!(iDelegate.Target is ISynchronizeInvoke syncer)) {
                                     try {
                                         iDelegate.DynamicInvoke(invokeArgs);
                                     } catch (MemberAccessException) { } catch (TargetInvocationException) { }
@@ -450,11 +449,11 @@ namespace Medo.Net {
 
         #region DuplicateDetection
 
-        private const Int32 DuplicateBufferCount = 1024;
+        private const int DuplicateBufferCount = 1024;
         private readonly Guid[] DuplicateBuffer = new Guid[DuplicateBufferCount];
-        private readonly Int64[] DuplicateBufferExpiry = new Int64[DuplicateBufferCount];
-        private Int32 DuplicateBufferIndex = 0;
-        private Object DuplicateBufferLock = new object();
+        private readonly long[] DuplicateBufferExpiry = new long[DuplicateBufferCount];
+        private int DuplicateBufferIndex = 0;
+        private readonly object DuplicateBufferLock = new object();
 
         private TinyPacket GetUniquePacket(string tag, IPEndPoint remoteEndpoint, byte[] packetBuffer, byte[] key) { //returns null if there is an duplicate or error parsing.
             TinyPacket packet = null;
@@ -474,8 +473,7 @@ namespace Medo.Net {
                     return null;
                 }
 
-                int id;
-                if (int.TryParse(packet[".Id"], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out id)) {
+                if (int.TryParse(packet[".Id"], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var id)) {
                     var host = packet[".Host"];
                     if (host != null) {
                         var hostBytes = Encoding.UTF8.GetBytes(host);
@@ -499,16 +497,16 @@ namespace Medo.Net {
             }
 
             var nowTicks = DateTime.UtcNow.Ticks;
-            lock (this.DuplicateBufferLock) {
+            lock (DuplicateBufferLock) {
                 for (var i = 0; i < DuplicateBufferCount; i++) {
                     if ((DuplicateBufferExpiry[i] > nowTicks) && (DuplicateBuffer[i] == uniqueId)) { //must be non-expired and duplicate
                         Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Ignoring duplicate packet from {1}.", tag, remoteEndpoint));
                         return null;
                     }
                 }
-                this.DuplicateBuffer[this.DuplicateBufferIndex] = uniqueId;
-                this.DuplicateBufferExpiry[this.DuplicateBufferIndex] = nowTicks + TimeSpan.TicksPerSecond; //expires in a second
-                this.DuplicateBufferIndex = (this.DuplicateBufferIndex + 1) % TinyMessage.DuplicateBufferCount;
+                DuplicateBuffer[DuplicateBufferIndex] = uniqueId;
+                DuplicateBufferExpiry[DuplicateBufferIndex] = nowTicks + TimeSpan.TicksPerSecond; //expires in a second
+                DuplicateBufferIndex = (DuplicateBufferIndex + 1) % TinyMessage.DuplicateBufferCount;
             }
 
             try {
@@ -541,7 +539,7 @@ namespace Medo.Net {
             var sw = Stopwatch.StartNew();
 #endif
 
-            this.Send(packet, this.Key);
+            Send(packet, Key);
 
 #if DEBUG
             sw.Stop();
@@ -565,28 +563,28 @@ namespace Medo.Net {
 #endif
 
             var sentToAny = false;
-            var packetBytes = packet.GetBytes(this.Key);
-            foreach (var endpoint in this.PrivateLocalEndpoints) {
-                if (this.UseOnlyIPv6 && (endpoint.AddressFamily != AddressFamily.InterNetworkV6)) { continue; } //skip all not IPv6
+            var packetBytes = packet.GetBytes(Key);
+            foreach (var endpoint in PrivateLocalEndpoints) {
+                if (UseOnlyIPv6 && (endpoint.AddressFamily != AddressFamily.InterNetworkV6)) { continue; } //skip all not IPv6
 
                 if ((endpoint.AddressFamily == AddressFamily.InterNetworkV6) && endpoint.Address.IsIPv6Multicast) {
                     try {
-                        this.SendPacket(packet, packetBytes, endpoint);
+                        SendPacket(packet, packetBytes, endpoint);
                         sentToAny = true;
                     } catch (SocketException) { }
                 } else if ((endpoint.AddressFamily == AddressFamily.InterNetwork) && ((endpoint.Address.GetAddressBytes()[0] & 0xE0) == 0xE0)) {
                     try {
-                        this.SendPacket(packet, packetBytes, endpoint);
+                        SendPacket(packet, packetBytes, endpoint);
                         sentToAny = true;
                     } catch (SocketException) { }
                 }
             }
             if (!sentToAny) {
                 try {
-                    this.SendPacket(packet, packetBytes, TinyMessage.DefaultIPv6MulticastEndpoint);
+                    SendPacket(packet, packetBytes, TinyMessage.DefaultIPv6MulticastEndpoint);
                 } catch (SocketException) {
                     Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: Sending broadcast due to failure in multicast for {0}/{1}.", packet.Product, packet.Operation));
-                    this.SendPacket(packet, packetBytes, TinyMessage.DefaultIPv4BroadcastEndpoint);
+                    SendPacket(packet, packetBytes, TinyMessage.DefaultIPv4BroadcastEndpoint);
                 }
             }
 
@@ -612,7 +610,7 @@ namespace Medo.Net {
             var sw = Stopwatch.StartNew();
 #endif
 
-            this.Send(packet, remoteEndpoint, this.Key);
+            Send(packet, remoteEndpoint, Key);
 
 #if DEBUG
             sw.Stop();
@@ -639,7 +637,7 @@ namespace Medo.Net {
             var sw = Stopwatch.StartNew();
 #endif
 
-            this.SendPacket(packet, packet.GetBytes(key), remoteEndpoint);
+            SendPacket(packet, packet.GetBytes(key), remoteEndpoint);
 
 #if DEBUG
             sw.Stop();
@@ -657,7 +655,7 @@ namespace Medo.Net {
         public async Task SendAsync(TinyPacket packet) {
             if (packet == null) { throw new ArgumentNullException("packet", "Packet cannot be null."); }
 
-            await SendAsync(packet, this.Key);
+            await SendAsync(packet, Key);
         }
 
         /// <summary>
@@ -672,7 +670,7 @@ namespace Medo.Net {
             if ((key != null) && (key.Length != 16)) { throw new ArgumentOutOfRangeException("key", "Key must be 16 bytes (128 bits) in length."); }
 
             await Task.Run(() => {
-                this.Send(packet, key);
+                Send(packet, key);
             });
         }
 
@@ -689,7 +687,7 @@ namespace Medo.Net {
             if ((remoteEndpoint.AddressFamily != AddressFamily.InterNetwork) && (remoteEndpoint.AddressFamily != AddressFamily.InterNetworkV6)) { throw new ArgumentOutOfRangeException("remoteEndpoint", "Only IPv4 and IPv6 endpoints are supported."); }
 
             await Task.Run(() => {
-                this.Send(packet, remoteEndpoint);
+                Send(packet, remoteEndpoint);
             });
         }
 
@@ -708,7 +706,7 @@ namespace Medo.Net {
             if ((key != null) && (key.Length != 16)) { throw new ArgumentOutOfRangeException("key", "Key must be 16 bytes (128 bits) in length."); }
 
             await Task.Run(() => {
-                this.Send(packet, remoteEndpoint, key);
+                Send(packet, remoteEndpoint, key);
             });
         }
 
@@ -723,7 +721,7 @@ namespace Medo.Net {
                 var totalAvailable = 0;
                 var totalFailed = 0;
                 List<Exception> exceptions = null;
-                foreach (var netInterface in this.GetApplicableNetworkInterfaces(remoteEndpoint.AddressFamily)) {
+                foreach (var netInterface in GetApplicableNetworkInterfaces(remoteEndpoint.AddressFamily)) {
                     foreach (var unicast in netInterface.GetIPProperties().UnicastAddresses) {
                         if (unicast.Address.AddressFamily != AddressFamily.InterNetwork) { continue; }
                         totalAvailable += 1;
@@ -811,7 +809,7 @@ namespace Medo.Net {
         /// <summary>
         /// Default port for TinyMessage protocol.
         /// </summary>
-        public static Int32 DefaultPort { get { return 5104; } }
+        public static int DefaultPort { get { return 5104; } }
 
 
         private static readonly IPEndPoint _defaultIPv4BroadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, TinyMessage.DefaultPort);
@@ -841,8 +839,8 @@ namespace Medo.Net {
         private DateTime CacheNetworkInterfacesExpiry = DateTime.UtcNow;
 
         private IEnumerable<NetworkInterface> GetApplicableNetworkInterfaces(AddressFamily family) {
-            var networkInterfaceCache = (family == AddressFamily.InterNetworkV6) ? this.CacheNetworkInterfacesIPv6 : this.CacheNetworkInterfacesIPv4;
-            if ((networkInterfaceCache.Count == 0) || (DateTime.UtcNow > this.CacheNetworkInterfacesExpiry)) {
+            var networkInterfaceCache = (family == AddressFamily.InterNetworkV6) ? CacheNetworkInterfacesIPv6 : CacheNetworkInterfacesIPv4;
+            if ((networkInterfaceCache.Count == 0) || (DateTime.UtcNow > CacheNetworkInterfacesExpiry)) {
                 var familyComponent = (family == AddressFamily.InterNetworkV6) ? NetworkInterfaceComponent.IPv6 : NetworkInterfaceComponent.IPv4;
                 foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces()) {
                     if (netInterface.OperationalStatus != OperationalStatus.Up) { continue; }
@@ -852,7 +850,7 @@ namespace Medo.Net {
                     if (!netInterface.Supports(familyComponent)) { continue; }
                     networkInterfaceCache.Add(netInterface);
                 }
-                this.CacheNetworkInterfacesExpiry = DateTime.UtcNow.AddMinutes(5); //refresh every N minutes
+                CacheNetworkInterfacesExpiry = DateTime.UtcNow.AddMinutes(5); //refresh every N minutes
             }
             foreach (var netInterface in networkInterfaceCache) {
                 yield return netInterface;
@@ -860,7 +858,7 @@ namespace Medo.Net {
         }
 
         private IEnumerable<UnicastIPAddressInformation> GetApplicableAddressInformation(AddressFamily family) {
-            foreach (var netInterface in this.GetApplicableNetworkInterfaces(family)) {
+            foreach (var netInterface in GetApplicableNetworkInterfaces(family)) {
                 foreach (var unicast in netInterface.GetIPProperties().UnicastAddresses) {
                     if (unicast.Address.AddressFamily == family) {
                         yield return unicast;
@@ -878,7 +876,7 @@ namespace Medo.Net {
         /// Clean up any resources being used.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -888,13 +886,13 @@ namespace Medo.Net {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.Close();
+                Close();
             }
         }
 
         #endregion
 
-        private static Boolean IsRunningOnMono { get { return (Type.GetType("Mono.Runtime") != null); } }
+        private static bool IsRunningOnMono { get { return (Type.GetType("Mono.Runtime") != null); } }
 
     }
 
@@ -905,7 +903,7 @@ namespace Medo.Net {
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     [DebuggerDisplay(@"{Product + ""/"" + Operation + "" - "" + Items.Count + "" items""}")]
-    public class TinyPacket : IDisposable, IEnumerable<KeyValuePair<String, String>> {
+    public class TinyPacket : IDisposable, IEnumerable<KeyValuePair<string, string>> {
 
         /// <summary>
         /// Creates new instance
@@ -914,7 +912,7 @@ namespace Medo.Net {
         /// <param name="operation">Message type.</param>
         /// <exception cref="System.ArgumentNullException">Product is null or empty. -or- Operation is null or empty.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Product/Operation length cannot be more than 32 characters. -or- Product/Operation must contain only letters and digits.</exception>
-        public TinyPacket(String product, String operation) {
+        public TinyPacket(string product, string operation) {
             if (string.IsNullOrEmpty(product)) { throw new ArgumentNullException("product", "Product is null or empty."); }
             if (product.Length > 32) { throw new ArgumentOutOfRangeException("product", "Product length cannot be more than 32 characters."); }
             foreach (var ch in product) { if (!char.IsLetterOrDigit(ch)) { throw new ArgumentOutOfRangeException("product", "Product must contain only letters and digits"); } }
@@ -922,30 +920,30 @@ namespace Medo.Net {
             if (operation.Length > 32) { throw new ArgumentOutOfRangeException("operation", "Operation length cannot be more than 32 characters."); }
             foreach (var ch in operation) { if (!char.IsLetterOrDigit(ch)) { throw new ArgumentOutOfRangeException("operation", "Operation must contain only letters and digits"); } }
 
-            this.Product = product;
-            this.Operation = operation;
-            this.Items = new Dictionary<string, string>();
+            Product = product;
+            Operation = operation;
+            Items = new Dictionary<string, string>();
         }
 
 
-        private TinyPacket(String product, String operation, IDictionary<String, String> items, byte[] iv) {
-            this.Product = product;
-            this.Operation = operation;
-            this.Items = items;
-            this.WasParsed = true;
-            this.AesIV = iv;
+        private TinyPacket(string product, string operation, IDictionary<string, string> items, byte[] iv) {
+            Product = product;
+            Operation = operation;
+            Items = items;
+            WasParsed = true;
+            AesIV = iv;
         }
 
 
         /// <summary>
         /// Gets name of product.
         /// </summary>
-        public String Product { get; private set; }
+        public string Product { get; private set; }
 
         /// <summary>
         /// Gets operation.
         /// </summary>
-        public String Operation { get; private set; }
+        public string Operation { get; private set; }
 
 
         /// <summary>
@@ -953,8 +951,8 @@ namespace Medo.Net {
         /// Data is only valid for parsed packets.
         /// Non-parsed packets will always return False.
         /// </summary>
-        public Boolean WasEncrypted {
-            get { return (this.AesIV != null); }
+        public bool WasEncrypted {
+            get { return (AesIV != null); }
         }
 
         /// <summary>
@@ -963,9 +961,9 @@ namespace Medo.Net {
         /// Non-parsed packets will always return null.
         /// </summary>
         public byte[] GetIV() {
-            if (this.AesIV == null) { return null; }
-            var bytes = new byte[this.AesIV.Length];
-            Buffer.BlockCopy(this.AesIV, 0, bytes, 0, bytes.Length);
+            if (AesIV == null) { return null; }
+            var bytes = new byte[AesIV.Length];
+            Buffer.BlockCopy(AesIV, 0, bytes, 0, bytes.Length);
             return bytes;
         }
 
@@ -987,13 +985,13 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Key is null or empty.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Key length cannot be more than 32 characters. -or- Key must contain only letters, digits, and underscore.</exception>
         public void Add(string key, string value) {
-            if (this.WasParsed) { throw new NotSupportedException("Data is read-only."); }
+            if (WasParsed) { throw new NotSupportedException("Data is read-only."); }
 
             if (string.IsNullOrEmpty(key)) { throw new ArgumentNullException("key", "Key is null or empty."); }
             if (key.Length > 32) { throw new ArgumentOutOfRangeException("key", "Key length cannot be more than 32 characters."); }
             foreach (var ch in key) { if (!char.IsLetterOrDigit(ch) && (ch != '_')) { throw new ArgumentOutOfRangeException("key", "Key must contain only letters, digits, and underscore."); } }
 
-            this.Items.Add(key, value);
+            Items.Add(key, value);
         }
 
         /// <summary>
@@ -1003,26 +1001,26 @@ namespace Medo.Net {
         /// <exception cref="System.NotSupportedException">Data is read-only.</exception>
         /// <exception cref="System.ArgumentNullException">Key is null or empty.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Key length cannot be more than 32 characters. -or- Key must contain only letters, digits, and underscore.</exception>
-        public String this[String key] {
+        public string this[string key] {
             get {
-                if (this.Items == null) { return null; }
-                if (this.Items.ContainsKey(key)) {
-                    return this.Items[key];
+                if (Items == null) { return null; }
+                if (Items.ContainsKey(key)) {
+                    return Items[key];
                 } else {
                     return null;
                 }
             }
             set {
-                if (this.WasParsed) { throw new NotSupportedException("Data is read-only."); }
+                if (WasParsed) { throw new NotSupportedException("Data is read-only."); }
 
                 if (string.IsNullOrEmpty(key)) { throw new ArgumentNullException("key", "Key is null or empty."); }
                 if (key.Length > 32) { throw new ArgumentOutOfRangeException("key", "Key length cannot be more than 32 characters."); }
                 foreach (var ch in key) { if (!char.IsLetterOrDigit(ch) && (ch != '_')) { throw new ArgumentOutOfRangeException("key", "Key must contain only letters, digits, and underscore."); } }
 
-                if (this.Items.ContainsKey(key)) {
-                    this.Items[key] = value;
+                if (Items.ContainsKey(key)) {
+                    Items[key] = value;
                 } else {
-                    this.Items.Add(key, value);
+                    Items.Add(key, value);
                 }
             }
         }
@@ -1035,8 +1033,8 @@ namespace Medo.Net {
         /// Notice that .Id and .Host entries will be added in non-encrypted packets in order to facilitate duplicate discovery.
         /// </summary>
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
-        public Byte[] GetBytes() {
-            return this.GetBytes(null, omitIdentifiers: false);
+        public byte[] GetBytes() {
+            return GetBytes(null, omitIdentifiers: false);
         }
 
         /// <summary>
@@ -1047,7 +1045,7 @@ namespace Medo.Net {
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Key must be 16 bytes (128 bits) in length.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Nested streams in using statement are safe to dispose multiple times.")]
-        public Byte[] GetBytes(Byte[] key) {
+        public byte[] GetBytes(byte[] key) {
             return GetBytes(key, omitIdentifiers: false);
         }
 
@@ -1060,14 +1058,14 @@ namespace Medo.Net {
         /// <exception cref="System.InvalidOperationException">Packet length exceeds 65507 bytes.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Key must be 16 bytes (128 bits) in length.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Nested streams in using statement are safe to dispose multiple times.")]
-        public Byte[] GetBytes(Byte[] key, Boolean omitIdentifiers) {
+        public byte[] GetBytes(byte[] key, bool omitIdentifiers) {
 #if DEBUG
             var sw = Stopwatch.StartNew();
 #endif
 
             if (key == null) {
                 using (var stream = new MemoryStream(DefaultStreamCapacity)) {
-                    this.EncodeToStream(stream, omitIdentifiers, isEncrypted: false);
+                    EncodeToStream(stream, omitIdentifiers, isEncrypted: false);
                     if (stream.Position > 65507) { throw new InvalidOperationException("Packet length exceeds 65507 bytes."); }
 
 #if DEBUG
@@ -1094,7 +1092,7 @@ namespace Medo.Net {
                     stream.Write(BytesHeaderTiny128, 0, BytesHeaderTiny128.Length);
                     stream.Write(iv, 0, iv.Length);
 
-                    this.EncodeToStream(cryptoStream, omitIdentifiers, isEncrypted: true);
+                    EncodeToStream(cryptoStream, omitIdentifiers, isEncrypted: true);
                     cryptoStream.FlushFinalBlock();
 
                     stream.Position = 0;
@@ -1117,19 +1115,19 @@ namespace Medo.Net {
 
             stream.Write(BytesHeaderTiny, 0, BytesHeaderTiny.Length);
 
-            var productBytes = encoding.GetBytes(this.Product);
+            var productBytes = encoding.GetBytes(Product);
             stream.Write(productBytes, 0, productBytes.Length);
             stream.WriteByte(0x20);
 
-            var operationBytes = encoding.GetBytes(this.Operation);
+            var operationBytes = encoding.GetBytes(Operation);
             stream.Write(operationBytes, 0, operationBytes.Length);
             stream.WriteByte(0x20);
 
             var addComma = false;
-            if (this.Items != null) {
+            if (Items != null) {
                 stream.WriteByte(0x7B); //{
                 if (!omitIdentifiers) {
-                    if (!isEncrypted && !this.Items.ContainsKey(".Id")) { //IV can be ID for encrypted packets
+                    if (!isEncrypted && !Items.ContainsKey(".Id")) { //IV can be ID for encrypted packets
                         var idBytes = new byte[4];
                         TinyPacket.Random.Value.GetBytes(idBytes);
                         stream.WriteByte(0x22); //"
@@ -1141,7 +1139,7 @@ namespace Medo.Net {
                         stream.WriteByte(0x22); //"
                         addComma = true;
                     }
-                    if (!this.Items.ContainsKey(".Host")) {
+                    if (!Items.ContainsKey(".Host")) {
                         if (addComma) { stream.WriteByte(0x2C); } //,
                         stream.WriteByte(0x22); //"
                         WriteText(stream, ".Host");
@@ -1153,7 +1151,7 @@ namespace Medo.Net {
                         addComma = true;
                     }
                 }
-                foreach (var item in this.Items) {
+                foreach (var item in Items) {
                     if (addComma) { stream.WriteByte(0x2C); } //,
                     stream.WriteByte(0x22); //"
                     WriteText(stream, item.Key);
@@ -1218,7 +1216,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        internal static byte[] ParseIV(Byte[] buffer, Int32 offset, Int32 count) {
+        internal static byte[] ParseIV(byte[] buffer, int offset, int count) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
@@ -1239,7 +1237,7 @@ namespace Medo.Net {
         /// <param name="buffer">Byte array.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        public static TinyPacket Parse(Byte[] buffer) {
+        public static TinyPacket Parse(byte[] buffer) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             return TinyPacket.Parse(buffer, 0, buffer.Length);
         }
@@ -1251,7 +1249,7 @@ namespace Medo.Net {
         /// <param name="key">Decryption key.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        public static TinyPacket Parse(Byte[] buffer, byte[] key) {
+        public static TinyPacket Parse(byte[] buffer, byte[] key) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             return TinyPacket.Parse(buffer, 0, buffer.Length, key);
         }
@@ -1261,11 +1259,11 @@ namespace Medo.Net {
         /// </summary>
         /// <param name="buffer">Byte array.</param>
         /// <param name="offset">Starting offset.</param>
-        /// <param name="count">Total lenght.</param>
+        /// <param name="count">Total length.</param>
         /// <exception cref="System.ArgumentNullException">Buffer is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
-        public static TinyPacket Parse(Byte[] buffer, Int32 offset, Int32 count) {
+        public static TinyPacket Parse(byte[] buffer, int offset, int count) {
             return TinyPacket.Parse(buffer, offset, count, null);
         }
 
@@ -1280,7 +1278,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentOutOfRangeException">Offset is less than zero. -or- Count is less than zero. -or- The sum of offset and count is greater than the length of buffer.</exception>
         /// <exception cref="System.FormatException">Cannot parse packet.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "Nested streams in using statement are safe to dispose multiple times.")]
-        public static TinyPacket Parse(Byte[] buffer, Int32 offset, Int32 count, byte[] key) {
+        public static TinyPacket Parse(byte[] buffer, int offset, int count, byte[] key) {
             if (buffer == null) { throw new ArgumentNullException("buffer", "Buffer is null."); }
             if (offset < 0) { throw new ArgumentOutOfRangeException("offset", "Index is less than zero."); }
             if (count < 0) { throw new ArgumentOutOfRangeException("count", "Count is less than zero."); }
@@ -1378,7 +1376,8 @@ namespace Medo.Net {
                                 case '{': state = JsonState.LookingForNameStart; break;
                                 default: throw new System.FormatException("Cannot find item start.");
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForNameStart: {
                             switch (ch) {
@@ -1387,7 +1386,8 @@ namespace Medo.Net {
                                 case '\"': state = JsonState.LookingForNameEnd; break;
                                 default: throw new System.FormatException("Cannot find key name start.");
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForNameEnd: {
                             switch (ch) {
@@ -1395,7 +1395,8 @@ namespace Medo.Net {
                                 case '\"': state = JsonState.LookingForPairSeparator; break;
                                 default: sbName.Append(ch); break;
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForPairSeparator: {
                             switch (ch) {
@@ -1403,7 +1404,8 @@ namespace Medo.Net {
                                 case ':': state = JsonState.LookingForValueStart; break;
                                 default: throw new System.FormatException("Cannot find name/value separator.");
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForValueStart: {
                             switch (ch) {
@@ -1412,7 +1414,8 @@ namespace Medo.Net {
                                 case 'n': state = JsonState.LookingForNullChar2; break;
                                 default: throw new System.FormatException("Cannot find key value start.");
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForValueEnd: {
                             switch (ch) {
@@ -1431,21 +1434,24 @@ namespace Medo.Net {
                                     break;
                                 default: sbValue.Append(ch); break;
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForNullChar2: {
                             switch (ch) {
                                 case 'u': state = JsonState.LookingForNullChar3; break;
                                 default: throw new System.FormatException("Cannot find null.");
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForNullChar3: {
                             switch (ch) {
                                 case 'l': state = JsonState.LookingForNullChar4; break;
                                 default: throw new System.FormatException("Cannot find null.");
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForNullChar4: {
                             switch (ch) {
@@ -1462,7 +1468,8 @@ namespace Medo.Net {
                                     break;
                                 default: throw new System.FormatException("Cannot find null.");
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.LookingForObjectEnd: {
                             switch (ch) {
@@ -1471,14 +1478,16 @@ namespace Medo.Net {
                                 case '}': state = JsonState.DeadEnd; break;
                                 default: throw new System.FormatException("Cannot find item start.");
                             }
-                        } break;
+                        }
+                        break;
 
                     case JsonState.DeadEnd: {
                             switch (ch) {
                                 case ' ': break;
                                 default: throw new System.FormatException("Unexpected data.");
                             }
-                        } break;
+                        }
+                        break;
 
                     default: throw new System.FormatException("Unexpected state.");
 
@@ -1500,7 +1509,7 @@ namespace Medo.Net {
                 case 't': return System.Convert.ToChar(0x09).ToString();
                 case 'u':
                     var hex = new string(new char[] { jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue(), jsonText.Dequeue() });
-                    var codepoint = UInt32.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    var codepoint = uint.Parse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                     return System.Convert.ToChar(codepoint).ToString();
                 default: throw new System.FormatException("Cannot decode escape sequence.");
             }
@@ -1538,7 +1547,7 @@ namespace Medo.Net {
             return encoding.GetString(bytes.ToArray());
         }
 
-        private static bool IsMatchingPrefix(byte[] buffer, Int32 offset, byte[] prefix) {
+        private static bool IsMatchingPrefix(byte[] buffer, int offset, byte[] prefix) {
             if (offset + prefix.Length > buffer.Length) { return false; }
             for (int i = 0; i < prefix.Length; i++) {
                 if (buffer[offset + i] != prefix[i]) { return false; }
@@ -1583,8 +1592,8 @@ namespace Medo.Net {
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Object is intentionally not disposed.")]
         public TinyPacket Clone() {
-            var clone = new TinyPacket(this.Product, this.Operation);
-            foreach (var item in this.Items) {
+            var clone = new TinyPacket(Product, Operation);
+            foreach (var item in Items) {
                 if (!item.Key.StartsWith(".", StringComparison.Ordinal)) {
                     clone.Add(item.Key, item.Value);
                 }
@@ -1597,18 +1606,18 @@ namespace Medo.Net {
         /// Determines whether the specified object is equal to the current object.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
-        public override Boolean Equals(Object obj) {
+        public override bool Equals(object obj) {
             return base.Equals(obj);
         }
 
         /// <summary>
         /// Serves as a hash function for a particular type.
         /// </summary>
-        public override Int32 GetHashCode() {
+        public override int GetHashCode() {
             unchecked {
                 int hash = 17;
-                hash = hash * 31 + this.Product.GetHashCode();
-                hash = hash * 31 + this.Operation.GetHashCode();
+                hash = hash * 31 + Product.GetHashCode();
+                hash = hash * 31 + Operation.GetHashCode();
                 return hash;
             }
         }
@@ -1620,7 +1629,7 @@ namespace Medo.Net {
         /// Clean up any resources being used.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -1630,9 +1639,9 @@ namespace Medo.Net {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.Product = null;
-                this.Operation = null;
-                this.Items.Clear();
+                Product = null;
+                Operation = null;
+                Items.Clear();
             }
         }
 
@@ -1643,8 +1652,8 @@ namespace Medo.Net {
         /// <summary>
         /// Returns an enumerator.
         /// </summary>
-        public IEnumerator<KeyValuePair<String, String>> GetEnumerator() {
-            foreach (var item in this.Items) {
+        public IEnumerator<KeyValuePair<string, string>> GetEnumerator() {
+            foreach (var item in Items) {
                 if (!item.Key.StartsWith(".", StringComparison.Ordinal)) {
                     yield return item;
                 }
@@ -1655,7 +1664,7 @@ namespace Medo.Net {
         /// Returns an enumerator.
         /// </summary>
         IEnumerator IEnumerable.GetEnumerator() {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         #endregion
@@ -1677,11 +1686,9 @@ namespace Medo.Net {
         /// <param name="remoteEndpoint">Remote end point.</param>
         /// <exception cref="System.ArgumentNullException">Packet cannot be null.</exception>
         public TinyPacketEventArgs(TinyPacket packet, IPEndPoint localEndpoint, IPEndPoint remoteEndpoint) {
-            if (packet == null) { throw new ArgumentNullException("packet", "Packet cannot be null."); }
-
-            this.Packet = packet;
-            this.LocalEndpoint = localEndpoint;
-            this.RemoteEndpoint = remoteEndpoint;
+            Packet = packet ?? throw new ArgumentNullException("packet", "Packet cannot be null.");
+            LocalEndpoint = localEndpoint;
+            RemoteEndpoint = remoteEndpoint;
         }
 
 

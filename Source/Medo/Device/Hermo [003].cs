@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2015-03-18: Fixed error measurement mixup.
 //2015-03-15: Works under Mono (and Linux).
@@ -34,20 +34,21 @@ namespace Medo.Device {
             portName = portName.Trim();
             foreach (var systemPortName in SerialPort.GetPortNames()) { //match system casing
                 if (string.Equals(portName, systemPortName, StringComparison.OrdinalIgnoreCase)) {
-                    this.PortName = systemPortName;
+                    PortName = systemPortName;
                     foundPort = true;
                     break;
                 }
             }
             if (!foundPort) { throw new ArgumentOutOfRangeException("portName", "Unknown port name."); }
 
-            this.SerialPort = new SerialPort(this.PortName, 9600, Parity.None, 8, StopBits.One);
-            this.SerialPort.Encoding = ASCIIEncoding.ASCII;
-            this.SerialPort.NewLine = "\n";
-            this.SerialPort.ReadTimeout = 2500;
-            this.SerialPort.WriteTimeout = 1000;
-            this.SerialPort.DtrEnable = true;
-            this.SerialPort.RtsEnable = true;
+            SerialPort = new SerialPort(PortName, 9600, Parity.None, 8, StopBits.One) {
+                Encoding = ASCIIEncoding.ASCII,
+                NewLine = "\n",
+                ReadTimeout = 2500,
+                WriteTimeout = 1000,
+                DtrEnable = true,
+                RtsEnable = true
+            };
         }
 
 
@@ -65,27 +66,27 @@ namespace Medo.Device {
         /// <exception cref="System.IO.IOException">Cannot open port.</exception>
         public void Open() {
             try {
-                this.SerialPort.Open();
+                SerialPort.Open();
             } catch (Exception ex) {
                 throw new IOException(ex.Message, ex);
             }
 
-            this.ThreadCancelEvent = new ManualResetEvent(false);
-            this.Thread = new Thread(Run) { CurrentCulture = CultureInfo.InvariantCulture, IsBackground = true, Name = "Hermo @" + this.PortName };
-            this.Thread.Start();
+            ThreadCancelEvent = new ManualResetEvent(false);
+            Thread = new Thread(Run) { CurrentCulture = CultureInfo.InvariantCulture, IsBackground = true, Name = "Hermo @" + PortName };
+            Thread.Start();
         }
 
         /// <summary>
         /// Closes a connection.
         /// </summary>
         public void Close() {
-            if (this.SerialPort.IsOpen) {
-                this.SerialPort.Close();
-                this.ThreadCancelEvent.Set();
-                while (this.Thread.IsAlive) { Thread.Sleep(1); }
-                this.ThreadCancelEvent.Close();
-                this.ThreadCancelEvent = null;
-                this.Thread = null;
+            if (SerialPort.IsOpen) {
+                SerialPort.Close();
+                ThreadCancelEvent.Set();
+                while (Thread.IsAlive) { Thread.Sleep(1); }
+                ThreadCancelEvent.Close();
+                ThreadCancelEvent = null;
+                Thread = null;
             }
         }
 
@@ -94,7 +95,7 @@ namespace Medo.Device {
         /// Gets if connection toward Hermo is open.
         /// </summary>
         public bool IsOpen {
-            get { return this.SerialPort.IsOpen; }
+            get { return SerialPort.IsOpen; }
         }
 
 
@@ -104,7 +105,7 @@ namespace Medo.Device {
         /// Disposes used resources.
         /// </summary>
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -114,8 +115,8 @@ namespace Medo.Device {
         /// <param name="disposing">If true, managed resources are to be disposed.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.Close();
-                this.SerialPort.Dispose();
+                Close();
+                SerialPort.Dispose();
             }
         }
 
@@ -125,7 +126,7 @@ namespace Medo.Device {
         #region Reading
 
         private readonly object ReadingsSyncRoot = new object();
-        private readonly Dictionary<Int64, KeyValuePair<HermoReading, DateTime>> ReadingCache = new Dictionary<Int64, KeyValuePair<HermoReading, DateTime>>();
+        private readonly Dictionary<long, KeyValuePair<HermoReading, DateTime>> ReadingCache = new Dictionary<long, KeyValuePair<HermoReading, DateTime>>();
         private static int ReadingValidityInSeconds = 15;
 
         /// <summary>
@@ -134,8 +135,8 @@ namespace Medo.Device {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Calling the method two times in succession creates different results.")]
         public IEnumerable<HermoReading> GetReadings() {
             var readings = new List<HermoReading>();
-            lock (this.ReadingsSyncRoot) {
-                foreach (var item in this.ReadingCache) {
+            lock (ReadingsSyncRoot) {
+                foreach (var item in ReadingCache) {
                     var reading = item.Value.Key;
                     var expiry = item.Value.Value;
                     if (expiry > DateTime.UtcNow) {
@@ -143,7 +144,7 @@ namespace Medo.Device {
                     }
                 }
             }
-            readings.Sort(delegate(HermoReading reading1, HermoReading reading2) { return reading1.Code.CompareTo(reading2.Code); }); //so that results are always in same order
+            readings.Sort(delegate (HermoReading reading1, HermoReading reading2) { return reading1.Code.CompareTo(reading2.Code); }); //so that results are always in same order
 
             foreach (var reading in readings) {
                 yield return reading;
@@ -156,7 +157,7 @@ namespace Medo.Device {
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Calling the method two times in succession creates different results.")]
         public IEnumerable<HermoReading> GetTemperatureReadings() {
-            foreach (var reading in this.GetReadings()) {
+            foreach (var reading in GetReadings()) {
                 if (reading.HasTemperature) {
                     yield return reading;
                 }
@@ -191,21 +192,21 @@ namespace Medo.Device {
 
             var key = reading.Code;
             var value = new KeyValuePair<HermoReading, DateTime>(reading, expiry);
-            lock (this.ReadingsSyncRoot) {
-                if (this.ReadingCache.ContainsKey(key)) {
-                    if (reading.HasTemperature || (this.ReadingCache[key].Value.AddSeconds(-Hermo.ReadingValidityInSeconds / 2) > DateTime.UtcNow)) { //overwrite cache if new one has temperature or it is about to expire; to avoid overwrite without temperature
-                        this.ReadingCache[key] = value;
+            lock (ReadingsSyncRoot) {
+                if (ReadingCache.ContainsKey(key)) {
+                    if (reading.HasTemperature || (ReadingCache[key].Value.AddSeconds(-Hermo.ReadingValidityInSeconds / 2) > DateTime.UtcNow)) { //overwrite cache if new one has temperature or it is about to expire; to avoid overwrite without temperature
+                        ReadingCache[key] = value;
                     }
                 } else {
-                    this.ReadingCache.Add(key, value);
+                    ReadingCache.Add(key, value);
                 }
             }
 
-            var eh = this.DeviceRead;
+            var eh = DeviceRead;
             if (eh != null) { eh.Invoke(this, e); }
 
             if ((e != null) && (reading.HasTemperature)) {
-                var eh2 = this.TemperatureRead;
+                var eh2 = TemperatureRead;
                 if (eh2 != null) { eh2.Invoke(this, e); }
             }
         }
@@ -220,12 +221,12 @@ namespace Medo.Device {
 
         private void Run() {
             try {
-                while (!this.ThreadCancelEvent.WaitOne(0, false)) {
+                while (!ThreadCancelEvent.WaitOne(0, false)) {
                     try {
-                        if (this.SerialPort.IsOpen) {
-                            var line = this.SerialPort.ReadLine();
+                        if (SerialPort.IsOpen) {
+                            var line = SerialPort.ReadLine();
                             var reading = ParseLine(line);
-                            if (reading != null) { this.OnDeviceRead(new HermoReadingEventArgs(reading)); }
+                            if (reading != null) { OnDeviceRead(new HermoReadingEventArgs(reading)); }
                         } else {
                             ResetSerialPort();
                         }
@@ -244,12 +245,12 @@ namespace Medo.Device {
 
         private void ResetSerialPort() {
             try {
-                if (this.SerialPort.IsOpen) { this.SerialPort.Close(); }
-                for (var i = 0; i < this.SerialPort.ReadTimeout / 100; i++) {
-                    if (this.ThreadCancelEvent.WaitOne(0, false)) { break; }
+                if (SerialPort.IsOpen) { SerialPort.Close(); }
+                for (var i = 0; i < SerialPort.ReadTimeout / 100; i++) {
+                    if (ThreadCancelEvent.WaitOne(0, false)) { break; }
                     Thread.Sleep(100);
                 }
-                this.SerialPort.Open();
+                SerialPort.Open();
             } catch (IOException) {
                 Thread.Sleep(100);
             } catch (UnauthorizedAccessException) {
@@ -257,7 +258,7 @@ namespace Medo.Device {
             }
         }
 
-        private static HermoReading ParseLine(String value) {
+        private static HermoReading ParseLine(string value) {
             var bytes = GetBytesFromHex(value); //all bytes are LSB, in 1-wire orders
             if (bytes == null) { return null; }
 
@@ -285,12 +286,14 @@ namespace Medo.Device {
                         case 0x10: { //DS18S20
                                 var reading = ParseBytesForDS18S20(code, bytes);
                                 if (reading != null) { return reading; }
-                            } break;
+                            }
+                            break;
 
                         case 0x28: { //DS18B20
                                 var reading = ParseBytesForDS18B20(code, bytes);
                                 if (reading != null) { return reading; }
-                            } break;
+                            }
+                            break;
 
                     }
                 }
@@ -343,8 +346,7 @@ namespace Medo.Device {
                 var ch = value[i];
                 if (char.IsWhiteSpace(ch) || (ch == ',') || (ch == '-') || (ch == ':')) { continue; } //ignore whitespaces and some other characters
 
-                byte nibble;
-                if (byte.TryParse(value.Substring(i, 1), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out nibble)) {
+                if (byte.TryParse(value.Substring(i, 1), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var nibble)) {
                     if (lowNibble.HasValue) {
                         bytes.Push((byte)((nibble << 4) | lowNibble));
                         lowNibble = null;
@@ -392,26 +394,26 @@ namespace Medo.Device {
         /// <param name="code">64-bit device code.</param>
         /// <param name="temperature">Temperature reading. If NaN, temperature couldn't be read.</param>
         /// <param name="resolution">Resolution of a temperature reading.</param>
-        internal HermoReading(Int64 code, Double temperature, Double resolution) {
-            this.Code = code;
-            this.Temperature = temperature;
-            this.Resolution = resolution;
+        internal HermoReading(long code, double temperature, double resolution) {
+            Code = code;
+            Temperature = temperature;
+            Resolution = resolution;
         }
 
 
         /// <summary>
         /// Gets full 1-wire device code.
         /// </summary>
-        public Int64 Code { get; private set; }
+        public long Code { get; private set; }
 
         /// <summary>
         /// Gets 1-wire device code folded into 32-bits.
         /// Folding is done using XOR between high and low halves of 64-bit code.
         /// </summary>
-        public Int32 Code32 {
+        public int Code32 {
             get {
-                var msb = (int)((this.Code >> 32) & 0xFFFFFFFF);
-                var lsb = (int)(this.Code & 0xFFFFFFFF);
+                var msb = (int)((Code >> 32) & 0xFFFFFFFF);
+                var lsb = (int)(Code & 0xFFFFFFFF);
                 return msb ^ lsb;
             }
         }
@@ -420,10 +422,10 @@ namespace Medo.Device {
         /// Gets 1-wire device code folded into 16-bits.
         /// Folding is done using XOR between high and low halves of 32-bit code.
         /// </summary>
-        public Int32 Code16 {
+        public int Code16 {
             get {
-                var msb = (this.Code32 >> 16) & 0xFFFF;
-                var lsb = this.Code32 & 0xFFFF;
+                var msb = (Code32 >> 16) & 0xFFFF;
+                var lsb = Code32 & 0xFFFF;
                 return msb ^ lsb;
             }
         }
@@ -432,9 +434,9 @@ namespace Medo.Device {
         /// <summary>
         /// Gets serial number portion of a code.
         /// </summary>
-        public Int64 Serial {
+        public long Serial {
             get {
-                return (this.Code & 0x00FFFFFFFFFFFF00) >> 8;
+                return (Code & 0x00FFFFFFFFFFFF00) >> 8;
             }
         }
 
@@ -442,9 +444,9 @@ namespace Medo.Device {
         /// Gets family ID.
         /// Common values are: 0x10 (DS18S20) and 0x28 (DS18B20).
         /// </summary>
-        public Int32 FamilyId {
+        public int FamilyId {
             get {
-                return (int)(this.Code & 0xFF);
+                return (int)(Code & 0xFF);
             }
         }
 
@@ -452,20 +454,18 @@ namespace Medo.Device {
         /// <summary>
         /// Gets temperature in °C.
         /// </summary>
-        public Double Temperature { get; private set; }
+        public double Temperature { get; private set; }
 
         /// <summary>
         /// Gets temperature resolution in °C.
         /// </summary>
-        public Double Resolution { get; private set; }
+        public double Resolution { get; private set; }
 
         /// <summary>
         /// Gets whether temperature is valid.
         /// </summary>
-        public Boolean HasTemperature {
-            get {
-                return !double.IsNaN(this.Temperature);
-            }
+        public bool HasTemperature {
+            get { return !double.IsNaN(Temperature); }
         }
 
     }
@@ -482,8 +482,7 @@ namespace Medo.Device {
         /// <param name="reading">Temperature reading.</param>
         /// <exception cref="System.ArgumentNullException">Reading cannot be null.</exception>
         public HermoReadingEventArgs(HermoReading reading) {
-            if (reading == null) { throw new ArgumentNullException("reading", "Reading cannot be null."); }
-            this.Reading = reading;
+            Reading = reading ?? throw new ArgumentNullException("reading", "Reading cannot be null.");
         }
 
         /// <summary>

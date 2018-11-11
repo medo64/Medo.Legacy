@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2015-03-14: First version.
 
@@ -23,9 +23,9 @@ namespace Medo {
         /// <exception cref="System.ArgumentOutOfRangeException">Lifetime cannot be zero or negative.</exception>
         public Expirable(TimeSpan lifetime, T value, T defaultValue) {
             if (lifetime.TotalMilliseconds <= 0) { throw new ArgumentOutOfRangeException("lifetime", "Lifetime cannot be zero or negative."); }
-            this.Lifetime = lifetime;
-            this.Value = value;
-            this.DefaultValue = defaultValue;
+            Lifetime = lifetime;
+            Value = value;
+            DefaultValue = defaultValue;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Medo {
         /// <param name="lifetime">Value lifetime.</param>
         public Expirable(TimeSpan lifetime)
             : this(lifetime, default(T), default(T)) {
-            this.ExpireTime = DateTime.UtcNow; //expire it immediatelly since value was never set.
+            ExpireTime = DateTime.UtcNow; //expire it immediatelly since value was never set.
         }
 
         /// <summary>
@@ -88,15 +88,15 @@ namespace Medo {
         /// </summary>
         public T Value {
             get {
-                if (DateTime.UtcNow < this.ExpireTime) {
-                    return this._value;
+                if (DateTime.UtcNow < ExpireTime) {
+                    return _value;
                 } else {
-                    return this.DefaultValue;
+                    return DefaultValue;
                 }
             }
             set {
-                this._value = value;
-                this.ExpireTime = DateTime.UtcNow.Add(this.Lifetime);
+                _value = value;
+                ExpireTime = DateTime.UtcNow.Add(Lifetime);
             }
         }
 
@@ -105,7 +105,7 @@ namespace Medo {
         /// </summary>
         public bool HasValue {
             get {
-                return (DateTime.UtcNow < this.ExpireTime);
+                return (DateTime.UtcNow < ExpireTime);
             }
         }
 
@@ -114,11 +114,11 @@ namespace Medo {
         /// </summary>
         /// <param name="value">Value if not expired.</param>
         public bool TryGet(out T value) {
-            if (DateTime.UtcNow < this.ExpireTime) {
-                value = this._value;
+            if (DateTime.UtcNow < ExpireTime) {
+                value = _value;
                 return true;
             } else {
-                value = this.DefaultValue;
+                value = DefaultValue;
                 return false;
             }
         }
@@ -127,7 +127,7 @@ namespace Medo {
         /// Immediately expires value.
         /// </summary>
         public void Expire() {
-            this.ExpireTime = DateTime.UtcNow;
+            ExpireTime = DateTime.UtcNow;
         }
 
 
@@ -138,13 +138,12 @@ namespace Medo {
         /// </summary>
         /// <param name="obj">Object to compare.</param>
         public override bool Equals(object obj) {
-            var other = obj as Expirable<T>;
-            if (other != null) {
-                var value = this.Value;
+            if (obj is Expirable<T> other) {
+                var value = Value;
                 var otherValue = other.Value;
                 return object.Equals(value, otherValue);
             } else {
-                var value = this.Value;
+                var value = Value;
                 return object.Equals(value, obj);
             }
         }
@@ -154,7 +153,7 @@ namespace Medo {
         /// </summary>
         /// <returns></returns>
         public override int GetHashCode() {
-            var value = this.Value;
+            var value = Value;
             return (value != null) ? value.GetHashCode() : 0;
         }
 
@@ -162,7 +161,7 @@ namespace Medo {
         /// Returns a string that represents the current object.
         /// </summary>
         public override string ToString() {
-            var value = this.Value;
+            var value = Value;
             return (value != null) ? value.ToString() : string.Empty;
         }
 

@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-11-24: Suppressing bogus CA5122 warning (http://connect.microsoft.com/VisualStudio/feedback/details/729254/bogus-ca5122-warning-about-p-invoke-declarations-should-not-be-safe-critical); removing link demands.
 //2008-04-29: Inital release.
@@ -121,9 +121,9 @@ namespace Medo.Security.Principal {
         private struct TransferBag {
 
             public TransferBag(TokenHandle logonUserHandle, TokenHandle logonUserDuplicatedHandle, WindowsImpersonationContext windowsImpersonationContext) {
-                this.LogonUserHandle = logonUserHandle;
-                this.LogonUserDuplicatedHandle = logonUserDuplicatedHandle;
-                this.WindowsImpersonationContext = windowsImpersonationContext;
+                LogonUserHandle = logonUserHandle;
+                LogonUserDuplicatedHandle = logonUserDuplicatedHandle;
+                WindowsImpersonationContext = windowsImpersonationContext;
             }
 
             public TokenHandle LogonUserHandle;
@@ -151,6 +151,7 @@ namespace Medo.Security.Principal {
         }
 
         private static class NativeMethods {
+#pragma warning disable IDE0049 // Simplify Names
 
             internal const Int32 LOGON32_LOGON_INTERACTIVE = 2;
             internal const Int32 LOGON32_PROVIDER_DEFAULT = 0;
@@ -160,20 +161,20 @@ namespace Medo.Security.Principal {
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool CloseHandle(IntPtr hObject);
+            public static extern Boolean CloseHandle(IntPtr hObject);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool DuplicateToken(TokenHandle ExistingTokenHandle, Int32 ImpersonationLevel, ref TokenHandle DuplicatedTokenHandle);
+            public static extern Boolean DuplicateToken(TokenHandle ExistingTokenHandle, Int32 ImpersonationLevel, ref TokenHandle DuplicatedTokenHandle);
 
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5122:PInvokesShouldNotBeSafeCriticalFxCopRule", Justification = "Warning is bogus.")]
             [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            public static extern bool LogonUser(String lpszUsername, String lpszDomain, String lpszPassword, Int32 dwLogonType, Int32 dwLogonProvider, ref TokenHandle phToken);
+            public static extern Boolean LogonUser(String lpszUsername, String lpszDomain, String lpszPassword, Int32 dwLogonType, Int32 dwLogonProvider, ref TokenHandle phToken);
 
+#pragma warning restore IDE0049 // Simplify Names
         }
 
     }
-
 }

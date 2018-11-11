@@ -1,4 +1,4 @@
-//Copyright 2017 by Josip Medved <jmedved@jmedved.com> (www.medo64.com) MIT License
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2017-04-24: Initial version.
 
@@ -22,7 +22,7 @@ namespace Medo.Security.Checksum {
         /// <summary>
         /// Gets hash as 16-bit integer.
         /// </summary>
-        public Int16 HashAsInt16 => (Int16)((this.Sum2 << 8) | this.Sum1);
+        public short HashAsInt16 => (short)((Sum2 << 8) | Sum1);
 
 
         #region HashAlgorithm
@@ -43,7 +43,7 @@ namespace Medo.Security.Checksum {
         /// Initializes an instance.
         /// </summary>
         public override void Initialize() {
-            this.InitializationPending = true; //to avoid base class' HashFinal call after ComputeHash clear HashAsInt16.
+            InitializationPending = true; //to avoid base class' HashFinal call after ComputeHash clear HashAsInt16.
         }
 
         /// <summary>
@@ -54,23 +54,23 @@ namespace Medo.Security.Checksum {
         /// <param name="cbSize">The number of bytes in the array to use as data.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Methods in base class are already validating these values.")]
         protected override void HashCore(byte[] array, int ibStart, int cbSize) {
-            if (this.InitializationPending) {
-                this.Sum1 = 0;
-                this.Sum2 = 0;
-                this.InitializationPending = false;
+            if (InitializationPending) {
+                Sum1 = 0;
+                Sum2 = 0;
+                InitializationPending = false;
             }
 
             for (var i = ibStart; i < (ibStart + cbSize); i++) {
-                this.Sum1 = this.Sum1 + array[i];
-                this.Sum2 = this.Sum2 + this.Sum1;
-                if (this.Sum2 > MaximumRunningSum) {
-                    this.Sum1 %= 255;
-                    this.Sum2 %= 255;
+                Sum1 = Sum1 + array[i];
+                Sum2 = Sum2 + Sum1;
+                if (Sum2 > MaximumRunningSum) {
+                    Sum1 %= 255;
+                    Sum2 %= 255;
                 }
             }
 
-            this.Sum1 %= 255;
-            this.Sum2 %= 255;
+            Sum1 %= 255;
+            Sum2 %= 255;
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Medo.Security.Checksum {
         /// </summary>
         /// <returns></returns>
         protected override byte[] HashFinal() {
-            return new byte[] { (byte)this.Sum2, (byte)this.Sum1 };
+            return new byte[] { (byte)Sum2, (byte)Sum1 };
         }
 
         #endregion

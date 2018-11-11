@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2008-04-12: New version.
 
@@ -20,7 +20,7 @@ namespace Medo.Security.Cryptography {
         /// Creates new instance.
         /// </summary>
         public Sha1() {
-            this._sha = new SHA1Managed();
+            _sha = new SHA1Managed();
         }
 
 
@@ -31,7 +31,7 @@ namespace Medo.Security.Cryptography {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public void Append(byte[] value) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-            this.Append(value, 0, value.Length);
+            Append(value, 0, value.Length);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Medo.Security.Cryptography {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public void Append(byte[] value, int index, int length) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-            this._sha.TransformBlock(value, index, length, value, 0);
+            _sha.TransformBlock(value, index, length, value, 0);
         }
 
         /// <summary>
@@ -55,9 +55,9 @@ namespace Medo.Security.Cryptography {
         public void Append(string value, bool useAsciiEncoding) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
             if (useAsciiEncoding) {
-                this.Append(System.Text.ASCIIEncoding.ASCII.GetBytes(value));
+                Append(System.Text.ASCIIEncoding.ASCII.GetBytes(value));
             } else {
-                this.Append(System.Text.UnicodeEncoding.Unicode.GetBytes(value));
+                Append(System.Text.UnicodeEncoding.Unicode.GetBytes(value));
             }//if
         }
 
@@ -69,9 +69,9 @@ namespace Medo.Security.Cryptography {
         public byte[] Hash {
             get {
                 if (_isFinalized) { throw new System.InvalidOperationException(Resources.ExceptionCannotRetrieveHashMoreThanOnce); }
-                this._isFinalized = true;
-                this._sha.TransformFinalBlock(new byte[] { }, 0, 0);
-                return this._sha.Hash;
+                _isFinalized = true;
+                _sha.TransformFinalBlock(new byte[] { }, 0, 0);
+                return _sha.Hash;
             }
         }
 
@@ -127,9 +127,9 @@ namespace Medo.Security.Cryptography {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                if (this._sha != null) {
-                    ((System.IDisposable)this._sha).Dispose();
-                    this._sha = null;
+                if (_sha != null) {
+                    ((System.IDisposable)_sha).Dispose();
+                    _sha = null;
                 }
             }
         }

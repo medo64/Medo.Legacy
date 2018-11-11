@@ -1,4 +1,4 @@
-//Josip Medved <jmedved@jmedved.com>   www.medo64.com
+/* Josip Medved <jmedved@jmedved.com> * www.medo64.com * MIT License */
 
 //2012-10-30: Initial version.
 
@@ -27,27 +27,27 @@ namespace Medo.Math {
         /// <param name="knownValue">Reference value.</param>
         /// <param name="measuredValue">Measured value.</param>
         public void AddCalibrationPoint(double knownValue, double measuredValue) {
-            this.CalibrationPoints.Add(new KeyValuePair<double, double>(knownValue, measuredValue));
-            this.Ready = false;
+            CalibrationPoints.Add(new KeyValuePair<double, double>(knownValue, measuredValue));
+            Ready = false;
         }
 
 
         private double _slope;
         internal double Slope {
             get {
-                if (this.Ready == false) { this.Prepare(); }
-                return this._slope;
+                if (Ready == false) { Prepare(); }
+                return _slope;
             }
-            private set { this._slope = value; }
+            private set { _slope = value; }
         }
 
         private double _intercept;
         internal double Intercept {
             get {
-                if (this.Ready == false) { this.Prepare(); }
-                return this._intercept;
+                if (Ready == false) { Prepare(); }
+                return _intercept;
             }
-            private set { this._intercept = value; }
+            private set { _intercept = value; }
         }
 
         private double _correlationCoefficient;
@@ -56,10 +56,10 @@ namespace Medo.Math {
         /// </summary>
         public double CorrelationCoefficient {
             get {
-                if (this.Ready == false) { this.Prepare(); }
-                return this._correlationCoefficient;
+                if (Ready == false) { Prepare(); }
+                return _correlationCoefficient;
             }
-            private set { this._correlationCoefficient = value; }
+            private set { _correlationCoefficient = value; }
         }
 
         private double _coefficientOfDetermination;
@@ -68,35 +68,35 @@ namespace Medo.Math {
         /// </summary>
         public double CoefficientOfDetermination {
             get {
-                if (this.Ready == false) { this.Prepare(); }
-                return this._coefficientOfDetermination;
+                if (Ready == false) { Prepare(); }
+                return _coefficientOfDetermination;
             }
-            private set { this._coefficientOfDetermination = value; }
+            private set { _coefficientOfDetermination = value; }
         }
 
 
         private bool Ready = false;
 
         private void Prepare() {
-            if (this.CalibrationPoints.Count == 0) { //no calibration
-                this.Slope = 1;
-                this.Intercept = 0;
-                this.CorrelationCoefficient = 1;
-                this.CoefficientOfDetermination = 1;
-            } else if (this.CalibrationPoints.Count == 1) { //no calibration - just offset
-                this.Slope = 1;
-                this.Intercept = this.CalibrationPoints[0].Value - this.CalibrationPoints[0].Key;
-                this.CorrelationCoefficient = 1;
-                this.CoefficientOfDetermination = 1;
+            if (CalibrationPoints.Count == 0) { //no calibration
+                Slope = 1;
+                Intercept = 0;
+                CorrelationCoefficient = 1;
+                CoefficientOfDetermination = 1;
+            } else if (CalibrationPoints.Count == 1) { //no calibration - just offset
+                Slope = 1;
+                Intercept = CalibrationPoints[0].Value - CalibrationPoints[0].Key;
+                CorrelationCoefficient = 1;
+                CoefficientOfDetermination = 1;
             } else {
 
-                double n = this.CalibrationPoints.Count;
+                double n = CalibrationPoints.Count;
                 double sumX = 0;
                 double sumY = 0;
                 double sumX2 = 0;
                 double sumY2 = 0;
                 double sumXY = 0;
-                foreach (var point in this.CalibrationPoints) {
+                foreach (var point in CalibrationPoints) {
                     var x = point.Key;
                     var y = point.Value;
                     sumX += x;
@@ -111,13 +111,13 @@ namespace Medo.Math {
                 var m = mT / mB;
                 var r = mT / System.Math.Sqrt(mB * (n * sumY2 - sumY * sumY));
 
-                this.Slope = m;
-                this.Intercept = (sumY / n) - m * (sumX / n); ;
-                this.CorrelationCoefficient = r;
-                this.CoefficientOfDetermination = r * r;
+                Slope = m;
+                Intercept = (sumY / n) - m * (sumX / n); ;
+                CorrelationCoefficient = r;
+                CoefficientOfDetermination = r * r;
             }
 
-            this.Ready = true;
+            Ready = true;
         }
 
 
@@ -126,7 +126,7 @@ namespace Medo.Math {
         /// </summary>
         /// <param name="value">Value to adjust.</param>
         public double GetAdjustedValue(double value) {
-            return (value - this.Intercept) / this.Slope;
+            return (value - Intercept) / Slope;
         }
 
     }

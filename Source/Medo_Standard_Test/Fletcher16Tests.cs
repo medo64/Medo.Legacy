@@ -36,7 +36,7 @@ namespace Test {
             var sw = new Stopwatch();
             var hash = checksum.ComputeHash(Get16K());
             Trace.WriteLine(sw.ElapsedMilliseconds + " ms");
-            this.Output.WriteLine(sw.ElapsedMilliseconds + " ms");
+            Output.WriteLine(sw.ElapsedMilliseconds + " ms");
             Assert.Equal("AF-4E", BitConverter.ToString(hash));
             Assert.Equal(unchecked((Int16)0xAF4E), checksum.HashAsInt16);
         }
@@ -58,7 +58,7 @@ namespace Test {
             var millis = sw.ElapsedMilliseconds;
             var seconds = millis / 1000.0;
             var mb = (blockCount * data.Length) / 1024.0 / 1024;
-            this.Output.WriteLine($"Hashed {mb:0.0} MB in {millis} ms ({mb / seconds:0.0} MB/s).");
+            Output.WriteLine($"Hashed {mb:0.0} MB in {millis} ms ({mb / seconds:0.0} MB/s).");
         }
 
         [Fact(DisplayName = "Fletcher16: Blindspot")] //Fletched cannot distinguish between all 1 and all 0 blocks
@@ -113,7 +113,7 @@ namespace Test {
         private readonly ITestOutputHelper Output;
 
         public Fletcher16Tests(ITestOutputHelper output) {
-            this.Output = output;
+            Output = output;
         }
 
         private static byte[] Get16K() {

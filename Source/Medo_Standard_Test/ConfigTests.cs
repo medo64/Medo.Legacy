@@ -527,21 +527,21 @@ namespace Test {
                 Config.Reset();
 
                 if (File.Exists(resourceFileName)) {
-                    this.Bytes = File.ReadAllBytes(resourceFileName);
+                    Bytes = File.ReadAllBytes(resourceFileName);
                 } else {
-                    this.Bytes = (resourceFileName != null) ? GetResourceStreamBytes(resourceFileName) : null;
+                    Bytes = (resourceFileName != null) ? GetResourceStreamBytes(resourceFileName) : null;
                 }
-                this.GoodBytes = (resourceFileNameGood != null) ? GetResourceStreamBytes(resourceFileNameGood) : null;
+                GoodBytes = (resourceFileNameGood != null) ? GetResourceStreamBytes(resourceFileNameGood) : null;
                 var overrideBytes = (resourceOverrideFileName != null) ? GetResourceStreamBytes(resourceOverrideFileName) : null;
 
-                this.FileName = Path.GetTempFileName();
+                FileName = Path.GetTempFileName();
                 if (resourceFileName == null) {
-                    File.Delete(this.FileName); //to start fresh
+                    File.Delete(FileName); //to start fresh
                 } else {
-                    File.WriteAllBytes(this.FileName, this.Bytes);
+                    File.WriteAllBytes(FileName, Bytes);
                 }
 
-                Config.FileName = this.FileName;
+                Config.FileName = FileName;
 
                 var overrideFileName = (resourceOverrideFileName != null) ? Path.GetTempFileName() : null;
                 if (overrideFileName != null) {
@@ -561,12 +561,12 @@ namespace Test {
             #region IDisposable Support
 
             ~ConfigLoader() {
-                this.Dispose(false);
+                Dispose(false);
             }
 
             protected virtual void Dispose(bool disposing) {
                 try {
-                    File.Delete(this.FileName);
+                    File.Delete(FileName);
                 } catch (IOException) { }
             }
 
