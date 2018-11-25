@@ -470,10 +470,10 @@ namespace Medo.Configuration {
                     _isAssumedInstalled = true;
                     _fileName = userFilePath;
                     _overrideFileName = File.Exists(localFilePath) ? localFilePath : null;
-                } else { //if outside of program files, assume local file is first, user config is override
+                } else { //if outside of program files, assume local file only
                     _isAssumedInstalled = false;
                     _fileName = localFilePath;
-                    _overrideFileName = File.Exists(userFilePath) ? userFilePath : null;
+                    _overrideFileName = null;
                 }
 
             } else { //Linux
@@ -492,10 +492,10 @@ namespace Medo.Configuration {
                     } else {
                         _overrideFileName = File.Exists(localFilePath) ? localFilePath : null;
                     }
-                } else { //if not installed, assume local file is first, user config is override
+                } else { //if outside of program files, assume local file only
                     _isAssumedInstalled = false;
                     _fileName = localFilePath;
-                    _overrideFileName = File.Exists(userFilePath) ? userFilePath : null;
+                    _overrideFileName = null;
                 }
 
             }
