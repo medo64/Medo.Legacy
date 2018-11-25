@@ -106,8 +106,8 @@
     <Compile Include="..\Medo\Bitwise [001].cs">
       <Link>Bitwise [001].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Configuration\Config [005].cs">
-      <Link>Configuration\Config [005].cs</Link>
+    <Compile Include="..\Medo\Configuration\Config [006].cs">
+      <Link>Configuration\Config [006].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Configuration\History [002].cs">
       <Link>Configuration\History [002].cs</Link>

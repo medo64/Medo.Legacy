@@ -40,28 +40,56 @@ namespace Test {
 
         [Fact(DisplayName = "Config: Installation status assumption")]
         void AssumeInstalled() {
-            Assert.False(Config.IsAssumedInstalled);
-
-            Config.Reset();
+            var executablePath = Assembly.GetEntryAssembly().Location;
 
             var userFileLocation = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? Path.Combine(Environment.GetEnvironmentVariable("AppData"), "", "Microsoft.TestHost", "Microsoft.TestHost.cfg")
                 : Path.Combine(Environment.GetEnvironmentVariable("HOME") ?? "~", "Microsoft.TestHost.cfg");
 
+            var localFileLocation = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? Path.Combine(Path.GetDirectoryName(executablePath), "Microsoft.TestHost.cfg")
+                : Path.Combine(Path.GetDirectoryName(executablePath), ".Microsoft.TestHost");
+
             var userFileDirectory = Path.GetDirectoryName(userFileLocation);
 
-            try { //create empty file in AppData directory
-                if (!Directory.Exists(userFileDirectory)) { Directory.CreateDirectory(userFileDirectory); }
-                File.WriteAllText(userFileLocation, "");
+            //clean files
+            if (Directory.Exists(userFileDirectory)) { Directory.Delete(userFileDirectory, true); }
+            if (File.Exists(localFileLocation)) { File.Delete(localFileLocation); }
 
-                Assert.True(Config.IsAssumedInstalled);
-            } finally {
+            try {
+                Assert.False(Config.IsAssumedInstalled);
+                Assert.NotNull(Config.FileName);
+                Assert.Null(Config.OverrideFileName);
+            } finally { //clean files
                 if (Directory.Exists(userFileDirectory)) { Directory.Delete(userFileDirectory, true); }
+                if (File.Exists(localFileLocation)) { File.Delete(localFileLocation); }
             }
 
-            Config.Reset();
+            try { //create empty file in AppData directory and a local file
+                Config.Reset();
+                Config.IsAssumedInstalled = true;
+                if (!Directory.Exists(userFileDirectory)) { Directory.CreateDirectory(userFileDirectory); }
+                File.WriteAllText(userFileLocation, "");
+                File.WriteAllText(localFileLocation, "");
 
-            Assert.False(Config.IsAssumedInstalled);
+                Assert.True(Config.IsAssumedInstalled);
+                Assert.NotNull(Config.FileName);
+                Assert.NotNull(Config.OverrideFileName);
+            } finally { //clean files
+                if (Directory.Exists(userFileDirectory)) { Directory.Delete(userFileDirectory, true); }
+                if (File.Exists(localFileLocation)) { File.Delete(localFileLocation); }
+            }
+
+            try {
+                Config.Reset();
+
+                Assert.False(Config.IsAssumedInstalled);
+                Assert.NotNull(Config.FileName);
+                Assert.Null(Config.OverrideFileName);
+            } finally { //clean files
+                if (Directory.Exists(userFileDirectory)) { Directory.Delete(userFileDirectory, true); }
+                if (File.Exists(localFileLocation)) { File.Delete(localFileLocation); }
+            }
         }
 
 
