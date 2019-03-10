@@ -30,6 +30,7 @@
   <ItemGroup>
     <Compile Include="..\Medo\Configuration\Config [006].cs" Link="Configuration\Config [006].cs" />
     <Compile Include="..\Medo\Configuration\RecentlyUsed [001].cs" Link="Configuration\RecentlyUsed [001].cs" />
+    <Compile Include="..\Medo\Convert\Base58.cs" Link="Convert\Base58.cs" />
     <Compile Include="..\Medo\Net\TrivialNtpClient [001].cs" Link="Net\TrivialNtpClient [001].cs" />
     <Compile Include="..\Medo\Security\Checksum\Damm [001].cs" Link="Security\Checksum\Damm [001].cs" />
     <Compile Include="..\Medo\Security\Checksum\Fletcher16 [001].cs" Link="Security\Checksum\Fletcher16 [001].cs" />
@@ -40,6 +41,7 @@
   <ItemGroup>
     <Folder Include="Configuration\" />
     <Folder Include="Net\" />
+    <Folder Include="Convert\" />
     <Folder Include="Security\Checksum\" />
     <Folder Include="Security\Cryptography\" />
   </ItemGroup>
