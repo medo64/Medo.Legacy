@@ -411,8 +411,8 @@
     <Compile Include="..\Medo\Windows\Forms\SplashBox [011].cs">
       <Link>Windows\Forms\SplashBox [011].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Windows\Forms\State [016].cs">
-      <Link>Windows\Forms\State [015].cs</Link>
+    <Compile Include="..\Medo\Windows\Forms\State [017].cs">
+      <Link>Windows\Forms\State [017].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Windows\Forms\TaskbarProgress [002].cs">
       <Link>Windows\Forms\TaskbarProgress [002].cs</Link>
