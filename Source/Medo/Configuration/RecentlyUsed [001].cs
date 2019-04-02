@@ -65,7 +65,7 @@ namespace Medo.Configuration {
 
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        private List<RecentlyUsedFile> BaseItems = new List<RecentlyUsedFile>();
+        private readonly List<RecentlyUsedFile> BaseItems = new List<RecentlyUsedFile>();
 
         /// <summary>
         /// Gets file at given index.
