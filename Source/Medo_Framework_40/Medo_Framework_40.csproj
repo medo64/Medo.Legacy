@@ -125,8 +125,8 @@
     <Compile Include="..\Medo\Configuration\Settings [---].cs">
       <Link>Configuration\Settings [---].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Convert\Base58.cs">
-      <Link>Convert\Base58.cs</Link>
+    <Compile Include="..\Medo\Convert\Base58 [001].cs">
+      <Link>Convert\Base58 [001].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Data\CommonConnection [010].cs">
       <Link>Data\CommonConnection [010].cs</Link>
