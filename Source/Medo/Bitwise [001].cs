@@ -23,7 +23,7 @@ namespace Medo {
 		/// <param name="amount">The number of bits to shift the bit pattern.</param>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "8-amount", Justification = "No overflow will happen since amount is limited.")]
 		public static byte ShiftLeft(byte value, int amount) {
-			amount = amount % 8;
+			amount %= 8;
 			if (amount == 0) { return value; }
 			return (byte)((value & _lookupOn[8 - amount]) * (_lookupPower[amount]));
 		}
@@ -35,7 +35,7 @@ namespace Medo {
 		/// <param name="amount">The number of bits to shift the bit pattern.</param>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "16-amount", Justification = "No overflow will happen since amount is limited.")]
 		public static short ShiftLeft(short value, int amount) {
-			amount = amount % 16;
+			amount %= 16;
 			if (amount == 0) { return value; }
 			return (short)(((ushort)value & _lookupOn[16 - amount]) * (_lookupPower[amount]));
 		}
@@ -47,7 +47,7 @@ namespace Medo {
 		/// <param name="amount">The number of bits to shift the bit pattern.</param>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "32-amount", Justification = "No overflow will happen since amount is limited.")]
 		public static int ShiftLeft(int value, int amount) {
-			amount = amount % 32;
+			amount %= 32;
 			if (amount == 0) { return value; }
 			return (int)(((uint)value & _lookupOn[32 - amount]) * (_lookupPower[amount]));
 		}
@@ -63,7 +63,7 @@ namespace Medo {
 		/// <param name="value">The bit pattern to be shifted.</param>
 		/// <param name="amount">The number of bits to shift the bit pattern.</param>
 		public static byte ShiftRight(byte value, int amount) {
-			amount = amount % 8;
+			amount %= 8;
 			if (amount == 0) { return value; }
 			return (byte)(value / _lookupPower[amount]);
 		}
@@ -74,7 +74,7 @@ namespace Medo {
 		/// <param name="value">The bit pattern to be shifted.</param>
 		/// <param name="amount">The number of bits to shift the bit pattern.</param>
 		public static short ShiftRight(short value, int amount) {
-			amount = amount % 16;
+			amount %= 16;
 			if (amount == 0) { return value; }
 			return (short)((ushort)value / _lookupPower[amount]);
 		}
@@ -85,7 +85,7 @@ namespace Medo {
 		/// <param name="value">The bit pattern to be shifted.</param>
 		/// <param name="amount">The number of bits to shift the bit pattern.</param>
 		public static int ShiftRight(int value, int amount) {
-			amount = amount % 32;
+			amount %= 32;
 			if (amount == 0) { return value; }
 			return (int)((uint)value / _lookupPower[amount]);
 		}
@@ -165,7 +165,7 @@ namespace Medo {
 		/// <param name="value">The bit pattern to be reversed.</param>
 		public static byte Reverse(byte value) {
 			byte result = 0;
-			for (int i = 0; i < 4; i++) {
+			for (var i = 0; i < 4; i++) {
 				if ((value & _lookupPower[i]) == _lookupPower[i]) { result = (byte)(result | _lookupPower[7 - i]); }
 				if ((value & _lookupPower[7 - i]) == _lookupPower[7 - i]) { result = (byte)(result | _lookupPower[i]); }
 			}
@@ -178,8 +178,8 @@ namespace Medo {
 		/// <param name="value">The bit pattern to be reversed.</param>
 		public static short Reverse(short value) {
 			ushort result = 0;
-			ushort valueU = (ushort)value;
-			for (int i = 0; i < 8; i++) {
+			var valueU = (ushort)value;
+			for (var i = 0; i < 8; i++) {
 				if ((valueU & _lookupPower[i]) == _lookupPower[i]) { result = (ushort)(result | _lookupPower[15 - i]); }
 				if ((valueU & _lookupPower[15 - i]) == _lookupPower[15 - i]) { result = (ushort)(result | _lookupPower[i]); }
 			}
@@ -192,8 +192,8 @@ namespace Medo {
 		/// <param name="value">The bit pattern to be reversed.</param>
 		public static int Reverse(int value) {
 			uint result = 0;
-			uint valueU = (uint)value;
-			for (int i = 0; i < 16; i++) {
+			var valueU = (uint)value;
+			for (var i = 0; i < 16; i++) {
 				if ((valueU & _lookupPower[i]) == _lookupPower[i]) { result = (uint)(result | _lookupPower[31 - i]); }
 				if ((valueU & _lookupPower[31 - i]) == _lookupPower[31 - i]) { result = (uint)(result | _lookupPower[i]); }
 			}
