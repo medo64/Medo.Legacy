@@ -8,7 +8,7 @@ namespace Test {
     public class Fletcher16Tests {
 
         [Fact(DisplayName = "Fletcher16: Basic")]
-        void Basic() {
+        public void Basic() {
             var checksum = new Fletcher16();
             var hash = checksum.ComputeHash(new byte[] { 0x01, 0x02 });
             Assert.Equal("04-03", BitConverter.ToString(hash));
@@ -16,7 +16,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Fletcher16: Two hashes can be converted one after another")]
-        void Reinitialized() {
+        public void Reinitialized() {
             var checksum = new Fletcher16();
             {
                 var hash = checksum.ComputeHash(new byte[] { 0x01, 0x02 });
@@ -31,7 +31,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Fletcher16: 16K")]
-        void Long() {
+        public void Long() {
             var checksum = new Fletcher16();
             var sw = new Stopwatch();
             var hash = checksum.ComputeHash(Get16K());
@@ -42,7 +42,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Fletcher16: Timed 250ms")]
-        void Timed() {
+        public void Timed() {
             var checksum = new Fletcher16();
 
             var data = new byte[65536];
@@ -62,7 +62,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Fletcher16: Blindspot")] //Fletched cannot distinguish between all 1 and all 0 blocks
-        void Sad() {
+        public void Sad() {
             var bytes0 = new byte[100000];
             var checksum0 = new Fletcher16();
             checksum0.ComputeHash(bytes0);
@@ -76,15 +76,15 @@ namespace Test {
 
 
         [Fact(DisplayName = "Fletcher16: Something else")]
-        void Long2() {
+        public void Long2() {
             var checksum = new Fletcher16();
-            var hash = checksum.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes("140byt.es is totally rad!"));
+            checksum.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes("140byt.es is totally rad!"));
             Assert.Equal(unchecked((Int16)51599), checksum.HashAsInt16);
         }
 
 
         [Fact(DisplayName = "Fletcher16: Exception due to null data")]
-        void ExceptionNullData() {
+        public void ExceptionNullData() {
             var checksum = new Fletcher16();
             var ex = Assert.Throws<ArgumentNullException>(() => {
                 var hash = checksum.ComputeHash(default(byte[]));
@@ -92,7 +92,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Fletcher16: Exception due to offset error")]
-        void ExceptionDataOffset() {
+        public void ExceptionDataOffset() {
             var checksum = new Fletcher16();
             var ex = Assert.Throws<ArgumentException>(() => {
                 var hash = checksum.ComputeHash(new byte[] { 1, 2 }, 3, 0);
@@ -100,7 +100,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Fletcher16: Exception due to length error")]
-        void ExceptionDataCount() {
+        public void ExceptionDataCount() {
             var checksum = new Fletcher16();
             var ex = Assert.Throws<ArgumentException>(() => {
                 var hash = checksum.ComputeHash(new byte[] { 1, 2 }, 0, 3);

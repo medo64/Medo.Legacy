@@ -12,7 +12,7 @@ namespace Test {
     public class ConfigTests {
 
         [Fact(DisplayName = "Config: Null key throws exception")]
-        void NullKey() {
+        public void NullKey() {
             var ex = Assert.Throws<ArgumentNullException>(() => {
                 Config.Read(null, "");
             });
@@ -20,7 +20,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Empty key throws exception")]
-        void EmptyKey() {
+        public void EmptyKey() {
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() => {
                 Config.Read("   ", "");
             });
@@ -29,7 +29,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Config: Empty file Load/Save")]
-        void EmptySave() {
+        public void EmptySave() {
             using (var loader = new ConfigLoader("Empty.cfg")) {
                 Assert.True(Config.Load(), "File should exist before load.");
                 Assert.True(Config.Save(), "Save should succeed.");
@@ -39,7 +39,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Installation status assumption")]
-        void AssumeInstalled() {
+        public void AssumeInstalled() {
             var executablePath = Assembly.GetEntryAssembly().Location;
 
             var userFileLocation = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
@@ -94,7 +94,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Config: CRLF preserved on Save")]
-        void EmptyLinesCRLF() {
+        public void EmptyLinesCRLF() {
             using (var loader = new ConfigLoader("EmptyLinesCRLF.cfg")) {
                 Config.Save();
                 Assert.Equal(BitConverter.ToString(loader.Bytes), BitConverter.ToString(File.ReadAllBytes(loader.FileName)));
@@ -102,7 +102,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: LF preserved on Save")]
-        void EmptyLinesLF() {
+        public void EmptyLinesLF() {
             using (var loader = new ConfigLoader("EmptyLinesLF.cfg")) {
                 Config.Save();
                 Assert.Equal(BitConverter.ToString(loader.Bytes), BitConverter.ToString(File.ReadAllBytes(loader.FileName)));
@@ -110,7 +110,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: CR preserved on Save")]
-        void EmptyLinesCR() {
+        public void EmptyLinesCR() {
             using (var loader = new ConfigLoader("EmptyLinesCR.cfg")) {
                 Config.Save();
                 Assert.Equal(BitConverter.ToString(loader.Bytes), BitConverter.ToString(File.ReadAllBytes(loader.FileName)));
@@ -118,7 +118,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Mixed line ending gets normalized on Save")]
-        void EmptyLinesMixed() {
+        public void EmptyLinesMixed() {
             using (var loader = new ConfigLoader("EmptyLinesMixed.cfg", "EmptyLinesMixed.Good.cfg")) {
                 Config.Save();
                 Assert.Equal(loader.GoodText, File.ReadAllText(loader.FileName));
@@ -126,7 +126,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Comments are preserved on Save")]
-        void CommentsOnly() {
+        public void CommentsOnly() {
             using (var loader = new ConfigLoader("CommentsOnly.cfg")) {
                 Config.Save();
                 Assert.Equal(BitConverter.ToString(loader.Bytes), BitConverter.ToString(File.ReadAllBytes(loader.FileName)));
@@ -134,7 +134,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Values with comments are preserved on Save")]
-        void CommentsWithValues() {
+        public void CommentsWithValues() {
             using (var loader = new ConfigLoader("CommentsWithValues.cfg")) {
                 Config.Save();
                 Assert.Equal(Encoding.UTF8.GetString(loader.Bytes), Encoding.UTF8.GetString(File.ReadAllBytes(loader.FileName)));
@@ -143,7 +143,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Leading spaces are preserved on Save")]
-        void SpacingEscape() {
+        public void SpacingEscape() {
             using (var loader = new ConfigLoader("SpacingEscape.cfg", "SpacingEscape.Good.cfg")) {
                 Assert.Equal(" Value 1", Config.Read("Key1", null));
                 Assert.Equal("Value 2 ", Config.Read("Key2", null));
@@ -162,7 +162,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Basic write")]
-        void WriteBasic() {
+        public void WriteBasic() {
             using (var loader = new ConfigLoader("Empty.cfg", "WriteBasic.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
                 Config.Write("Key2", "Value 2");
@@ -174,7 +174,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Basic write (without empty line ending)")]
-        void WriteNoEmptyLine() {
+        public void WriteNoEmptyLine() {
             using (var loader = new ConfigLoader("WriteNoEmptyLine.cfg", "WriteNoEmptyLine.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
                 Config.Write("Key2", "Value 2");
@@ -186,7 +186,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Separator equals (=) is preserved upon save")]
-        void WriteSameSeparatorEquals() {
+        public void WriteSameSeparatorEquals() {
             using (var loader = new ConfigLoader("WriteSameSeparatorEquals.cfg", "WriteSameSeparatorEquals.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
                 Config.Write("Key2", "Value 2");
@@ -198,7 +198,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Separator space ( ) is preserved upon save")]
-        void WriteSameSeparatorSpace() {
+        public void WriteSameSeparatorSpace() {
             using (var loader = new ConfigLoader("WriteSameSeparatorSpace.cfg", "WriteSameSeparatorSpace.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
                 Config.Write("Key2", "Value 2");
@@ -210,7 +210,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Write replaces existing entry")]
-        void Replace() {
+        public void Replace() {
             using (var loader = new ConfigLoader("Replace.cfg", "Replace.Good.cfg")) {
                 Config.Write("Key1", "Value 1a");
                 Config.Write("Key2", "Value 2a");
@@ -225,7 +225,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Write preserves spacing")]
-        void SpacingPreserved() {
+        public void SpacingPreserved() {
             using (var loader = new ConfigLoader("SpacingPreserved.cfg", "SpacingPreserved.Good.cfg")) {
                 Config.Write("KeyOne", "Value 1a");
                 Config.Write("KeyTwo", "Value 2b");
@@ -238,7 +238,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Write preserves spacing on add")]
-        void SpacingPreservedOnAdd() {
+        public void SpacingPreservedOnAdd() {
             using (var loader = new ConfigLoader("SpacingPreservedOnAdd.cfg", "SpacingPreservedOnAdd.Good.cfg")) {
                 Config.Write("One", "Value 1a");
                 Config.Write("Two", new string[] { "Value 2a", "Value 2b" });
@@ -254,7 +254,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Write without preexisting file")]
-        void WriteToEmpty() {
+        public void WriteToEmpty() {
             using (var loader = new ConfigLoader(null, "Replace.Good.cfg")) {
                 Config.Write("Key1", "Value 1a");
                 Config.Write("Key2", "Value 2a");
@@ -266,7 +266,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Write replaces only last instance of same key")]
-        void ReplaceOnlyLast() {
+        public void ReplaceOnlyLast() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.cfg", "ReplaceOnlyLast.Good.cfg")) {
                 Config.Write("Key1", "Value 1a");
                 Config.Write("Key2", "Value 2a");
@@ -283,7 +283,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Config: Write creates directory")]
-        void SaveInNonexistingDirectory1() {
+        public void SaveInNonexistingDirectory1() {
             var propertiesFile = Path.Combine(Path.GetTempPath(), "ConfigDirectory", "Test.cfg");
             try {
                 Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectory"), true);
@@ -302,7 +302,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Write creates directory (2 levels deep)")]
-        void SaveInNonexistingDirectory2() {
+        public void SaveInNonexistingDirectory2() {
             var propertiesFile = Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter", "ConfigDirectoryInner", "Test.cfg");
             try {
                 Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter"), true);
@@ -321,7 +321,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Write creates directory (3 levels deep)")]
-        void SaveInNonexistingDirectory3() {
+        public void SaveInNonexistingDirectory3() {
             var propertiesFile = Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter", "ConfigDirectoryMiddle", "ConfigDirectoryInner", "Test.cfg");
             try {
                 Directory.Delete(Path.Combine(Path.GetTempPath(), "ConfigDirectoryOuter"), true);
@@ -341,7 +341,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Config: Removing entry")]
-        void RemoveSingle() {
+        public void RemoveSingle() {
             using (var loader = new ConfigLoader("Remove.cfg", "Remove.Good.cfg")) {
                 Config.Delete("Key1");
                 Config.Save();
@@ -351,7 +351,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Removing multiple entries")]
-        void RemoveMulti() {
+        public void RemoveMulti() {
             using (var loader = new ConfigLoader("RemoveMulti.cfg", "RemoveMulti.Good.cfg")) {
                 Config.Delete("Key2");
                 Config.Save();
@@ -362,14 +362,14 @@ namespace Test {
 
 
         [Fact(DisplayName = "Config: Override is used first")]
-        void UseOverrideFirst() {
+        public void UseOverrideFirst() {
             using (var loader = new ConfigLoader("Replace.cfg", resourceOverrideFileName: "Replace.Good.cfg")) {
                 Assert.Equal("Value 1a", Config.Read("Key1", null));
             }
         }
 
         [Fact(DisplayName = "Config: Override is not written")]
-        void DontOverwriteOverride() {
+        public void DontOverwriteOverride() {
             using (var loader = new ConfigLoader("Replace.cfg", resourceOverrideFileName: "Replace.Good.cfg")) {
                 Config.ImmediateSave = true;
 
@@ -382,7 +382,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Config: Reading multiple entries")]
-        void ReadMulti() {
+        public void ReadMulti() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.Good.cfg")) {
                 var list = new List<string>(Config.Read("Key2"));
                 Assert.Equal(2, list.Count);
@@ -392,7 +392,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Reading multiple entries from override")]
-        void ReadMultiFromOverride() {
+        public void ReadMultiFromOverride() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.Good.cfg", resourceOverrideFileName: "RemoveMulti.cfg")) {
                 var list = new List<string>(Config.Read("Key2"));
                 Assert.Equal(3, list.Count);
@@ -403,7 +403,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Reading multi entries when override is not found")]
-        void ReadMultiFromOverrideNotFound() {
+        public void ReadMultiFromOverrideNotFound() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.Good.cfg", resourceOverrideFileName: "RemoveMulti.cfg")) {
                 var list = new List<string>(Config.Read("Key3"));
                 Assert.Equal(1, list.Count);
@@ -412,7 +412,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Multi-value write")]
-        void MultiWrite() {
+        public void MultiWrite() {
             using (var loader = new ConfigLoader(null, resourceFileNameGood: "WriteMulti.Good.cfg")) {
                 Config.Write("Key1", "Value 1");
                 Config.Write("Key2", new string[] { "Value 2a", "Value 2b", "Value 2c" });
@@ -432,7 +432,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Multi-value replace")]
-        void MultiReplace() {
+        public void MultiReplace() {
             using (var loader = new ConfigLoader("WriteMulti.cfg", resourceFileNameGood: "WriteMulti.Good.cfg")) {
                 Config.Write("Key2", new string[] { "Value 2a", "Value 2b", "Value 2c" });
                 Config.Save();
@@ -450,7 +450,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Multi-value override is not written")]
-        void DontOverwriteOverrideMulti() {
+        public void DontOverwriteOverrideMulti() {
             using (var loader = new ConfigLoader("ReplaceOnlyLast.Good.cfg", resourceOverrideFileName: "RemoveMulti.cfg")) {
                 Config.Write("Key2", "Value X");
                 var list = new List<string>(Config.Read("Key2"));
@@ -463,7 +463,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Config: Test conversion")]
-        void TestConversion() {
+        public void TestConversion() {
             using (var loader = new ConfigLoader(null, resourceFileNameGood: "WriteConverted.Good.cfg")) {
                 Config.Write("Integer", 42);
                 Config.Write("Integer Min", int.MinValue);
@@ -507,7 +507,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Config: Key whitespace reading and saving")]
-        void KeyWhitespace() {
+        public void KeyWhitespace() {
             using (var loader = new ConfigLoader("KeyWhitespace.cfg", "KeyWhitespace.Good.cfg")) {
                 Config.Save();
 
@@ -526,7 +526,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Config: Delete all values")]
-        void DeleteAll() {
+        public void DeleteAll() {
             using (var loader = new ConfigLoader("WriteBasic.Good.cfg", "Empty.cfg")) {
                 Assert.Equal("Value 1", Config.Read("Key1", null));
                 Assert.Equal("Value 2", Config.Read("Key2", null));

@@ -7,14 +7,14 @@ namespace Test {
     public class Base58Tests {
 
         [Fact(DisplayName = "Base58: Empty ToString")]
-        void Empty_ToString() {
+        public void Empty_ToString() {
             var input = new byte[] { };
             var output = Base58.ToString(input);
             Assert.Equal("", output);
         }
 
         [Fact(DisplayName = "Base58: Empty AsBytes")]
-        void Empty_AsBytes() {
+        public void Empty_AsBytes() {
             var input = "";
             var output = Base58.AsBytes(input);
             Assert.Equal("", BitConverter.ToString(output));
@@ -22,14 +22,14 @@ namespace Test {
 
 
         [Fact(DisplayName = "Base58: Basic ToString")]
-        void Basic_ToString() {
+        public void Basic_ToString() {
             var input = new byte[] { 1, 2, 3 };
             var output = Base58.ToString(input);
             Assert.Equal("Ldp", output);
         }
 
         [Fact(DisplayName = "Base58: Basic AsBytes")]
-        void Basic_AsBytes() {
+        public void Basic_AsBytes() {
             var input = "Ldp";
             var output = Base58.AsBytes(input);
             Assert.Equal("01-02-03", BitConverter.ToString(output));
@@ -37,14 +37,14 @@ namespace Test {
 
 
         [Fact(DisplayName = "Base58: LeadingZero ToString")]
-        void LeadingZero_ToString() {
+        public void LeadingZero_ToString() {
             var input = new byte[] { 0, 0, 1 };
             var output = Base58.ToString(input);
             Assert.Equal("112", output);
         }
 
         [Fact(DisplayName = "Base58: LeadingZero AsBytes")]
-        void LeadingZero_AsBytes() {
+        public void LeadingZero_AsBytes() {
             var input = "112";
             var output = Base58.AsBytes(input);
             Assert.Equal("00-00-01", BitConverter.ToString(output));
@@ -52,14 +52,14 @@ namespace Test {
 
 
         [Fact(DisplayName = "Base58: MiddleZero ToString")]
-        void MiddleZero_ToString() {
+        public void MiddleZero_ToString() {
             var input = new byte[] { 0x00, 0xFF, 0x00 };
             var output = Base58.ToString(input);
             Assert.Equal("1LQX", output);
         }
 
         [Fact(DisplayName = "Base58: MiddleZero AsBytes")]
-        void MiddleZero_AsBytes() {
+        public void MiddleZero_AsBytes() {
             var input = "1LQX";
             var output = Base58.AsBytes(input);
             Assert.Equal("00-FF-00", BitConverter.ToString(output));
@@ -67,7 +67,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Base58: All 0x00 ToString")]
-        void All00_ToString() {
+        public void All00_ToString() {
             var input = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -78,7 +78,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Base58: All 0x00 AsBytes")]
-        void All00_AsBytes() {
+        public void All00_AsBytes() {
             var input = "1111111111111111111111111111111111111111111111111111111111111111";
             var output = Base58.AsBytes(input);
             Assert.Equal("00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00", BitConverter.ToString(output));
@@ -86,7 +86,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Base58: All 0xFF ToString")]
-        void AllFF_ToString() {
+        public void AllFF_ToString() {
             var input = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
                                      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
                                      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -97,7 +97,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Base58: All 0xFF AsBytes")]
-        void AllFF_AsBytes() {
+        public void AllFF_AsBytes() {
             var input = "67rpwLCuS5DGA8KGZXKsVQ7dnPb9goRLoKfgGbLfQg9WoLUgNY77E2jT11fem3coV9nAkguBACzrU1iyZM4B8roQ";
             var output = Base58.AsBytes(input);
             Assert.Equal("FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF-FF", BitConverter.ToString(output));
@@ -105,7 +105,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Base58: Long ToString")]
-        void Long_ToString() {
+        public void Long_ToString() {
             var input = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
                                      0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
                                      0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F,
@@ -128,7 +128,7 @@ namespace Test {
         }
 
         [Fact(DisplayName = "Base58: Long AsBytes")]
-        void Long_AsBytes() {
+        public void Long_AsBytes() {
             var input = "1cWB5HCBdLjAuqGGReWE3R3CguuwSjw6RHn39s2yuDRTS5NsBgNiFpWgAnEx6VQi8csexkgYw3mdYrMHr8x9i7aEwP8kZ7vccXWqKDvGv3u1GxFKPuAkn8JCPPGDMf3vMMnbzm6Nh9zh1gcNsMvH3ZNLmP5fSG6DGbbi2tuwMWPthr4boWwCxf7ewSgNQeacyozhKDDQQ1qL5fQFUW52QKUZDZ5fw3KXNQJMcNTcaB723LchjeKun7MuGW5qyCBZYzA1KjofN1gYBV3NqyhQJ3Ns746GNuf9N2pQPmHz4xpnSrrfCvy6TVVz5d4PdrjeshsWQwpZsZGzvbdAdN8MKV5QsBDY";
             var output = Base58.AsBytes(input);
             Assert.Equal("00-01-02-03-04-05-06-07-08-09-0A-0B-0C-0D-0E-0F-10-11-12-13-14-15-16-17-18-19-1A-1B-1C-1D-1E-1F-20-21-22-23-24-25-26-27-28-29-2A-2B-2C-2D-2E-2F-30-31-32-33-34-35-36-37-38-39-3A-3B-3C-3D-3E-3F-40-41-42-43-44-45-46-47-48-49-4A-4B-4C-4D-4E-4F-50-51-52-53-54-55-56-57-58-59-5A-5B-5C-5D-5E-5F-60-61-62-63-64-65-66-67-68-69-6A-6B-6C-6D-6E-6F-70-71-72-73-74-75-76-77-78-79-7A-7B-7C-7D-7E-7F-80-81-82-83-84-85-86-87-88-89-8A-8B-8C-8D-8E-8F-90-91-92-93-94-95-96-97-98-99-9A-9B-9C-9D-9E-9F-A0-A1-A2-A3-A4-A5-A6-A7-A8-A9-AA-AB-AC-AD-AE-AF-B0-B1-B2-B3-B4-B5-B6-B7-B8-B9-BA-BB-BC-BD-BE-BF-C0-C1-C2-C3-C4-C5-C6-C7-C8-C9-CA-CB-CC-CD-CE-CF-D0-D1-D2-D3-D4-D5-D6-D7-D8-D9-DA-DB-DC-DD-DE-DF-E0-E1-E2-E3-E4-E5-E6-E7-E8-E9-EA-EB-EC-ED-EE-EF-F0-F1-F2-F3-F4-F5-F6-F7-F8-F9-FA-FB-FC-FD-FE-FF", BitConverter.ToString(output));
@@ -136,7 +136,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Base58: Basic Text")]
-        void Text_Basic() {
+        public void Text_Basic() {
             var text = "Testing";
 
             var base58 = Base58.ToString(text);
@@ -149,7 +149,7 @@ namespace Test {
         private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
 
         [Fact(DisplayName = "Base58: Randomized")]
-        void Randomized() {
+        public void Randomized() {
             var random = new byte[64];
             Random.GetBytes(random);
 
@@ -161,7 +161,7 @@ namespace Test {
 
 
         [Fact(DisplayName = "Base58: Exception - Invalid Character")]
-        void Exception_InvalidCharacter() {
+        public void Exception_InvalidCharacter() {
             Assert.Throws<FormatException>(() => {
                 var bytes = Base58.AsBytes("!");
             });
