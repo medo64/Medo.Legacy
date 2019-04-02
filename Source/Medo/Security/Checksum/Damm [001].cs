@@ -30,12 +30,12 @@ namespace Medo.Security.Checksum {
         /// <summary>
         /// Gets hash as number between 0 and 9.
         /// </summary>
-        public int HashAsNumber => CurrentChecksum;
+        public int HashAsNumber { get; private set; } = 0;
 
         /// <summary>
         /// Gets hash as char.
         /// </summary>
-        public char HashAsChar => (char)(0x30 + CurrentChecksum);
+        public char HashAsChar => (char)(0x30 + HashAsNumber);
 
 
         /// <summary>
@@ -89,7 +89,6 @@ namespace Medo.Security.Checksum {
         #endregion
 
 
-        private int CurrentChecksum = 0;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Member", Justification = "This multidimensional array does not waste space.")]
         private static readonly int[,] AntisymmetricQuasigroup = new int[10, 10] {
             {0, 3, 1, 7, 5, 9, 8, 6, 4, 2},
@@ -131,9 +130,9 @@ namespace Medo.Security.Checksum {
             for (var i = ibStart; i < (ibStart + cbSize); i++) {
                 var b = array[i];
                 if ((b < 0x30) || (b > 0x39)) { throw new ArgumentOutOfRangeException(nameof(array), "Only numbers 0 to 9 are allowed."); }
-                var row = CurrentChecksum;
+                var row = HashAsNumber;
                 var col = b - 0x30;
-                CurrentChecksum = Damm.AntisymmetricQuasigroup[row, col];
+                HashAsNumber = Damm.AntisymmetricQuasigroup[row, col];
             }
         }
 
@@ -142,7 +141,7 @@ namespace Medo.Security.Checksum {
         /// </summary>
         /// <returns></returns>
         protected override byte[] HashFinal() {
-            return new byte[] { (byte)(0x30 + CurrentChecksum) };
+            return new byte[] { (byte)(0x30 + HashAsNumber) };
         }
 
         #endregion
