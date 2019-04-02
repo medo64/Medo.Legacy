@@ -61,8 +61,8 @@ namespace Medo.Security.Checksum {
             }
 
             for (var i = ibStart; i < (ibStart + cbSize); i++) {
-                Sum1 = Sum1 + array[i];
-                Sum2 = Sum2 + Sum1;
+                Sum1 += array[i];
+                Sum2 += Sum1;
                 if (Sum2 > MaximumRunningSum) {
                     Sum1 %= 255;
                     Sum2 %= 255;
