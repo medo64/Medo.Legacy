@@ -17,7 +17,7 @@ namespace Medo.Math {
 	/// </remarks>
 	public class WeightedMovingAverage  {
 
-		private System.Collections.Generic.List<double> _items = new System.Collections.Generic.List<double>();
+		private readonly System.Collections.Generic.List<double> _items = new System.Collections.Generic.List<double>();
 		private readonly int _maxCount;
 
 
@@ -71,10 +71,10 @@ namespace Medo.Math {
 				if (IsEmpty) {
 					return double.NaN;
 				} else {
-					int count = _items.Count;
-					int divider = 0;
+					var count = _items.Count;
+					var divider = 0;
 					double sum = 0;
-					for (int i = 0; i < count; i++) {
+					for (var i = 0; i < count; i++) {
 						sum += _items[i] * (i + 1);
 						divider += (i + 1);
 					}
