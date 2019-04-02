@@ -13,8 +13,8 @@ namespace Medo.Windows.Forms {
 	/// </summary>
 	public class WaitBox : System.IDisposable {
 
-		private System.Threading.Thread _thread;
-		private System.Threading.ManualResetEvent _hideEvent;
+		private readonly System.Threading.Thread _thread;
+		private readonly System.Threading.ManualResetEvent _hideEvent;
 		private readonly object _syncRoot = new object();
 		private readonly object _syncForm = new object();
 		private Form _form;
