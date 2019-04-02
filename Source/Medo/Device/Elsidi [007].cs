@@ -94,7 +94,7 @@ namespace Medo.Device {
             _serial.DiscardOutBuffer();
 
             var buffer = ASCIIEncoding.ASCII.GetBytes(text);
-            for (int i = 0; i < buffer.Length; i++) {
+            for (var i = 0; i < buffer.Length; i++) {
                 if ((buffer[i] >= 0x08) && (buffer[i] <= 0x0F)) { buffer[i] -= 0x08; }
                 _serial.Write(buffer, i, 1);
                 var ret = _serial.ReadByte();
@@ -248,7 +248,7 @@ namespace Medo.Device {
         /// <param name="command">Command character.</param>
         /// <param name="commandData">Command data.</param>
         public bool SendTextCommand(char command, string commandData) {
-            return SendTextCommand(command, commandData, out var bytes);
+            return SendTextCommand(command, commandData, out _);
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace Medo.Device {
             var bufferList = new List<byte>(new byte[] { HT });
             bufferList.AddRange(ASCIIEncoding.ASCII.GetBytes(command.ToString()));
             if (commandData != null) { bufferList.AddRange(ASCIIEncoding.ASCII.GetBytes(commandData)); }
-            for (int i = bufferList.Count - 1; i >= 1; i--) {
+            for (var i = bufferList.Count - 1; i >= 1; i--) {
                 if ((bufferList[i] == LF) || (bufferList[i] == CR)) {
                     bufferList.RemoveAt(i);
                 }
