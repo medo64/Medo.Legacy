@@ -9,14 +9,14 @@ namespace Test {
         public void Basic() {
             var time = TrivialNtpClient.RetrieveTime("0.medo64.pool.ntp.org");
             var diff = DateTime.UtcNow - time;
-            Assert.True(Math.Abs(diff.TotalSeconds) < 1);
+            Assert.True(Math.Abs(diff.TotalSeconds) < 5);
         }
 
         [Fact(DisplayName = "TrivialNtpClient: Async")]
         async public void Async() {
             var time = await TrivialNtpClient.RetrieveTimeAsync("0.medo64.pool.ntp.org");
             var diff = DateTime.UtcNow - time;
-            Assert.True(Math.Abs(diff.TotalSeconds) < 1);
+            Assert.True(Math.Abs(diff.TotalSeconds) < 5);
         }
 
 
