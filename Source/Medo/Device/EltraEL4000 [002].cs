@@ -187,7 +187,7 @@ namespace Medo.Device {
         /// </summary>
         /// <param name="text">Printed data on ticket</param>
         public bool PrintTextOnTicket(string text) {
-            List<byte> buffer = new List<byte>();
+            var buffer = new List<byte>();
             buffer.AddRange(ASCIIEncoding.ASCII.GetBytes(text));
             buffer.Add(0x0A); //LF
             WritePortCommand(0x50, buffer.ToArray()); //P
@@ -214,13 +214,13 @@ namespace Medo.Device {
         /// <param name="barcode">Barcode field.</param>
         /// <param name="text">Text line.</param>
         public bool ValidateTicket(string barcode, params string[] text) {
-            List<byte> buffer = new List<byte>();
+            var buffer = new List<byte>();
 
             if (barcode != null) { buffer.AddRange(ASCIIEncoding.ASCII.GetBytes(barcode)); }
             buffer.Add(0x0A); //LF
 
             if (text != null) {
-                for (int i = 0; i < text.Length; ++i) {
+                for (var i = 0; i < text.Length; ++i) {
                     if (text[i] != null) { buffer.AddRange(ASCIIEncoding.ASCII.GetBytes(text[i])); }
                     buffer.Add(0x0A); //LF
                 }
@@ -269,7 +269,7 @@ namespace Medo.Device {
             _lastErrorCode = EltraErrorCodes.None;
             _lastData = null;
 
-            List<byte> command = new List<byte> {
+            var command = new List<byte> {
                 0x12, //WUP
                 0x02, //STX
                 0x42, //DEST
@@ -280,7 +280,7 @@ namespace Medo.Device {
             }
             command.Add(0x03); //ETX
 
-            Lrc8 lrc = Lrc8.GetEltra();
+            var lrc = Lrc8.GetEltra();
             lrc.Append(command.ToArray());
             command.AddRange(lrc.DigestAsAscii30); //LRC
 
@@ -290,7 +290,7 @@ namespace Medo.Device {
         }
 
         private bool ReadPortAnswer() {
-            int value = _serial.ReadByte(); //Check whether command was ok.
+            var value = _serial.ReadByte(); //Check whether command was ok.
             if (value != 0x06) { //ACK
                 _lastCommandStatus = EltraCommandStatus.CommandError;
                 return false;
@@ -303,7 +303,7 @@ namespace Medo.Device {
                 if (value == 0x10) { //DLE  No message to send.
                     System.Threading.Thread.Sleep(100); //just wait a little
                 } else if (value == 0x02) { //STX  Answer is ready.
-                    List<byte> buffer = new List<byte> {
+                    var buffer = new List<byte> {
                         (byte)value
                     };
                     do {
@@ -327,8 +327,8 @@ namespace Medo.Device {
                             } break;
                         default: throw new System.FormatException("Unknown answer status.");
                     }
-                    int errorCodesX = (buffer[4] & 0xF);
-                    int errorCodesY = (buffer[5] & 0xF);
+                    var errorCodesX = (buffer[4] & 0xF);
+                    var errorCodesY = (buffer[5] & 0xF);
                     switch (buffer[2]) {
                         case 0x3C: //Insert Ticket. Ticket in Position
                             if ((errorCodesX & 0x01) == 0x01) { _lastErrorCode |= EltraErrorCodes.TicketAlreadyInsideTheTransport; }
@@ -560,7 +560,7 @@ namespace Medo.Device {
             /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
             public void Append(byte[] value, int index, int length) {
                 if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-                for (int i = index; i < index + length; i++) {
+                for (var i = index; i < index + length; i++) {
                     _currDigest = (byte)(_currDigest ^ value[i]);
                 }
             }
@@ -578,8 +578,8 @@ namespace Medo.Device {
             [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "This is in order to have similar properties for all Medo.Security.Checksum namespace classes.")]
             public byte[] DigestAsAscii30 {
                 get {
-                    byte part1 = (byte)(0x30 + (Digest >> 4));
-                    byte part2 = (byte)(0x30 + (Digest & 0x0f));
+                    var part1 = (byte)(0x30 + (Digest >> 4));
+                    var part2 = (byte)(0x30 + (Digest & 0x0f));
                     return new byte[] { part1, part2 };
                 }
             }
