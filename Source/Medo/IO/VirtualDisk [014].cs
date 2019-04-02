@@ -134,7 +134,7 @@ namespace Medo.IO {
             }
             storageType.VendorId = NativeMethods.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
 
-            int res = NativeMethods.OpenVirtualDisk(ref storageType, FileName, (NativeMethods.VIRTUAL_DISK_ACCESS_MASK)fileAccess, NativeMethods.OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, ref parameters, ref _handle);
+            var res = NativeMethods.OpenVirtualDisk(ref storageType, FileName, (NativeMethods.VIRTUAL_DISK_ACCESS_MASK)fileAccess, NativeMethods.OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, ref parameters, ref _handle);
             if (res == NativeMethods.ERROR_SUCCESS) {
             } else {
                 _handle.SetHandleAsInvalid();
@@ -369,7 +369,7 @@ namespace Medo.IO {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Method may throw exceptions.")]
         public VirtualDiskOperationProgress GetCreateProgress() {
             var progress = new NativeMethods.VIRTUAL_DISK_PROGRESS();
-            int res = NativeMethods.GetVirtualDiskOperationProgress(_handle, ref _createOverlap, ref progress);
+            var res = NativeMethods.GetVirtualDiskOperationProgress(_handle, ref _createOverlap, ref progress);
             if (res == NativeMethods.ERROR_SUCCESS) {
                 res = progress.OperationStatus; //overwrites original res in order for copy/paste error handling to work (copy/paste is from Create method and may be used in future also)
                 if (res == NativeMethods.ERROR_SUCCESS) {
@@ -412,7 +412,7 @@ namespace Medo.IO {
                 Version = NativeMethods.ATTACH_VIRTUAL_DISK_VERSION.ATTACH_VIRTUAL_DISK_VERSION_1
             };
 
-            int res = NativeMethods.AttachVirtualDisk(_handle, IntPtr.Zero, (NativeMethods.ATTACH_VIRTUAL_DISK_FLAG)options, 0, ref parameters, IntPtr.Zero);
+            var res = NativeMethods.AttachVirtualDisk(_handle, IntPtr.Zero, (NativeMethods.ATTACH_VIRTUAL_DISK_FLAG)options, 0, ref parameters, IntPtr.Zero);
             if (res == NativeMethods.ERROR_SUCCESS) {
             } else if (res == NativeMethods.ERROR_ACCESS_DENIED) {
                 throw new IOException("Access is denied.");
@@ -434,11 +434,10 @@ namespace Medo.IO {
         /// <exception cref="System.IO.IOException">Device could not be accessed.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This method may not return immediately when called.")]
         public string GetAttachedPath() {
-            int res = 0;
-            int pathSize = 200; //size in bytes (200) - not in chars (100)
+            var pathSize = 200; //size in bytes (200) - not in chars (100)
             var path = new StringBuilder(pathSize / 2); //unicode
 
-            res = NativeMethods.GetVirtualDiskPhysicalPath(_handle, ref pathSize, path);
+            var res = NativeMethods.GetVirtualDiskPhysicalPath(_handle, ref pathSize, path);
             if (res == NativeMethods.ERROR_INSUFFICIENT_BUFFER) {
                 path.Capacity = pathSize / 2;
                 res = NativeMethods.GetVirtualDiskPhysicalPath(_handle, ref pathSize, path);
@@ -461,7 +460,7 @@ namespace Medo.IO {
         /// <exception cref="System.UnauthorizedAccessException">A required privilege is not held by the client.</exception>
         /// <exception cref="System.ComponentModel.Win32Exception">Native error.</exception>
         public void Detach() {
-            int res = NativeMethods.DetachVirtualDisk(_handle, NativeMethods.DETACH_VIRTUAL_DISK_FLAG.DETACH_VIRTUAL_DISK_FLAG_NONE, 0);
+            var res = NativeMethods.DetachVirtualDisk(_handle, NativeMethods.DETACH_VIRTUAL_DISK_FLAG.DETACH_VIRTUAL_DISK_FLAG_NONE, 0);
             if (res == NativeMethods.ERROR_SUCCESS) {
             } else if (res == NativeMethods.ERROR_INVALID_HANDLE) {
                 throw new InvalidOperationException("The handle is invalid.");
@@ -497,9 +496,9 @@ namespace Medo.IO {
                 Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_SIZE
             };
 
-            int size = Marshal.SizeOf(info);
-            int sizeUsed = 0;
-            int res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
+            var size = Marshal.SizeOf(info);
+            var sizeUsed = 0;
+            var res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
 
             if (res == NativeMethods.ERROR_SUCCESS) {
 
@@ -524,9 +523,9 @@ namespace Medo.IO {
                 Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_IDENTIFIER
             };
 
-            int size = Marshal.SizeOf(info);
-            int sizeUsed = 0;
-            int res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
+            var size = Marshal.SizeOf(info);
+            var sizeUsed = 0;
+            var res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
 
             if (res == NativeMethods.ERROR_SUCCESS) {
 
@@ -549,9 +548,9 @@ namespace Medo.IO {
                 Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_VIRTUAL_STORAGE_TYPE
             };
 
-            int size = Marshal.SizeOf(info);
-            int sizeUsed = 0;
-            int res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
+            var size = Marshal.SizeOf(info);
+            var sizeUsed = 0;
+            var res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
 
             if (res == NativeMethods.ERROR_SUCCESS) {
 
@@ -574,9 +573,9 @@ namespace Medo.IO {
                 Version = NativeMethods.GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_PROVIDER_SUBTYPE
             };
 
-            int size = Marshal.SizeOf(info);
-            int sizeUsed = 0;
-            int res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
+            var size = Marshal.SizeOf(info);
+            var sizeUsed = 0;
+            var res = NativeMethods.GetVirtualDiskInformation(_handle, ref size, ref info, ref sizeUsed);
 
             if (res == NativeMethods.ERROR_SUCCESS) {
 
