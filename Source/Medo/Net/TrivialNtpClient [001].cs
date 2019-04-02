@@ -364,7 +364,7 @@ namespace Medo.Net {
             private static byte[] GetTimestamp(DateTime? timestamp) {
                 if (timestamp == null) { return new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }; }
 
-                DateTime time = timestamp.Value;
+                var time = timestamp.Value;
                 if (time.Kind == DateTimeKind.Local) { time = time.ToUniversalTime(); }
 
                 var eraTime = new DateTime(1900, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
