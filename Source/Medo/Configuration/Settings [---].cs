@@ -61,21 +61,21 @@ namespace Medo.Configuration {
             get {
                 lock (SyncRoot) {
                     if (Settings._subkeyPath == null) {
-                        Assembly assembly = Assembly.GetEntryAssembly();
+                        var assembly = Assembly.GetEntryAssembly();
                         if (assembly == null) { assembly = Assembly.GetExecutingAssembly(); }
 
                         string company = null;
-                        object[] companyAttributes = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), true);
+                        var companyAttributes = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), true);
                         if ((companyAttributes != null) && (companyAttributes.Length >= 1)) {
                             company = ((AssemblyCompanyAttribute)companyAttributes[companyAttributes.Length - 1]).Company;
                         }
 
                         string product = null;
-                        object[] productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), true);
+                        var productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), true);
                         if ((productAttributes != null) && (productAttributes.Length >= 1)) {
                             product = ((AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
                         } else {
-                            object[] titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
+                            var titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
                             if ((titleAttributes != null) && (titleAttributes.Length >= 1)) {
                                 product = ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
                             } else {
@@ -83,7 +83,7 @@ namespace Medo.Configuration {
                             }
                         }
 
-                        string path = "Software";
+                        var path = "Software";
                         if (!string.IsNullOrEmpty(company)) { path += "\\" + company; }
                         if (!string.IsNullOrEmpty(product)) { path += "\\" + product; }
 
@@ -124,7 +124,7 @@ namespace Medo.Configuration {
             lock (SyncRoot) {
                 if (Cache.Contains(key)) { return Cache.Read(key); }
 
-                string retValue = defaultValue;
+                var retValue = defaultValue;
                 try {
                     if (_args.ContainsKey(key)) { //CommandLine
                         retValue = _args.GetValue(key);
@@ -192,7 +192,7 @@ namespace Medo.Configuration {
             lock (SyncRoot) {
                 if (Cache.Contains(key)) { return GetInt32(Cache.Read(key), defaultValue); }
 
-                int retValue = defaultValue;
+                var retValue = defaultValue;
                 try {
                     if (_args.ContainsKey(key)) { //CommandLine
                         retValue = GetInt32(_args.GetValue(key), defaultValue);
@@ -255,7 +255,7 @@ namespace Medo.Configuration {
 
             if (Cache.Contains(key)) { return GetBoolean(Cache.Read(key), defaultValue); }
 
-            bool retValue = defaultValue;
+            var retValue = defaultValue;
             lock (SyncRoot) {
                 try {
                     if (_args.ContainsKey(key)) { //CommandLine
@@ -322,7 +322,7 @@ namespace Medo.Configuration {
 
         private static class Cache {
 
-            private static Dictionary<string, string> _cache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            private static readonly Dictionary<string, string> _cache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             private static readonly object _cacheSyncRoot = new object();
 
 
@@ -374,10 +374,10 @@ namespace Medo.Configuration {
             get {
                 if (_appConfig == null) {
                     _appConfig = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    for (int i = 0; i < ConfigurationManager.AppSettings.Count; ++i) {
-                        string currKey = ConfigurationManager.AppSettings.GetKey(i).ToUpperInvariant();
-                        string[] currValues = ConfigurationManager.AppSettings.GetValues(i);
-                        string currValue = string.Empty;
+                    for (var i = 0; i < ConfigurationManager.AppSettings.Count; ++i) {
+                        var currKey = ConfigurationManager.AppSettings.GetKey(i).ToUpperInvariant();
+                        var currValues = ConfigurationManager.AppSettings.GetValues(i);
+                        var currValue = string.Empty;
                         if (currValues.Length > 0) { currValue = currValues[currValues.Length - 1]; }
                         if (!string.IsNullOrEmpty(currKey)) {
                             if (_appConfig.ContainsKey(currKey)) {
@@ -398,7 +398,7 @@ namespace Medo.Configuration {
 
         #region Args
 
-        private static Args _args = Args.Current;
+        private static readonly Args _args = Args.Current;
 
         private class Args {
 
@@ -409,7 +409,7 @@ namespace Medo.Configuration {
             public static Args Current {
                 get {
                     if (_current == null) {
-                        string[] envArgs = Environment.GetCommandLineArgs();
+                        var envArgs = Environment.GetCommandLineArgs();
                         _current = new Args(envArgs, 1, envArgs.Length - 1);
                     }
                     return _current;
@@ -433,18 +433,18 @@ namespace Medo.Configuration {
             private void InitializeFromArray(string[] array, int offset, int count, string[] prefixes, char[] separators) {
                 _items = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
-                for (int i = 0; i < count; ++i) {
-                    string curr = array[offset + i];
+                for (var i = 0; i < count; ++i) {
+                    var curr = array[offset + i];
                     string key = null;
                     string value = null;
 
-                    bool isDone = false;
+                    var isDone = false;
 
                     //named
-                    for (int j = 0; j < prefixes.Length; ++j) {
-                        string currPrefix = prefixes[j];
+                    for (var j = 0; j < prefixes.Length; ++j) {
+                        var currPrefix = prefixes[j];
                         if (curr.StartsWith(currPrefix, StringComparison.Ordinal)) {
-                            int iSep = curr.IndexOfAny(separators);
+                            var iSep = curr.IndexOfAny(separators);
                             if (iSep >= 0) {
                                 key = curr.Substring(currPrefix.Length, iSep - currPrefix.Length);
                                 value = curr.Remove(0, iSep + 1);
@@ -526,7 +526,7 @@ namespace Medo.Configuration {
         #endregion
 
 
-        private static Dictionary<string, string> Defaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, string> Defaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Sets defaults to be used as last priority.
@@ -588,7 +588,7 @@ namespace Medo.Configuration {
             try {
                 using (var rk = root.OpenSubKey(Settings.SubkeyPath, false)) {
                     if (rk != null) {
-                        object regValue = rk.GetValue(key, null);
+                        var regValue = rk.GetValue(key, null);
                         if (regValue != null) {
                             switch (Settings.IsRunningOnMono ? RegistryValueKind.String : rk.GetValueKind(key)) {
                                 case RegistryValueKind.String:
@@ -604,7 +604,7 @@ namespace Medo.Configuration {
                 }
             } catch (SecurityException) { }
 
-            value = default(string);
+            value = default;
             return false;
         }
 
@@ -612,14 +612,14 @@ namespace Medo.Configuration {
             try {
                 using (var rk = root.OpenSubKey(Settings.SubkeyPath, false)) {
                     if (rk != null) {
-                        object regValue = rk.GetValue(key, null);
+                        var regValue = rk.GetValue(key, null);
                         if (regValue != null) {
                             switch (Settings.IsRunningOnMono ? RegistryValueKind.String : rk.GetValueKind(key)) {
                                 case RegistryValueKind.DWord:
                                     value = (int)regValue;
                                     return true;
                                 case RegistryValueKind.String:
-                                    value = GetInt32(string.Format(CultureInfo.InvariantCulture, "{0}", regValue), default(int));
+                                    value = GetInt32(string.Format(CultureInfo.InvariantCulture, "{0}", regValue), default);
                                     return true;
                             }
                         }
@@ -627,7 +627,7 @@ namespace Medo.Configuration {
                 }
             } catch (SecurityException) { }
 
-            value = default(int);
+            value = default;
             return false;
         }
 
@@ -635,14 +635,14 @@ namespace Medo.Configuration {
             try {
                 using (var rk = root.OpenSubKey(Settings.SubkeyPath, false)) {
                     if (rk != null) {
-                        object regValue = rk.GetValue(key, null);
+                        var regValue = rk.GetValue(key, null);
                         if (regValue != null) {
                             switch (Settings.IsRunningOnMono ? RegistryValueKind.String : rk.GetValueKind(key)) {
                                 case RegistryValueKind.DWord:
                                     value = (int)regValue != 0;
                                     return true;
                                 case RegistryValueKind.String:
-                                    value = GetBoolean(string.Format(CultureInfo.InvariantCulture, "{0}", regValue), default(bool));
+                                    value = GetBoolean(string.Format(CultureInfo.InvariantCulture, "{0}", regValue), default);
                                     return true;
                             }
                         }
@@ -650,7 +650,7 @@ namespace Medo.Configuration {
                 }
             } catch (SecurityException) { }
 
-            value = default(bool);
+            value = default;
             return false;
         }
 
