@@ -155,12 +155,12 @@ namespace Medo.Windows.Forms {
             }
         }
 
-        void btnOk_Click(object sender, EventArgs e) {
+        private void btnOk_Click(object sender, EventArgs e) {
             Text = txtValue.Text;
             frm.DialogResult = DialogResult.OK;
         }
 
-        void frm_Load(object sender, EventArgs e) {
+        private void frm_Load(object sender, EventArgs e) {
             txtValue.Text = DefaultText;
             txtValue.SelectAll();
             txtValue.Focus();
@@ -169,9 +169,9 @@ namespace Medo.Windows.Forms {
 
         private static Icon GetAppIcon(string fileName) {
             if (!InputBox.IsRunningOnMono) {
-                System.IntPtr hLibrary = NativeMethods.LoadLibrary(fileName);
+                var hLibrary = NativeMethods.LoadLibrary(fileName);
                 if (!hLibrary.Equals(System.IntPtr.Zero)) {
-                    System.IntPtr hIcon = NativeMethods.LoadIcon(hLibrary, "#32512");
+                    var hIcon = NativeMethods.LoadIcon(hLibrary, "#32512");
                     if (!hIcon.Equals(System.IntPtr.Zero)) {
                         var icon = System.Drawing.Icon.FromHandle(hIcon);
                         if (icon != null) { return icon; }
