@@ -666,7 +666,7 @@ namespace Test {
 
         #region Private setup
 
-        private static Random Rnd = new Random();
+        private static readonly Random Rnd = new Random();
 
         private static List<TestBlock> GetTestBlocks(Stream fileStream) {
             var result = new List<TestBlock>();
@@ -704,8 +704,8 @@ namespace Test {
 
         private static byte[] ParseBytes(string hex) {
             Trace.Assert((hex.Length % 2) == 0);
-            byte[] result = new byte[hex.Length / 2];
-            for (int i = 0; i < hex.Length; i += 2) {
+            var result = new byte[hex.Length / 2];
+            for (var i = 0; i < hex.Length; i += 2) {
                 result[i / 2] = byte.Parse(hex.Substring(i, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             }
             return result;

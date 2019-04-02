@@ -119,7 +119,7 @@ namespace Medo.Security.Cryptography {
 
         #region Private
 
-        private static Lazy<RandomNumberGenerator> Rng = new Lazy<RandomNumberGenerator>(() => RandomNumberGenerator.Create());
+        private static readonly Lazy<RandomNumberGenerator> Rng = new Lazy<RandomNumberGenerator>(() => RandomNumberGenerator.Create());
 
         private ICryptoTransform NewEncryptor(byte[] rgbKey, CipherMode mode, byte[] rgbIV, TwofishManagedTransformMode encryptMode) {
             if (rgbKey == null) {
@@ -165,7 +165,7 @@ namespace Medo.Security.Cryptography {
         private readonly TwofishManagedTransformMode TransformMode;
         private readonly PaddingMode PaddingMode;
 
-        private TwofishImplementation Implementation;
+        private readonly TwofishImplementation Implementation;
 
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace Medo.Security.Cryptography {
 
 
         [ThreadStatic()]
-        private static RandomNumberGenerator Rng = RandomNumberGenerator.Create();
+        private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
         private byte[] PaddingBuffer; //used to store last block under decrypting as to work around CryptoStream implementation details.
 
@@ -362,7 +362,7 @@ namespace Medo.Security.Cryptography {
             if (paddingMode == PaddingMode.PKCS7) {
                 var padding = outputBuffer[outputBuffer.Length - 1];
                 if ((padding < 1) || (padding > 16)) { throw new CryptographicException("Invalid padding."); }
-                for (int i = outputBuffer.Length - padding; i < outputBuffer.Length; i++) {
+                for (var i = outputBuffer.Length - padding; i < outputBuffer.Length; i++) {
                     if (outputBuffer[i] != padding) { throw new CryptographicException("Invalid padding."); }
                 }
                 var newOutputBuffer = new byte[outputBuffer.Length - padding];
@@ -370,7 +370,7 @@ namespace Medo.Security.Cryptography {
                 return newOutputBuffer;
             } else if (paddingMode == PaddingMode.Zeros) {
                 var newOutputLength = outputBuffer.Length;
-                for (int i = outputBuffer.Length - 1; i >= outputBuffer.Length - 16; i--) {
+                for (var i = outputBuffer.Length - 1; i >= outputBuffer.Length - 16; i--) {
                     if (outputBuffer[i] != 0) {
                         newOutputLength = i + 1;
                         break;
@@ -386,7 +386,7 @@ namespace Medo.Security.Cryptography {
             } else if (paddingMode == PaddingMode.ANSIX923) {
                 var padding = outputBuffer[outputBuffer.Length - 1];
                 if ((padding < 1) || (padding > 16)) { throw new CryptographicException("Invalid padding."); }
-                for (int i = outputBuffer.Length - padding; i < outputBuffer.Length - 1; i++) {
+                for (var i = outputBuffer.Length - padding; i < outputBuffer.Length - 1; i++) {
                     if (outputBuffer[i] != 0) { throw new CryptographicException("Invalid padding."); }
                 }
                 var newOutputBuffer = new byte[outputBuffer.Length - padding];
@@ -437,8 +437,8 @@ namespace Medo.Security.Cryptography {
             private const int RoundSubkeys = (OutputWhiten + BlockSize / 32);
             private const int TotalSubkeys = (RoundSubkeys + 2 * Rounds);
 
-            private DWord[] SBoxKeys = new DWord[MaxKeyBits / 64]; //key bits used for S-boxes
-            private DWord[] SubKeys = new DWord[TotalSubkeys]; //round subkeys, input/output whitening bits
+            private readonly DWord[] SBoxKeys = new DWord[MaxKeyBits / 64]; //key bits used for S-boxes
+            private readonly DWord[] SubKeys = new DWord[TotalSubkeys]; //round subkeys, input/output whitening bits
 
 
             public void Dispose() {
@@ -471,7 +471,7 @@ namespace Medo.Security.Cryptography {
                     SBoxKeys[k64Cnt - 1 - i] = ReedSolomonMdsEncode(k32e[i], k32o[i]); //compute S-box keys using (12,8) Reed-Solomon code over GF(256)
                 }
 
-                int subkeyCnt = RoundSubkeys + 2 * Rounds;
+                var subkeyCnt = RoundSubkeys + 2 * Rounds;
                 var keyLen = Key.Length * 4 * 8;
                 for (var i = 0; i < subkeyCnt / 2; i++) { //compute round subkeys for PHT
                     var A = F32((DWord)(i * SubkeyStep), k32e, keyLen); //A uses even key dwords
