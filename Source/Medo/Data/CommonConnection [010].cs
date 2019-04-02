@@ -45,10 +45,10 @@ namespace Medo.Data {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public CommonConnection(string providerInvariantName) {
 #if DEBUG
-            DataTable table = DbProviderFactories.GetFactoryClasses();
-            StringBuilder sbProviders = new StringBuilder();
-            for (int i = 0; i < table.Rows.Count; i++) {
-                System.Data.DataRow row = table.Rows[i];
+            var table = DbProviderFactories.GetFactoryClasses();
+            var sbProviders = new StringBuilder();
+            for (var i = 0; i < table.Rows.Count; i++) {
+                var row = table.Rows[i];
                 if (sbProviders.Length > 0) { sbProviders.Append(", "); }
                 sbProviders.Append(row[2]);
             }
@@ -98,7 +98,7 @@ namespace Medo.Data {
         /// <param name="forceMultipleActiveResultSets">If true, MARS will be forced.</param>
         /// <param name="otherSettings">Other settings.</param>
         public static CommonConnection CreateSqlClientConnection(string server, string database, bool forceIntegratedSspiSecurity, bool forceMultipleActiveResultSets, params string[] otherSettings) {
-            StringBuilder sbCS = new StringBuilder();
+            var sbCS = new StringBuilder();
             if (!string.IsNullOrEmpty(server)) {
                 sbCS.Append("Server=" + server);
                 sbCS.Append(";");
@@ -116,8 +116,8 @@ namespace Medo.Data {
                 sbCS.Append(";");
             }
             if (otherSettings != null) {
-                for (int i = 0; i < otherSettings.Length; i++) {
-                    string s = otherSettings[i];
+                for (var i = 0; i < otherSettings.Length; i++) {
+                    var s = otherSettings[i];
                     if (s != null) {
                         sbCS.Append(s);
                         sbCS.Append(";");
@@ -178,7 +178,7 @@ namespace Medo.Data {
         /// <param name="otherSettings">Other settings.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1706:ShortAcronymsShouldBeUppercase", MessageId = "Member", Justification = "This casing is used also in System.Data.OleDb.")]
         public static CommonConnection CreateOleDbConnection(string provider, string dataSource, params string[] otherSettings) {
-            StringBuilder sbCS = new StringBuilder();
+            var sbCS = new StringBuilder();
             if (!string.IsNullOrEmpty(provider)) {
                 sbCS.Append("Provider=" + provider);
                 sbCS.Append(";");
@@ -188,8 +188,8 @@ namespace Medo.Data {
                 sbCS.Append(";");
             }
             if (otherSettings != null) {
-                for (int i = 0; i < otherSettings.Length; i++) {
-                    string s = otherSettings[i];
+                for (var i = 0; i < otherSettings.Length; i++) {
+                    var s = otherSettings[i];
                     if (s != null) {
                         sbCS.Append(s);
                         sbCS.Append(";");
@@ -358,17 +358,17 @@ namespace Medo.Data {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Injection attack is not possible since all args[] are converted to IDbDataParameter.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is intended behaviour.")]
         internal protected IDbCommand CreateCommand(string format, params object[] args) {
-            IDbCommand cmd = CreateCommand();
+            var cmd = CreateCommand();
 
-            List<string> argList = new List<string>();
+            var argList = new List<string>();
             if (args != null) {
-                for (int i = 0; i < args.Length; ++i) {
+                for (var i = 0; i < args.Length; ++i) {
                     if (args[i] == null) {
                         argList.Add("NULL");
                     } else {
-                        string paramName = string.Format(CultureInfo.InvariantCulture, "@P{0}", i);
+                        var paramName = string.Format(CultureInfo.InvariantCulture, "@P{0}", i);
                         argList.Add(paramName);
-                        IDbDataParameter param = cmd.CreateParameter();
+                        var param = cmd.CreateParameter();
                         param.ParameterName = paramName;
                         param.Value = args[i];
                         if (param.DbType == DbType.DateTime) {
@@ -386,7 +386,7 @@ namespace Medo.Data {
 #if DEBUG
             var sb = new StringBuilder();
             sb.AppendFormat(CultureInfo.InvariantCulture, "-- {0}", cmd.CommandText);
-            for (int i = 0; i < cmd.Parameters.Count; ++i) {
+            for (var i = 0; i < cmd.Parameters.Count; ++i) {
                 sb.AppendLine();
                 if (cmd.Parameters[i] is DbParameter curr) {
                     sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}=\"{1}\" ({2})", curr.ParameterName, curr.Value, curr.DbType);
