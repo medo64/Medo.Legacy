@@ -50,7 +50,7 @@ namespace Medo.Drawing {
         /// <param name="value">Value.</param>
         /// <param name="endCharacter">Ending character.</param>
         public static BarcodeImage GetNewCodabar(char startCharacter, string value, char endCharacter) {
-            BarcodeImage barcode = new BarcodeImage();
+            var barcode = new BarcodeImage();
 
             barcode.InitCodabar();
             barcode.StartCharacter = startCharacter;
@@ -68,7 +68,7 @@ namespace Medo.Drawing {
         /// </summary>
         /// <param name="value">Value.</param>
         public static BarcodeImage GetNewCode128(string value) {
-            BarcodeImage barcode = new BarcodeImage();
+            var barcode = new BarcodeImage();
 
             barcode.InitCode128();
             barcode.Value = value;
@@ -90,7 +90,7 @@ namespace Medo.Drawing {
         /// </summary>
         public float MeasureWidth() {
             float totalWidth = 0;
-            for (int i = 0; i < EncodedValue.Length; i++) {
+            for (var i = 0; i < EncodedValue.Length; i++) {
                 switch (i % 2) {
                     case 0: //bar
                         totalWidth += EncodedValue[i] * BarWidth;
@@ -142,7 +142,7 @@ namespace Medo.Drawing {
             get { return _value; }
             set {
                 if (value == null) { value = string.Empty; }
-                for (int i = 0; i < value.Length; ++i) {
+                for (var i = 0; i < value.Length; ++i) {
                     if (!IsCharacterSupported(value[i])) { throw new System.ArgumentOutOfRangeException("value", string.Format(CultureInfo.InvariantCulture, Resources.FormatExceptionCharacterIsNotSupported, value[i])); }
                 }
                 _value = value;
@@ -249,29 +249,29 @@ namespace Medo.Drawing {
         /// <param name="height">Height.</param>
         public void Paint(Graphics graphics, float left, float top, float height) {
             if (graphics == null) { return; }
-            InterpolationMode oldInterpolationMode = graphics.InterpolationMode;
-            SmoothingMode oldSmoothingMode = graphics.SmoothingMode;
+            var oldInterpolationMode = graphics.InterpolationMode;
+            var oldSmoothingMode = graphics.SmoothingMode;
 
             graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             graphics.SmoothingMode = SmoothingMode.None;
 
             try {
-                float currLeft = left;
+                var currLeft = left;
 
-                using (SolidBrush barBrush = new SolidBrush(BarColor))
-                using (SolidBrush gapBrush = new SolidBrush(GapColor))
-                using (SolidBrush spaceBrush = new SolidBrush(SpaceColor)) {
+                using (var barBrush = new SolidBrush(BarColor))
+                using (var gapBrush = new SolidBrush(GapColor))
+                using (var spaceBrush = new SolidBrush(SpaceColor)) {
 
-                    for (int i = 0; i < EncodedValue.Length; i++) {
+                    for (var i = 0; i < EncodedValue.Length; i++) {
                         switch (i % 2) {
                             case 0: { //bar
-                                    int multiplier = EncodedValue[i];
+                                    var multiplier = EncodedValue[i];
                                     graphics.FillRectangle(barBrush, currLeft, top, multiplier * BarWidth, height);
                                     currLeft += multiplier * BarWidth;
                                     break;
                                 }
                             case 1: { //gap or space
-                                    int multiplier = EncodedValue[i];
+                                    var multiplier = EncodedValue[i];
                                     if (multiplier != 0) { //gap
                                         graphics.FillRectangle(gapBrush, currLeft, top, multiplier * GapWidth, height);
                                         currLeft += multiplier * GapWidth;
@@ -363,7 +363,7 @@ namespace Medo.Drawing {
             var ev = new List<int>();
             ev.AddRange(barcode._codabarStartStopEncoding[barcode.StartCharacter]);
             ev.Add(0);
-            for (int i = 0; i < barcode.Value.Length; i++) {
+            for (var i = 0; i < barcode.Value.Length; i++) {
                 ev.AddRange(barcode._codabarValueEncoding[barcode.Value[i]]);
                 ev.Add(0);
             }
@@ -376,35 +376,35 @@ namespace Medo.Drawing {
 
         #region Code128
 
-        private const byte A_FNC3 = 96;
-        private const byte A_FNC2 = 97;
-        private const byte A_SHIFT = 98;
-        private const byte A_CODEC = 99;
-        private const byte A_CODEB = 100;
-        private const byte A_FNC4 = 101;
-        private const byte A_FNC1 = 102;
+        //private const byte A_FNC3 = 96;
+        //private const byte A_FNC2 = 97;
+        //private const byte A_SHIFT = 98;
+        //private const byte A_CODEC = 99;
+        //private const byte A_CODEB = 100;
+        //private const byte A_FNC4 = 101;
+        //private const byte A_FNC1 = 102;
         private const byte A_STARTA = 103;
-        private const byte A_STARTB = 104;
-        private const byte A_STARTC = 105;
+        //private const byte A_STARTB = 104;
+        //private const byte A_STARTC = 105;
         private const byte A_STOP = 106;
-        private const byte B_FNC3 = 96;
-        private const byte B_FNC2 = 97;
-        private const byte B_SHIFT = 98;
-        private const byte B_CODEC = 99;
-        private const byte B_FNC4 = 100;
-        private const byte B_CODE1 = 101;
-        private const byte B_FNC1 = 102;
-        private const byte B_STARTA = 103;
-        private const byte B_STARTB = 104;
-        private const byte B_STARTC = 105;
-        private const byte B_STOP = 106;
-        private const byte C_CODEB = 100;
-        private const byte C_CODEA = 101;
-        private const byte C_FNC1 = 102;
-        private const byte C_STARTA = 103;
-        private const byte C_STARTB = 104;
-        private const byte C_STARTC = 105;
-        private const byte C_STOP = 106;
+        //private const byte B_FNC3 = 96;
+        //private const byte B_FNC2 = 97;
+        //private const byte B_SHIFT = 98;
+        //private const byte B_CODEC = 99;
+        //private const byte B_FNC4 = 100;
+        //private const byte B_CODE1 = 101;
+        //private const byte B_FNC1 = 102;
+        //private const byte B_STARTA = 103;
+        //private const byte B_STARTB = 104;
+        //private const byte B_STARTC = 105;
+        //private const byte B_STOP = 106;
+        //private const byte C_CODEB = 100;
+        //private const byte C_CODEA = 101;
+        //private const byte C_FNC1 = 102;
+        //private const byte C_STARTA = 103;
+        //private const byte C_STARTB = 104;
+        //private const byte C_STARTC = 105;
+        //private const byte C_STOP = 106;
 
 		private Dictionary<int, int[]> _code128EncodingLookup;
 		private Dictionary<int, string>[] _code128MappingLookup;
@@ -413,7 +413,7 @@ namespace Medo.Drawing {
 			_allowedStartCharacters = new List<char>();
 			_allowedEndCharacters = new List<char>();
 			_allowedValueCharacters = new List<char>();
-            for (int i = 0; i < 128; ++i) {
+            for (var i = 0; i < 128; ++i) {
 				_allowedValueCharacters.Add(System.Convert.ToChar(i));
             }
 
@@ -842,19 +842,19 @@ namespace Medo.Drawing {
         }
 
         private static void Code128ValueEncoder(BarcodeImage barcode) {
-            List<int> ev = new List<int>();
+            var ev = new List<int>();
 
-            int startCodeSet = GetCode128BestCodeSet(barcode, barcode.Value, -1);
-            int checksum = A_STARTA + startCodeSet;
+            var startCodeSet = GetCode128BestCodeSet(barcode, barcode.Value, -1);
+            var checksum = A_STARTA + startCodeSet;
 
             ev.AddRange(barcode._code128EncodingLookup[(byte)(A_STARTA + startCodeSet)]);
 
-            int codeSet = startCodeSet;
-            int j = 1;
-            for (int i = 0; i < barcode.Value.Length; i++) {
+            var codeSet = startCodeSet;
+            var j = 1;
+            for (var i = 0; i < barcode.Value.Length; i++) {
                 int tmpCharIndex;
 
-                int tmpOldCodeSet = codeSet;
+                var tmpOldCodeSet = codeSet;
                 codeSet = GetCode128BestCodeSet(barcode, barcode.Value.Substring(i, barcode._value.Length - i), tmpOldCodeSet);
                 if (codeSet == 2) {
                     tmpCharIndex = GetCode128CharPos(barcode, barcode.Value.Substring(i, 2), codeSet);
@@ -919,17 +919,17 @@ namespace Medo.Drawing {
                     break;
             }//switch
 
-            int tmpCountMax = tmpCount[0];
-            int tmpCountMaxIndex = 0;
-            if (tmpCount[1] > tmpCountMax) { tmpCountMax = tmpCount[1]; tmpCountMaxIndex = 1; }
-            if (tmpCount[2] > tmpCountMax) { tmpCountMax = tmpCount[2]; tmpCountMaxIndex = 2; }
+            var tmpCountMax = tmpCount[0];
+            var tmpCountMaxIndex = 0;
+            if (tmpCount[1] > tmpCountMax) { tmpCountMaxIndex = 1; tmpCountMax = tmpCount[1]; }
+            if (tmpCount[2] > tmpCountMax) { tmpCountMaxIndex = 2; }
 
             return tmpCountMaxIndex;
         }//GetCode128BestCodeSet
 
 
         private static int GetCode128CharPos(BarcodeImage barcode, string value, int codeTableIndex) {
-            System.Collections.Generic.Dictionary<int, string>.Enumerator iMapping = barcode._code128MappingLookup[codeTableIndex].GetEnumerator();
+            var iMapping = barcode._code128MappingLookup[codeTableIndex].GetEnumerator();
             while (iMapping.MoveNext()) {
                 if (iMapping.Current.Value == value) {
                     return iMapping.Current.Key;
