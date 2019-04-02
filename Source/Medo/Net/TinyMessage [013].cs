@@ -424,7 +424,7 @@ namespace Medo.Net {
 
                             var invokeArgs = new object[] { this, new TinyPacketEventArgs(packet, new IPEndPoint(endpoint.Address, endpoint.Port), remoteEndpoint) };
                             Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "TinyMessage: {0} Raising event for packet {1}/{2} from {3}.", tag, packet.Product, packet.Operation, remoteEndpoint));
-                            foreach (Delegate iDelegate in receivedHandler.GetInvocationList()) {
+                            foreach (var iDelegate in receivedHandler.GetInvocationList()) {
                                 if (!(iDelegate.Target is ISynchronizeInvoke syncer)) {
                                     try {
                                         iDelegate.DynamicInvoke(invokeArgs);
@@ -477,16 +477,16 @@ namespace Medo.Net {
                     var host = packet[".Host"];
                     if (host != null) {
                         var hostBytes = Encoding.UTF8.GetBytes(host);
-                        short b = (hostBytes.Length >= 2) ? (short)(((int)hostBytes[1] << 8) | hostBytes[0]) : (hostBytes.Length >= 1) ? hostBytes[0] : (byte)0;
-                        short c = (hostBytes.Length >= 4) ? (short)(((int)hostBytes[3] << 8) | hostBytes[2]) : (hostBytes.Length >= 3) ? hostBytes[2] : (byte)0;
-                        byte d = (hostBytes.Length >= 5) ? hostBytes[4] : (byte)0;
-                        byte e = (hostBytes.Length >= 6) ? hostBytes[5] : (byte)0;
-                        byte f = (hostBytes.Length >= 7) ? hostBytes[6] : (byte)0;
-                        byte g = (hostBytes.Length >= 8) ? hostBytes[7] : (byte)0;
-                        byte h = (hostBytes.Length >= 9) ? hostBytes[8] : (byte)0;
-                        byte i = (hostBytes.Length >= 10) ? hostBytes[9] : (byte)0;
-                        byte j = (hostBytes.Length > 12) ? hostBytes[hostBytes.Length - 2] : (hostBytes.Length >= 11) ? hostBytes[10] : (byte)0; //if longer than 12 characters, take last two characters
-                        byte k = (hostBytes.Length > 12) ? hostBytes[hostBytes.Length - 1] : (hostBytes.Length >= 12) ? hostBytes[11] : (byte)0;
+                        var b = (hostBytes.Length >= 2) ? (short)(((int)hostBytes[1] << 8) | hostBytes[0]) : (hostBytes.Length >= 1) ? hostBytes[0] : (byte)0;
+                        var c = (hostBytes.Length >= 4) ? (short)(((int)hostBytes[3] << 8) | hostBytes[2]) : (hostBytes.Length >= 3) ? hostBytes[2] : (byte)0;
+                        var d = (hostBytes.Length >= 5) ? hostBytes[4] : (byte)0;
+                        var e = (hostBytes.Length >= 6) ? hostBytes[5] : (byte)0;
+                        var f = (hostBytes.Length >= 7) ? hostBytes[6] : (byte)0;
+                        var g = (hostBytes.Length >= 8) ? hostBytes[7] : (byte)0;
+                        var h = (hostBytes.Length >= 9) ? hostBytes[8] : (byte)0;
+                        var i = (hostBytes.Length >= 10) ? hostBytes[9] : (byte)0;
+                        var j = (hostBytes.Length > 12) ? hostBytes[hostBytes.Length - 2] : (hostBytes.Length >= 11) ? hostBytes[10] : (byte)0; //if longer than 12 characters, take last two characters
+                        var k = (hostBytes.Length > 12) ? hostBytes[hostBytes.Length - 1] : (hostBytes.Length >= 12) ? hostBytes[11] : (byte)0;
                         uniqueId = new Guid(id, b, c, d, e, f, g, h, i, j, k);
                     } else {
                         uniqueId = new Guid(id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); //just use ID if there is no host
@@ -1175,7 +1175,7 @@ namespace Medo.Net {
         private static void WriteText(Stream stream, string value) {
             var encoding = Utf8Encoding.Value;
 
-            foreach (char ch in value) {
+            foreach (var ch in value) {
                 switch (ch) {
                     case '\"': stream.WriteByte(0x5C); stream.WriteByte(0x22); break; // \"
                     case '\\': stream.WriteByte(0x5C); stream.WriteByte(0x5C); break; // \\
@@ -1308,7 +1308,7 @@ namespace Medo.Net {
                         cryptoStream.CopyTo(decryptedStream);
                         decryptedStream.Position = 0;
                         if (decryptedStream.Length < BytesHeaderTiny.Length) { throw new FormatException("Invalid encrypted header."); }
-                        for (int i = 0; i < BytesHeaderTiny.Length; i++) {
+                        for (var i = 0; i < BytesHeaderTiny.Length; i++) {
                             if (decryptedStream.ReadByte() != BytesHeaderTiny[i]) { throw new FormatException("Invalid encrypted header."); }
                         }
                         return ParseData(decryptedStream, iv);
@@ -1324,10 +1324,10 @@ namespace Medo.Net {
         private static TinyPacket ParseData(MemoryStream stream, byte[] iv) {
             var encoding = Utf8Encoding.Value;
 
-            string product = ReadToSpaceOrEnd(stream);
+            var product = ReadToSpaceOrEnd(stream);
             if (string.IsNullOrEmpty(product)) { throw new System.FormatException("Cannot parse product."); }
 
-            string operation = ReadToSpaceOrEnd(stream);
+            var operation = ReadToSpaceOrEnd(stream);
             if (string.IsNullOrEmpty(operation)) { throw new System.FormatException("Cannot parse operation."); }
 
             var data = new Dictionary<string, string>();
@@ -1549,7 +1549,7 @@ namespace Medo.Net {
 
         private static bool IsMatchingPrefix(byte[] buffer, int offset, byte[] prefix) {
             if (offset + prefix.Length > buffer.Length) { return false; }
-            for (int i = 0; i < prefix.Length; i++) {
+            for (var i = 0; i < prefix.Length; i++) {
                 if (buffer[offset + i] != prefix[i]) { return false; }
             }
             return true;
@@ -1564,7 +1564,7 @@ namespace Medo.Net {
         private static readonly ThreadLocal<RandomNumberGenerator> Random = new ThreadLocal<RandomNumberGenerator>(() => { return RandomNumberGenerator.Create(); });
         private static readonly ThreadLocal<RijndaelManaged> Aes128Cbc = new ThreadLocal<RijndaelManaged>(
             () => {
-                RijndaelManaged aes = new RijndaelManaged();
+                var aes = new RijndaelManaged();
                 try {
                     aes.KeySize = 128;
                     aes.Mode = CipherMode.CBC;
@@ -1615,7 +1615,7 @@ namespace Medo.Net {
         /// </summary>
         public override int GetHashCode() {
             unchecked {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 31 + Product.GetHashCode();
                 hash = hash * 31 + Operation.GetHashCode();
                 return hash;
