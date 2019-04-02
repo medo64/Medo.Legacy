@@ -37,7 +37,7 @@ namespace Medo {
         }
 
 
-        private TKey _key;
+        private readonly TKey _key;
         private TValue _value;
         private object _tag;
 
@@ -149,7 +149,7 @@ namespace Medo {
         }
 
 
-        private int _key;
+        private readonly int _key;
         private string _value;
         private object _tag;
 
