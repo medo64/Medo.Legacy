@@ -301,7 +301,7 @@ namespace Medo.Security.Cryptography {
                 Array.Clear(secret, 0, secret.Length);
             }
 
-            int offset = hash[hash.Length - 1] & 0x0F;
+            var offset = hash[hash.Length - 1] & 0x0F;
             var truncatedHash = new byte[] { (byte)(hash[offset + 0] & 0x7F), hash[offset + 1], hash[offset + 2], hash[offset + 3] };
             if (BitConverter.IsLittleEndian) { Array.Reverse(truncatedHash, 0, 4); }
             var number = BitConverter.ToInt32(truncatedHash, 0);
@@ -451,7 +451,7 @@ namespace Medo.Security.Cryptography {
 
             var bits = 0;
             var bitsRemaining = 0;
-            for (int i = 0; i < length; i++) {
+            for (var i = 0; i < length; i++) {
                 bits = (bits << 8) | bytes[i];
                 bitsRemaining += 8;
                 while (bitsRemaining >= 5) {
@@ -473,7 +473,7 @@ namespace Medo.Security.Cryptography {
             }
 
             if (hasPadding) {
-                for (int i = 0; i < padLength; i++) {
+                for (var i = 0; i < padLength; i++) {
                     if (hasSpacing && (i % 4 == padLength % 4)) {
                         chars[index] = ' ';
                         index++;
