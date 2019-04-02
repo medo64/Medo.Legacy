@@ -49,21 +49,21 @@ namespace Medo.Configuration {
         /// <param name="maximumCount">Maximum number of items to load or save.</param>
         /// <param name="groupName">Name of group. If omitted, "Default" is used.</param>
         public RecentFiles(int maximumCount, string groupName) {
-            Assembly assembly = Assembly.GetEntryAssembly();
+            var assembly = Assembly.GetEntryAssembly();
             if (assembly == null) { assembly = Assembly.GetCallingAssembly(); } //e.g. when running unit tests
 
             string company = null;
-            object[] companyAttributes = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), true);
+            var companyAttributes = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), true);
             if ((companyAttributes != null) && (companyAttributes.Length >= 1)) {
                 company = ((AssemblyCompanyAttribute)companyAttributes[companyAttributes.Length - 1]).Company;
             }
 
-            string product = null;
-            object[] productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), true);
+            string product;
+            var productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), true);
             if ((productAttributes != null) && (productAttributes.Length >= 1)) {
                 product = ((AssemblyProductAttribute)productAttributes[productAttributes.Length - 1]).Product;
             } else {
-                object[] titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
+                var titleAttributes = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
                 if ((titleAttributes != null) && (titleAttributes.Length >= 1)) {
                     product = ((AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
                 } else {
@@ -71,7 +71,7 @@ namespace Medo.Configuration {
                 }
             }
 
-            string basePath = "Software";
+            var basePath = "Software";
             if (!string.IsNullOrEmpty(company)) { basePath += "\\" + company; }
             if (!string.IsNullOrEmpty(product)) { basePath += "\\" + product; }
 
@@ -110,7 +110,7 @@ namespace Medo.Configuration {
         public string GroupName { get; private set; }
 
 
-        private List<RecentFile> _items = new List<RecentFile>();
+        private readonly List<RecentFile> _items = new List<RecentFile>();
 
         /// <summary>
         /// Gets file name at given index.
@@ -149,7 +149,7 @@ namespace Medo.Configuration {
             if (item != null) {
                 _items.Insert(0, item);
 
-                for (int i = _items.Count - 1; i >= 1; --i) { //remove duplicate of it
+                for (var i = _items.Count - 1; i >= 1; --i) { //remove duplicate of it
                     if (_items[i].Equals(fileName)) {
                         _items.RemoveAt(i);
                     }
@@ -165,7 +165,7 @@ namespace Medo.Configuration {
         /// </summary>
         /// <param name="fileName">File name.</param>
         public void Remove(string fileName) {
-            for (int i = _items.Count - 1; i >= 0; --i) {
+            for (var i = _items.Count - 1; i >= 0; --i) {
                 if (_items[i].Equals(fileName)) {
                     _items.RemoveAt(i);
                 }
@@ -191,13 +191,13 @@ namespace Medo.Configuration {
             try {
                 using (var rk = Registry.CurrentUser.OpenSubKey(SubkeyPath, false)) {
                     if (rk != null) {
-                        object valueCU = rk.GetValue(GroupName, null);
+                        var valueCU = rk.GetValue(GroupName, null);
                         if (valueCU != null) {
                             var valueKind = RegistryValueKind.MultiString;
                             if (!RecentFiles.IsRunningOnMono) { valueKind = rk.GetValueKind(GroupName); }
                             if (valueKind == RegistryValueKind.MultiString) {
                                 if (valueCU is string[] valueArr) {
-                                    for (int i = 0; i < valueArr.Length; ++i) {
+                                    for (var i = 0; i < valueArr.Length; ++i) {
                                         if (!string.IsNullOrEmpty(valueArr[i])) {
                                             var item = RecentFile.GetRecentFile(valueArr[i]);
                                             if (item != null) {
@@ -220,13 +220,13 @@ namespace Medo.Configuration {
         public void Save() {
             if (_items.Count > MaximumCount) { _items.RemoveRange(MaximumCount, _items.Count - MaximumCount); }
 
-            string[] fileNames = new string[_items.Count];
-            for (int i = 0; i < _items.Count; ++i) {
+            var fileNames = new string[_items.Count];
+            for (var i = 0; i < _items.Count; ++i) {
                 fileNames[i] = _items[i].FileName;
             }
 
             if (RecentFiles.NoRegistryWrites == false) {
-                using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(SubkeyPath)) {
+                using (var rk = Registry.CurrentUser.CreateSubKey(SubkeyPath)) {
                     rk.SetValue(GroupName, fileNames, RegistryValueKind.MultiString);
                 }
             }
@@ -333,11 +333,11 @@ namespace Medo.Configuration {
         private static bool HideExtension {
             get {
                 try {
-                    using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", false)) {
+                    using (var rk = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", false)) {
                         if (rk != null) {
                             var valueKind = IsRunningOnMono ? RegistryValueKind.DWord : rk.GetValueKind("HideFileExt");
                             if (valueKind == RegistryValueKind.DWord) {
-                                int hideFileExt = (int)(rk.GetValue("HideFileExt", 1));
+                                var hideFileExt = (int)(rk.GetValue("HideFileExt", 1));
                                 return (hideFileExt != 0);
                             }
                         }
