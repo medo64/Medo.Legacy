@@ -49,10 +49,10 @@ namespace Medo.Data {
             _tableName = tableName;
 
             _needsMonoFix = false;
-            StringBuilder sbColumnsAndValues = new StringBuilder();
-            for (int i = 0; i < columnsAndValues.Length; i += 2) {
+            var sbColumnsAndValues = new StringBuilder();
+            for (var i = 0; i < columnsAndValues.Length; i += 2) {
                 if (!(columnsAndValues[i] is string name)) { throw new InvalidCastException(Resources.ExceptionColumnNameShouldBeStringAndNonNull); }
-                object value = columnsAndValues[i + 1];
+                var value = columnsAndValues[i + 1];
 
                 if (sbColumnsAndValues.Length > 0) { sbColumnsAndValues.Append(", "); }
                 if (Connection is SqlConnection) {
@@ -64,7 +64,7 @@ namespace Medo.Data {
                 if (value == null) {
                     sbColumnsAndValues.Append("NULL");
                 } else {
-                    string paramName = "@P" + (i / 2).ToString(CultureInfo.InvariantCulture);
+                    var paramName = "@P" + (i / 2).ToString(CultureInfo.InvariantCulture);
                     sbColumnsAndValues.Append(paramName);
                     var param = _baseCommand.CreateParameter();
                     param.ParameterName = paramName;
@@ -85,7 +85,7 @@ namespace Medo.Data {
         }
 
         private string _whereText;
-        private List<IDbDataParameter> _whereParameters = new List<IDbDataParameter>();
+        private readonly List<IDbDataParameter> _whereParameters = new List<IDbDataParameter>();
 
         /// <summary>
         /// Sets where statement used.
@@ -94,19 +94,19 @@ namespace Medo.Data {
         /// <param name="args">An System.Object array containing zero or more objects to format. Those objects are inserted in Parameters as IDbDataParameter with name of @Px where x is order index.</param>
         public void SetWhere(string format, params object[] args) {
             if (_whereParameters != null) {
-                for (int i = 0; i < _whereParameters.Count; ++i) {
+                for (var i = 0; i < _whereParameters.Count; ++i) {
                     _baseCommand.Parameters.Remove(_whereParameters[i]);
                 }
             }
 
             _needsMonoFix = false;
-            List<string> argList = new List<string>();
+            var argList = new List<string>();
             if (args != null) {
-                for (int i = 0; i < args.Length; ++i) {
+                for (var i = 0; i < args.Length; ++i) {
                     if (args[i] == null) {
                         argList.Add("NULL");
                     } else {
-                        string paramName = string.Format(CultureInfo.InvariantCulture, "@W{0}", i);
+                        var paramName = string.Format(CultureInfo.InvariantCulture, "@W{0}", i);
                         argList.Add(paramName);
                         var param = _baseCommand.CreateParameter();
                         param.ParameterName = paramName;
@@ -153,7 +153,7 @@ namespace Medo.Data {
 
         #region Base properties
 
-        private IDbCommand _baseCommand;
+        private readonly IDbCommand _baseCommand;
         /// <summary>
         /// Gets underlying connection.
         /// </summary>
@@ -313,7 +313,7 @@ namespace Medo.Data {
         private void DebugCommand() {
             var sb = new StringBuilder();
             sb.AppendFormat(CultureInfo.InvariantCulture, "-- {0}", _baseCommand.CommandText);
-            for (int i = 0; i < _baseCommand.Parameters.Count; ++i) {
+            for (var i = 0; i < _baseCommand.Parameters.Count; ++i) {
                 sb.AppendLine();
                 if (_baseCommand.Parameters[i] is DbParameter curr) {
                     sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}=\"{1}\" ({2})", curr.ParameterName, curr.Value, curr.DbType);
