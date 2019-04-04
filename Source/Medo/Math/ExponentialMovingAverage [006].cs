@@ -62,7 +62,7 @@ namespace Medo.Math {
 				_value = value;
 				_isFilled = true;
 			} else {
-				_value = _value + _smoothingFactor * (value - _value);
+				_value += _smoothingFactor * (value - _value);
 			}
 		}
 
