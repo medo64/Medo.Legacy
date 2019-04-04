@@ -36,8 +36,8 @@ namespace Medo.Drawing.Printing {
 		/// Gets all lines currently in buffer.
 		/// </summary>
 		public string[] GetLines() {
-			List<string> lines = new List<string>();
-			for (int i = 0; i < _lines.Count; ++i) {
+			var lines = new List<string>();
+			for (var i = 0; i < _lines.Count; ++i) {
 				lines.Add(new string(_lines[i]).Replace('\0', ' '));
 			}
 			return lines.ToArray();
@@ -94,7 +94,7 @@ namespace Medo.Drawing.Printing {
 			if (left + width > Width) { throw new System.OverflowException(string.Format(System.Globalization.CultureInfo.InvariantCulture, Resources.ExceptionOperationWouldResultInWriteAtLocationWhichIsBeyondEndOfPaper, left + width - 1, Width - 1)); }
 
 
-			List<string> wrappedContent = new List<string>();
+			var wrappedContent = new List<string>();
 			if (text.Length <= width) {
 				wrappedContent.Add(text);
 			} else { //trim is needed
@@ -106,7 +106,7 @@ namespace Medo.Drawing.Printing {
 							wrappedContent.Add(text);
 							text = null;
 						} else {
-							int i = text.LastIndexOfAny(new char[] { '\0' }, width);
+							var i = text.LastIndexOfAny(new char[] { '\0' }, width);
 							if (i < 0) { //no space.
 								wrappedContent.Add(text.Substring(0, width));
 								text = text.Substring(width);
@@ -119,15 +119,15 @@ namespace Medo.Drawing.Printing {
 				}
 			}
 
-			string[] newContent = new string[wrappedContent.Count];
-			for (int i = 0; i < wrappedContent.Count; ++i) {
-				string curr = wrappedContent[i];
+			var newContent = new string[wrappedContent.Count];
+			for (var i = 0; i < wrappedContent.Count; ++i) {
+				var curr = wrappedContent[i];
 				switch (alignment) {
 					case System.Windows.Forms.HorizontalAlignment.Left:
 						newContent[i] = curr.PadRight(width, '\0');
 						break;
 					case System.Windows.Forms.HorizontalAlignment.Center:
-						int addToLeft = (width - curr.Length) / 2;
+						var addToLeft = (width - curr.Length) / 2;
 						newContent[i] = curr.PadLeft(addToLeft + curr.Length, '\0').PadRight(width, '\0');
 						break;
 					case System.Windows.Forms.HorizontalAlignment.Right:
@@ -139,9 +139,8 @@ namespace Medo.Drawing.Printing {
 				}
 			}
 
-
-			int addLineCount = 0;
-			if ((lineIndex >= _lines.Count) || (_lines.Count == 0)) { //add new line
+            int addLineCount;
+            if ((lineIndex >= _lines.Count) || (_lines.Count == 0)) { //add new line
 				lineIndex = _lines.Count;
 				addLineCount = newContent.Length;
 			} else if (lineIndex < 0) { //check last line
@@ -150,15 +149,15 @@ namespace Medo.Drawing.Printing {
 			} else { //use existing line.
 				addLineCount = System.Math.Max(0, newContent.Length - (_lines.Count - lineIndex));
 			}
-			for (int i = 0; i < addLineCount; ++i) {
+			for (var i = 0; i < addLineCount; ++i) {
 				_lines.Add((new string('\0', Width)).ToCharArray());
 			}
 
 
-			for (int i = 0; i < newContent.Length; ++i) {
-				int x = lineIndex + i;
-				for (int j = 0; j < width; ++j) {
-					int y = left + j;
+			for (var i = 0; i < newContent.Length; ++i) {
+				var x = lineIndex + i;
+				for (var j = 0; j < width; ++j) {
+					var y = left + j;
 					if (newContent[i][j] != '\0') {
 						_lines[x][y] = newContent[i][j];
 					}
@@ -219,8 +218,8 @@ namespace Medo.Drawing.Printing {
 		/// Returns whole paper content as string.
 		/// </summary>
 		public override string ToString() {
-			System.Text.StringBuilder sb = new System.Text.StringBuilder();
-			for (int i = 0; i < _lines.Count; ++i) {
+			var sb = new System.Text.StringBuilder();
+			for (var i = 0; i < _lines.Count; ++i) {
 				sb.AppendLine(new string(_lines[i]).Replace('\0', ' '));
 			}
 			return sb.ToString();
