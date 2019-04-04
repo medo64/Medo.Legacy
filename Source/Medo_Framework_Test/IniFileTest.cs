@@ -381,7 +381,7 @@ namespace Test {
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
         public void IniFile_Property_Create_Null() {
-            var property = new IniProperty("Test", null);
+            _ = new IniProperty("Test", null);
         }
 
         [TestMethod()]
@@ -405,7 +405,7 @@ namespace Test {
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
         public void IniFile_Property_Modify_NameNull() {
-            var property = new IniProperty("PN", "PV") {
+            _ = new IniProperty("PN", "PV") {
                 Name = null
             };
         }
@@ -413,7 +413,7 @@ namespace Test {
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
         public void IniFile_Property_Modify_ValueNull() {
-            var property = new IniProperty("PN", "PV") {
+            _ = new IniProperty("PN", "PV") {
                 Value = null
             };
         }
