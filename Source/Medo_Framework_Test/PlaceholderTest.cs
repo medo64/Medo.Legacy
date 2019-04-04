@@ -52,10 +52,6 @@ namespace Test {
 
         [TestMethod()]
         public void Placeholder_MultipleStrings2() {
-            var dict = new Dictionary<string, object> {
-                { "Text1", "Text1" },
-                { "Text2", "Text2" }
-            };
             Assert.AreEqual("Test: 42 (Fortytwo).", Placeholder.Format(CultureInfo.InvariantCulture, "Test: {Number} ({Text}).", "Number", 42, "Text", "Fortytwo"));
         }
 
