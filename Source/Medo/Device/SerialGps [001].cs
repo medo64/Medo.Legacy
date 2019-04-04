@@ -418,7 +418,7 @@ namespace Medo.Device {
             if (line[line.Length - 3] != '*') { return null; } //cannot find checksum
 
             byte newChecksum = 0;
-            string data = line.Substring(1, line.Length - 3 - 1);
+            var data = line.Substring(1, line.Length - 3 - 1);
             foreach (var b in ASCIIEncoding.ASCII.GetBytes(data)) {
                 newChecksum ^= b;
             }
@@ -671,7 +671,7 @@ namespace Medo.Device {
                 }
 
                 public static implicit operator T(ExpirableValue<T> expirable) {
-                    return (expirable != null) ? expirable.Value : default(T);
+                    return (expirable != null) ? expirable.Value : default;
                 }
             }
         }
