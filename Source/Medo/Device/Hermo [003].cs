@@ -127,7 +127,7 @@ namespace Medo.Device {
 
         private readonly object ReadingsSyncRoot = new object();
         private readonly Dictionary<long, KeyValuePair<HermoReading, DateTime>> ReadingCache = new Dictionary<long, KeyValuePair<HermoReading, DateTime>>();
-        private static int ReadingValidityInSeconds = 15;
+        private static readonly int ReadingValidityInSeconds = 15;
 
         /// <summary>
         /// Enumerates over all device readings.
@@ -306,7 +306,7 @@ namespace Medo.Device {
             if (bytes.Length <= 10) { return null; } //at least two temperature bytes (and CRC) are there
             if ((bytes[8] == 0xAA) && (bytes[9] == 0x00)) { return null; }  //Error measurement of 85°C
 
-            short temperatureCounter = BitConverter.IsLittleEndian ? BitConverter.ToInt16(bytes, 8) : BitConverter.ToInt16(new byte[] { bytes[9], bytes[8] }, 0);
+            var temperatureCounter = BitConverter.IsLittleEndian ? BitConverter.ToInt16(bytes, 8) : BitConverter.ToInt16(new byte[] { bytes[9], bytes[8] }, 0);
             var countRemain = (bytes.Length >= 15) ? bytes[14] : 0;
             var countPerC = (bytes.Length >= 15) ? bytes[15] : 0;
 
@@ -325,7 +325,7 @@ namespace Medo.Device {
             if (bytes.Length <= 10) { return null; } //at least two temperature bytes (and CRC) are there
             if ((bytes[8] == 0x50) && (bytes[9] == 0x05)) { return null; }  //Error measurement of 85°C
 
-            short temperatureCounter = BitConverter.IsLittleEndian ? BitConverter.ToInt16(bytes, 8) : BitConverter.ToInt16(new byte[] { bytes[9], bytes[8] }, 0);
+            var temperatureCounter = BitConverter.IsLittleEndian ? BitConverter.ToInt16(bytes, 8) : BitConverter.ToInt16(new byte[] { bytes[9], bytes[8] }, 0);
             var temperature = temperatureCounter * 0.0625;
             if ((temperature < -100) || (temperature > 170)) { return null; } //something is wrong with this reading
 
@@ -342,7 +342,7 @@ namespace Medo.Device {
         private static byte[] GetBytesFromHex(string value) {
             byte? lowNibble = null;
             var bytes = new Stack<byte>();
-            for (int i = value.Length - 1; i >= 0; i--) {
+            for (var i = value.Length - 1; i >= 0; i--) {
                 var ch = value[i];
                 if (char.IsWhiteSpace(ch) || (ch == ',') || (ch == '-') || (ch == ':')) { continue; } //ignore whitespaces and some other characters
 
@@ -371,7 +371,7 @@ namespace Medo.Device {
 
         private static byte GetCrc8Digest(byte[] value, int index, int length) {
             byte digest = 0;
-            for (int i = index; i < index + length; i++) {
+            for (var i = index; i < index + length; i++) {
                 digest = Crc8Lookup[digest ^ value[i]];
             }
             return digest;
