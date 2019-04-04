@@ -22,7 +22,6 @@ namespace Medo.Diagnostics {
         private static readonly string _logFileName;
 
         private static readonly string _infoProductTitle;
-        private static readonly string _infoProductVersion;
         private static readonly string _infoAssemblyFullName;
         private static readonly string[] _infoReferencedAssemblies;
 
@@ -44,7 +43,6 @@ namespace Medo.Diagnostics {
                     ExceptionReport._infoProductTitle = assembly.GetName().Name;
                 }
             }
-            _infoProductVersion = assembly.GetName().Version.ToString();
             ExceptionReport._logFileName = System.IO.Path.Combine(System.IO.Path.GetTempPath(), string.Format(System.Globalization.CultureInfo.InvariantCulture, "ErrorReport [{0}].log", _infoProductTitle));
 
             _infoAssemblyFullName = assembly.FullName;
@@ -162,24 +160,10 @@ namespace Medo.Diagnostics {
         }
 
 
-        private static readonly AssemblyNameComparer _assemblyNameComparer = new AssemblyNameComparer();
         private class AssemblyNameComparer : IComparer<AssemblyName> {
             int IComparer<AssemblyName>.Compare(AssemblyName x, AssemblyName y) {
                 return string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
             }
-        }
-
-        private static string UrlEncode(string text) {
-            var source = System.Text.UTF8Encoding.UTF8.GetBytes(text);
-            var sb = new StringBuilder();
-            for (var i = 0; i < source.Length; ++i) {
-                if (((source[i] >= 48) && (source[i] <= 57)) || ((source[i] >= 65) && (source[i] <= 90)) || ((source[i] >= 97) && (source[i] <= 122)) || (source[i] == 45) || (source[i] == 46) || (source[i] == 95) || (source[i] == 126)) { //A-Z a-z - . _ ~
-                    sb.Append(System.Convert.ToChar(source[i]));
-                } else {
-                    sb.Append("%" + source[i].ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
-                }
-            }
-            return sb.ToString();
         }
 
         private static void AppendLine(StringBuilder output, string input) {
