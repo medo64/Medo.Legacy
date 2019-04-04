@@ -34,7 +34,7 @@ namespace Medo {
         /// <param name="lifetime">Value lifetime.</param>
         /// <param name="value">Value.</param>
         public Expirable(TimeSpan lifetime, T value)
-            : this(lifetime, value, default(T)) {
+            : this(lifetime, value, default) {
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Medo {
         /// </summary>
         /// <param name="lifetime">Value lifetime.</param>
         public Expirable(TimeSpan lifetime)
-            : this(lifetime, default(T), default(T)) {
+            : this(lifetime, default, default) {
             ExpireTime = DateTime.UtcNow; //expire it immediatelly since value was never set.
         }
 
@@ -176,7 +176,7 @@ namespace Medo {
         /// <param name="expirable">Expirable.</param>
         /// <exception cref="System.ArgumentNullException">Expirable cannot be null.</exception>
         public static implicit operator T(Expirable<T> expirable) {
-            return (expirable != null) ? expirable.Value : default(T);
+            return (expirable != null) ? expirable.Value : default;
         }
 
         #endregion

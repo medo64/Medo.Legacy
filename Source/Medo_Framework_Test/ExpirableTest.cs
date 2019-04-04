@@ -45,7 +45,7 @@ namespace Test {
             var v = DateTime.UtcNow;
             var x = new Expirable<DateTime>(new TimeSpan(0, 0, 0, 0, 10), v);
 
-            Assert.AreEqual(default(DateTime), x.DefaultValue);
+            Assert.AreEqual(default, x.DefaultValue);
 
             Assert.IsTrue(x.Equals(x));
             Assert.IsTrue(x.Equals(v));
