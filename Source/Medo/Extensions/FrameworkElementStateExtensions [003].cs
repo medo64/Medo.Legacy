@@ -56,7 +56,6 @@ namespace Medo.Extensions.FrameworkElementState {
 
         private const string _stateFileName = "Medo.Extensions.FrameworkElementStateExtensions.state";
         private static Dictionary<string, object> _stateDictionary;
-        private static readonly IsolatedStorageFile _isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null);
         private static readonly object _syncRoot = new object();
 
         private static void OpenDictionary() {
