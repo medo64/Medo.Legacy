@@ -23,7 +23,7 @@ namespace Medo.Device {
 
         private Thread _thread;
         private ManualResetEvent _cancelEvent;
-        private SerialPort _serial;
+        private readonly SerialPort _serial;
         private readonly object _syncCodes = new object();
         private readonly Queue<string> _codes = new Queue<string>();
 
