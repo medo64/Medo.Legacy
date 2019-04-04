@@ -49,15 +49,15 @@ namespace Medo.Application {
         public static bool Attach(bool noAutoExit) {
             lock (_syncRoot) {
                 NativeMethods.FileSafeHandle handle = null;
-                bool isFirstInstance = false;
+                var isFirstInstance = false;
                 try {
                     _mtxFirstInstance = new Mutex(true, MutexName, out isFirstInstance);
                     if (isFirstInstance == false) { //we need to contact previous instance.
                         _mtxFirstInstance = null;
 
                         byte[] buffer;
-                        using (System.IO.MemoryStream ms = new System.IO.MemoryStream()) {
-                            System.Runtime.Serialization.Formatters.Binary.BinaryFormatter bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                        using (var ms = new System.IO.MemoryStream()) {
+                            var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                             bf.Serialize(ms, new NewInstanceEventArgs(System.Environment.CommandLine, System.Environment.GetCommandLineArgs()));
                             ms.Flush();
                             buffer = ms.GetBuffer();
@@ -72,7 +72,7 @@ namespace Medo.Application {
 
                         //send bytes
                         uint written = 0;
-                        NativeOverlapped overlapped = new NativeOverlapped();
+                        var overlapped = new NativeOverlapped();
                         if (!NativeMethods.WriteFile(handle, buffer, (uint)buffer.Length, ref written, ref overlapped)) {
                             throw new System.InvalidOperationException(Resources.ExceptionWriteFileFailed);
                         }
@@ -114,7 +114,7 @@ namespace Medo.Application {
             get {
                 lock (_syncRoot) {
                     if (_mutexName == null) {
-                        System.Text.StringBuilder sbComponents = new System.Text.StringBuilder();
+                        var sbComponents = new System.Text.StringBuilder();
                         sbComponents.AppendLine(System.Environment.MachineName);
                         sbComponents.AppendLine(System.Environment.UserName);
                         sbComponents.AppendLine(System.Reflection.Assembly.GetEntryAssembly().FullName);
@@ -125,11 +125,11 @@ namespace Medo.Application {
                             hash = sha1.ComputeHash(System.Text.Encoding.Unicode.GetBytes(sbComponents.ToString()));
                         }
 
-                        System.Text.StringBuilder sbFinal = new System.Text.StringBuilder();
-                        string assName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+                        var sbFinal = new System.Text.StringBuilder();
+                        var assName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
                         sbFinal.Append(assName, 0, System.Math.Min(assName.Length, 64));
                         sbFinal.Append('.');
-                        for (int i = 0; i < hash.Length; ++i) {
+                        for (var i = 0; i < hash.Length; ++i) {
                             sbFinal.AppendFormat("{0:X2}", hash[i]);
                         }
                         _mutexName = sbFinal.ToString();
@@ -170,11 +170,11 @@ namespace Medo.Application {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Needs to be cought all in order not to break in any case.")]
         private static void Run() {
             while (_mtxFirstInstance != null) {
-                IntPtr handle = IntPtr.Zero;
+                var handle = IntPtr.Zero;
                 try {
                     handle = NativeMethods.CreateNamedPipe(NamedPipeName, NativeMethods.PIPE_ACCESS_DUPLEX, NativeMethods.PIPE_TYPE_BYTE | NativeMethods.PIPE_READMODE_BYTE | NativeMethods.PIPE_WAIT, NativeMethods.PIPE_UNLIMITED_INSTANCES, 4096, 4096, NativeMethods.NMPWAIT_USE_DEFAULT_WAIT, System.IntPtr.Zero);
                     if (handle.Equals(IntPtr.Zero)) { throw new System.InvalidOperationException(Resources.ExceptionCreateNamedPipeFailed); }
-                    bool connected = NativeMethods.ConnectNamedPipe(handle, System.IntPtr.Zero);
+                    var connected = NativeMethods.ConnectNamedPipe(handle, System.IntPtr.Zero);
                     if (!connected) { throw new System.InvalidOperationException(Resources.ExceptionConnectNamedPipeFailed); }
 
                     uint available = 0;
@@ -185,9 +185,9 @@ namespace Medo.Application {
                             available = 0;
                         }
                     }
-                    byte[] buffer = new byte[available];
+                    var buffer = new byte[available];
                     uint read = 0;
-                    NativeOverlapped overlapped = new NativeOverlapped();
+                    var overlapped = new NativeOverlapped();
                     if (!NativeMethods.ReadFile(handle, buffer, (uint)buffer.Length, ref read, ref overlapped)) {
                         throw new System.InvalidOperationException(Resources.ExceptionReadFileFailed);
                     }
@@ -195,7 +195,7 @@ namespace Medo.Application {
                         throw new System.InvalidOperationException(Resources.ExceptionReadFileReturnedUnexpectedNumberOfBytes);
                     }
 
-                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer)) {
+                    using (var ms = new System.IO.MemoryStream(buffer)) {
                         var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                         NewInstanceDetected?.Invoke(null, (NewInstanceEventArgs)bf.Deserialize(ms));
                     }
@@ -248,7 +248,7 @@ namespace Medo.Application {
 
 
             public class FileSafeHandle : SafeHandle {
-                private static IntPtr minusOne = new IntPtr(-1);
+                private static readonly IntPtr minusOne = new IntPtr(-1);
 
 
                 public FileSafeHandle()
