@@ -25,7 +25,7 @@ namespace Medo.Net {
         }
 
 
-        private string _key;
+        private readonly string _key;
         /// <summary>
         /// Gets key.
         /// </summary>
@@ -75,14 +75,14 @@ namespace Medo.Net {
             //?x key as UTF8
             //?x value as UTF8
 
-            byte[] baHeader = new byte[] { 0x4B, 0x56, 0x50, 0x01 };
-            byte[] keyLengthLE = System.BitConverter.GetBytes(keyLength);
-            byte[] baKeyLengthBE = new byte[] { keyLengthLE[3], keyLengthLE[2], keyLengthLE[1], keyLengthLE[0] };
-            byte[] valueLengthLE = System.BitConverter.GetBytes(valueLength);
-            byte[] baValueLengthBE = new byte[] { valueLengthLE[3], valueLengthLE[2], valueLengthLE[1], valueLengthLE[0] };
-            byte[] baXor = new byte[] { (byte)(baHeader[0] ^ baKeyLengthBE[1] ^ baValueLengthBE[2]), (byte)(baHeader[1] ^ baKeyLengthBE[2] ^ baValueLengthBE[3]), (byte)(baHeader[2] ^ baKeyLengthBE[3] ^ baValueLengthBE[0]), (byte)(baHeader[3] ^ baKeyLengthBE[0] ^ baValueLengthBE[1]) };
+            var baHeader = new byte[] { 0x4B, 0x56, 0x50, 0x01 };
+            var keyLengthLE = System.BitConverter.GetBytes(keyLength);
+            var baKeyLengthBE = new byte[] { keyLengthLE[3], keyLengthLE[2], keyLengthLE[1], keyLengthLE[0] };
+            var valueLengthLE = System.BitConverter.GetBytes(valueLength);
+            var baValueLengthBE = new byte[] { valueLengthLE[3], valueLengthLE[2], valueLengthLE[1], valueLengthLE[0] };
+            var baXor = new byte[] { (byte)(baHeader[0] ^ baKeyLengthBE[1] ^ baValueLengthBE[2]), (byte)(baHeader[1] ^ baKeyLengthBE[2] ^ baValueLengthBE[3]), (byte)(baHeader[2] ^ baKeyLengthBE[3] ^ baValueLengthBE[0]), (byte)(baHeader[3] ^ baKeyLengthBE[0] ^ baValueLengthBE[1]) };
 
-            byte[] ret = new byte[4 + 4 + 4 + 4 + baKey.Length + baValue.Length];
+            var ret = new byte[4 + 4 + 4 + 4 + baKey.Length + baValue.Length];
             System.Array.Copy(baHeader, 0, ret, 0, 4);
             System.Array.Copy(baKeyLengthBE, 0, ret, 4, 4);
             System.Array.Copy(baValueLengthBE, 0, ret, 8, 4);
@@ -109,7 +109,7 @@ namespace Medo.Net {
         /// <param name="offset">Array offset at which to start.</param>
         /// <exception cref="System.FormatException">Not enough bytes to start. -or- Invalid header. -or- Not enough bytes. -or- Invalid checksum.</exception>
         public static KeyValuePacket Parse(byte[] array, int offset) {
-            if (TryParse(array, offset, out var result, out var newOffset, out var exception)) {
+            if (TryParse(array, offset, out var result, out _, out var exception)) {
                 return result;
             } else {
                 throw exception;
@@ -146,7 +146,7 @@ namespace Medo.Net {
                 return false;
             }
 
-            byte[] baHeader = new byte[4];
+            var baHeader = new byte[4];
             System.Array.Copy(array, offset + 0, baHeader, 0, 4);
             if ((baHeader[0] != 0x4B) || (baHeader[1] != 0x56) || (baHeader[2] != 0x50) || (baHeader[3] != 0x01)) {
                 result = new KeyValuePacket();
@@ -155,18 +155,18 @@ namespace Medo.Net {
                 return false;
             }
 
-            byte[] baKeyLengthBE = new byte[4];
+            var baKeyLengthBE = new byte[4];
             System.Array.Copy(array, offset + 4, baKeyLengthBE, 0, 4);
-            byte[] keyLengthLE = new byte[] { baKeyLengthBE[3], baKeyLengthBE[2], baKeyLengthBE[1], baKeyLengthBE[0] };
-            int keyLength = System.BitConverter.ToInt32(keyLengthLE, 0);
-            int realKeyLength = keyLength;
+            var keyLengthLE = new byte[] { baKeyLengthBE[3], baKeyLengthBE[2], baKeyLengthBE[1], baKeyLengthBE[0] };
+            var keyLength = System.BitConverter.ToInt32(keyLengthLE, 0);
+            var realKeyLength = keyLength;
             if (realKeyLength == -1) { realKeyLength = 0; }
 
-            byte[] baValueLengthBE = new byte[4];
+            var baValueLengthBE = new byte[4];
             System.Array.Copy(array, offset + 8, baValueLengthBE, 0, 4);
-            byte[] valueLengthLE = new byte[] { baValueLengthBE[3], baValueLengthBE[2], baValueLengthBE[1], baValueLengthBE[0] };
-            int valueLength = System.BitConverter.ToInt32(valueLengthLE, 0);
-            int realValueLength = valueLength;
+            var valueLengthLE = new byte[] { baValueLengthBE[3], baValueLengthBE[2], baValueLengthBE[1], baValueLengthBE[0] };
+            var valueLength = System.BitConverter.ToInt32(valueLengthLE, 0);
+            var realValueLength = valueLength;
             if (realValueLength == -1) { realValueLength = 0; }
 
             if (offset + 16 + realKeyLength + realValueLength > array.Length) {
@@ -176,7 +176,7 @@ namespace Medo.Net {
                 return false;
             }
 
-            byte[] baXor = new byte[4];
+            var baXor = new byte[4];
             System.Array.Copy(array, offset + 12, baXor, 0, 4);
             if ((baXor[0] != (byte)(baHeader[0] ^ baKeyLengthBE[1] ^ baValueLengthBE[2])) || (baXor[1] != (byte)(baHeader[1] ^ baKeyLengthBE[2] ^ baValueLengthBE[3])) || (baXor[2] != (byte)(baHeader[2] ^ baKeyLengthBE[3] ^ baValueLengthBE[0])) || (baXor[3] != (byte)(baHeader[3] ^ baKeyLengthBE[0] ^ baValueLengthBE[1]))) {
                 result = new KeyValuePacket();
@@ -218,7 +218,7 @@ namespace Medo.Net {
                 return (_key.Equals(otherKeyValuePacket._key));
             }
 
-            string otherString = obj as string;
+            var otherString = obj as string;
             if (obj != null) {
                 return (_key.Equals(otherString));
             }
