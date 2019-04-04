@@ -19,7 +19,7 @@ namespace Medo.Security.Principal {
     /// </summary>
     public static class Impersonation {
 
-        private static Dictionary<int, TransferBag> _impersonationPerThreadID = new Dictionary<int, TransferBag>();
+        private static readonly Dictionary<int, TransferBag> _impersonationPerThreadID = new Dictionary<int, TransferBag>();
         private static readonly object _syncRoot = new object();
 
 
@@ -47,20 +47,20 @@ namespace Medo.Security.Principal {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Runtime.InteropServices.SafeHandle.DangerousGetHandle", Justification = "This method is needed in order to properly call into Win32 API.")]
         public static bool Impersonate(string userName, string domain, string password, TokenImpersonationLevel impersonationLevel) {
             lock (_syncRoot) {
-                int threadID = Thread.CurrentThread.ManagedThreadId;
+                var threadID = Thread.CurrentThread.ManagedThreadId;
 
                 if (IsCurrentlyImpersonated) { Revert(); }
 
 
-                TokenHandle newUserToken = new TokenHandle();
-                bool luRet = NativeMethods.LogonUser(userName, domain, password, NativeMethods.LOGON32_LOGON_INTERACTIVE, NativeMethods.LOGON32_PROVIDER_DEFAULT, ref newUserToken);
+                var newUserToken = new TokenHandle();
+                var luRet = NativeMethods.LogonUser(userName, domain, password, NativeMethods.LOGON32_LOGON_INTERACTIVE, NativeMethods.LOGON32_PROVIDER_DEFAULT, ref newUserToken);
                 if (luRet == false) {
                     newUserToken.Close();
                     return false;
                 }
 
-                TokenHandle duplicatedUserToken = new TokenHandle();
-                bool dtRet = NativeMethods.DuplicateToken(newUserToken, (Int32)impersonationLevel, ref duplicatedUserToken);
+                var duplicatedUserToken = new TokenHandle();
+                var dtRet = NativeMethods.DuplicateToken(newUserToken, (Int32)impersonationLevel, ref duplicatedUserToken);
                 if (dtRet == false) {
                     duplicatedUserToken.Close();
                     newUserToken.Close();
@@ -68,8 +68,8 @@ namespace Medo.Security.Principal {
                 }
 
                 try {
-                    WindowsIdentity newIdentity = new WindowsIdentity(duplicatedUserToken.DangerousGetHandle());
-                    WindowsImpersonationContext impersonationContext = newIdentity.Impersonate();
+                    var newIdentity = new WindowsIdentity(duplicatedUserToken.DangerousGetHandle());
+                    var impersonationContext = newIdentity.Impersonate();
 
                     _impersonationPerThreadID.Add(threadID, new TransferBag(newUserToken, duplicatedUserToken, impersonationContext));
 
@@ -88,10 +88,10 @@ namespace Medo.Security.Principal {
         /// </summary>
         public static bool Revert() {
             lock (_syncRoot) {
-                int threadID = Thread.CurrentThread.ManagedThreadId;
+                var threadID = Thread.CurrentThread.ManagedThreadId;
 
                 if (IsCurrentlyImpersonated) {
-                    TransferBag valueBag = _impersonationPerThreadID[threadID];
+                    var valueBag = _impersonationPerThreadID[threadID];
                     try {
                         valueBag.WindowsImpersonationContext.Undo();
                     } finally {
