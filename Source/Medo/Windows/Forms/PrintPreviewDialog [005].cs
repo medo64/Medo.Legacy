@@ -36,10 +36,10 @@ namespace Medo.Windows.Forms {
                 ppdForm.ShowIcon = true;
                 ppdForm.Text = Resources.Caption;
                 ppdForm.KeyPreview = true;
-                for (int i = 0; i < ppdForm.Controls.Count; i++) {
+                for (var i = 0; i < ppdForm.Controls.Count; i++) {
                     var iControl = ppdForm.Controls[i];
                     if (iControl is System.Windows.Forms.ToolStrip iToolstrip) {
-                        for (int j = 0; j < iToolstrip.Items.Count; j++) {
+                        for (var j = 0; j < iToolstrip.Items.Count; j++) {
                             var jItem = iToolstrip.Items[j];
                             switch (jItem.Name) {
                                 case "printToolStripButton":
@@ -92,7 +92,7 @@ namespace Medo.Windows.Forms {
 		/// <param name="owner">Any object that implements System.Windows.Forms.IWin32Window and represents the top-level window that will own this form.</param>
 		/// <exception cref="System.ArgumentException">The form specified in the owner parameter is the same as the form being shown.</exception>
 		public new void Show(System.Windows.Forms.IWin32Window owner) {
-			System.Windows.Forms.Form ppdForm = this as System.Windows.Forms.Form;
+			var ppdForm = this as System.Windows.Forms.Form;
 			if (owner != null) {
 				if (ppdForm != null) {
 					ppdForm.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -126,7 +126,7 @@ namespace Medo.Windows.Forms {
 		/// <exception cref="System.InvalidOperationException">The current process is not running in user interactive mode. For more information, see System.Windows.Forms.SystemInformation.UserInteractive.</exception>
 		/// <exception cref="System.ArgumentException">The form specified in the owner parameter is the same as the form being shown.</exception>
 		public new DialogResult ShowDialog(System.Windows.Forms.IWin32Window owner) {
-			System.Windows.Forms.Form ppdForm = this as System.Windows.Forms.Form;
+			var ppdForm = this as System.Windows.Forms.Form;
 			if (owner != null) {
 				if (ppdForm != null) {
 					ppdForm.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -151,8 +151,8 @@ namespace Medo.Windows.Forms {
             }
 		}
 
-		void ppdForm_Load(object sender, System.EventArgs e) {
-            if (sender is System.Windows.Forms.Form form) {
+        private void ppdForm_Load(object sender, System.EventArgs e) {
+            if (sender is System.Windows.Forms.Form) {
                 WindowState = System.Windows.Forms.FormWindowState.Maximized;
             }
         }
@@ -204,7 +204,7 @@ namespace Medo.Windows.Forms {
 
 			internal static System.Drawing.Icon TransparentIcon {
 				get {
-					byte[] iconBuffer = System.Convert.FromBase64String("AAABAAEAEBAQAAAABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD//wD/AAAA/wD/AP//AAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA");
+					var iconBuffer = System.Convert.FromBase64String("AAABAAEAEBAQAAAABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAAACAAACAAAAAgIAAgAAAAIAAgACAgAAAgICAAMDAwAAAAP8AAP8AAAD//wD/AAAA/wD/AP//AAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA");
 					return new System.Drawing.Icon(new System.IO.MemoryStream(iconBuffer));
 				}
 			}
