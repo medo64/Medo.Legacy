@@ -19,8 +19,8 @@ namespace Medo.Security.Cryptography {
     /// </summary>
     public static class Password {
 
-        private static UTF8Encoding Utf8WithoutBom = new UTF8Encoding(false);
-        private static RandomNumberGenerator Rng = RandomNumberGenerator.Create();
+        private static readonly UTF8Encoding Utf8WithoutBom = new UTF8Encoding(false);
+        private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
         private static readonly char[] Base64Characters = new char[] { '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
         private const int MinimumSaltSize = 0;
@@ -87,7 +87,7 @@ namespace Medo.Security.Cryptography {
 
             var salt = new byte[saltSize];
             Password.Rng.GetBytes(salt);
-            for (int i = 0; i < salt.Length; i++) { //make it an ascii
+            for (var i = 0; i < salt.Length; i++) { //make it an ascii
                 salt[i] = (byte)Password.Base64Characters[salt[i] % Password.Base64Characters.Length];
             }
 
@@ -250,7 +250,7 @@ namespace Medo.Security.Cryptography {
 
             byte[] hashDP;
             using (var digestDP = HashAlgorithm.Create(hashName)) { //step 13
-                for (int i = 0; i < password.Length; i++) { //step 14
+                for (var i = 0; i < password.Length; i++) { //step 14
                     AddDigest(digestDP, password);
                 }
                 hashDP = FinishDigest(digestDP); //step 15
@@ -259,7 +259,7 @@ namespace Medo.Security.Cryptography {
 
             byte[] hashDS;
             using (var digestDS = HashAlgorithm.Create(hashName)) { //step 17
-                for (int i = 0; i < (16 + hashA[0]); i++) { //step 18
+                for (var i = 0; i < (16 + hashA[0]); i++) { //step 18
                     AddDigest(digestDS, salt);
                 }
                 hashDS = FinishDigest(digestDS); //step 19
@@ -267,7 +267,7 @@ namespace Medo.Security.Cryptography {
             var s = ProduceBytes(hashDS, salt.Length); //step 20
 
             var hashAC = hashA;
-            for (int i = 0; i < iterationCount; i++) { //step 21
+            for (var i = 0; i < iterationCount; i++) { //step 21
                 using (var digestC = HashAlgorithm.Create(hashName)) { //step 21a
                     if ((i % 2) == 1) { //step 21b
                         AddDigest(digestC, p);
@@ -331,7 +331,7 @@ namespace Medo.Security.Cryptography {
             }
 
             var hashAC = hashA;
-            for (int i = 0; i < iterationCount; i++) { //step 21
+            for (var i = 0; i < iterationCount; i++) { //step 21
                 using (var digestC = HashAlgorithm.Create("MD5")) { //step 21a
                     if ((i % 2) == 1) { //step 21b
                         AddDigest(digestC, password);
@@ -428,7 +428,7 @@ namespace Medo.Security.Cryptography {
         }
 
         private static bool SplitHashedPassword(string hashedPassword, out string hash) {
-            return SplitHashedPassword(hashedPassword, out var id, out var iterationCount, out var salt, out hash);
+            return SplitHashedPassword(hashedPassword, out _, out _, out _, out hash);
         }
 
         private static bool SplitHashedPassword(string hashedPassword, out string id, out int iterationCount, out byte[] salt, out string hash) {

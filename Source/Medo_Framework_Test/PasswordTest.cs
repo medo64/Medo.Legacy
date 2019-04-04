@@ -215,13 +215,13 @@ namespace Test {
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Password_Error_NullPassword() {
-            var hash = Password.Create(null, PasswordAlgorithm.MD5);
+            Password.Create(null, PasswordAlgorithm.MD5);
         }
 
         [TestMethod()]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Password_Error_NullSalt() {
-            var hash = Password.Create(new byte[] { }, null, PasswordAlgorithm.MD5, 5000);
+            Password.Create(new byte[] { }, null, PasswordAlgorithm.MD5, 5000);
         }
 
 
