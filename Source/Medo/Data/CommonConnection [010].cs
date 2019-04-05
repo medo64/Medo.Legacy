@@ -31,9 +31,6 @@ namespace Medo.Data {
     /// </summary>
     public class CommonConnection : IDbConnection, IDisposable {
 
-        private readonly IDbConnection _baseConnection;
-        private readonly DbProviderFactory _providerFactory;
-
 
         #region Constructors
 
@@ -55,8 +52,8 @@ namespace Medo.Data {
             Debug.WriteLine("-- Available providers: " + sbProviders.ToString());
 #endif
             ProviderName = providerInvariantName;
-            _providerFactory = DbProviderFactories.GetFactory(providerInvariantName);
-            _baseConnection = _providerFactory.CreateConnection();
+            ProviderFactory = DbProviderFactories.GetFactory(providerInvariantName);
+            BaseConnection = ProviderFactory.CreateConnection();
         }
 
         /// <summary>
@@ -68,7 +65,7 @@ namespace Medo.Data {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public CommonConnection(string providerInvariantName, string connectionString)
             : this(providerInvariantName) {
-            _baseConnection.ConnectionString = connectionString;
+            BaseConnection.ConnectionString = connectionString;
         }
 
 
@@ -291,16 +288,12 @@ namespace Medo.Data {
         /// <summary>
         /// Gets underlying connection.
         /// </summary>
-        protected IDbConnection BaseConnection {
-            get { return _baseConnection; }
-        }
+        protected IDbConnection BaseConnection { get; private set; }
 
         /// <summary>
         /// Gets underlying connection.
         /// </summary>
-        protected System.Data.Common.DbProviderFactory ProviderFactory {
-            get { return _providerFactory; }
-        }
+        protected System.Data.Common.DbProviderFactory ProviderFactory { get; private set; }
 
         #endregion
 
@@ -314,7 +307,7 @@ namespace Medo.Data {
         /// <param name="value">Value of parameter.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is intended behaviour.")]
         internal IDbDataParameter CreateParameter(string parameterName, object value) {
-            IDbDataParameter param = _providerFactory.CreateParameter();
+            IDbDataParameter param = ProviderFactory.CreateParameter();
             param.ParameterName = parameterName;
             param.Value = value;
             if (param.DbType == System.Data.DbType.DateTime) {
@@ -331,7 +324,7 @@ namespace Medo.Data {
         /// <param name="type">Type of parameter.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is intended behaviour.")]
         internal System.Data.IDbDataParameter CreateParameter(string parameterName, object value, System.Data.DbType type) {
-            System.Data.IDbDataParameter param = _providerFactory.CreateParameter();
+            System.Data.IDbDataParameter param = ProviderFactory.CreateParameter();
             param.ParameterName = parameterName;
             param.Value = value;
             param.DbType = type;
@@ -452,7 +445,7 @@ namespace Medo.Data {
         /// <param name="il">One of the System.Data.IsolationLevel values.</param>
         /// <returns>An object representing the new transaction.</returns>
         internal protected IDbTransaction BeginTransaction(IsolationLevel il) {
-            return _baseConnection.BeginTransaction(il);
+            return BaseConnection.BeginTransaction(il);
         }
 
         /// <summary>
@@ -460,7 +453,7 @@ namespace Medo.Data {
         /// </summary>
         /// <returns>An object representing the new transaction.</returns>
         internal protected System.Data.IDbTransaction BeginTransaction() {
-            return _baseConnection.BeginTransaction();
+            return BaseConnection.BeginTransaction();
         }
 
 
@@ -469,14 +462,14 @@ namespace Medo.Data {
         /// </summary>
         /// <param name="databaseName">The name of the database to use in place of the current database.</param>
         internal protected void ChangeDatabase(string databaseName) {
-            _baseConnection.ChangeDatabase(databaseName);
+            BaseConnection.ChangeDatabase(databaseName);
         }
 
         /// <summary>
         /// Closes the connection to the database.
         /// </summary>
         public void Close() {
-            _baseConnection.Close();
+            BaseConnection.Close();
         }
 
         /// <summary>
@@ -484,8 +477,8 @@ namespace Medo.Data {
         /// </summary>
         /// <returns>A string containing connection settings.</returns>
         internal protected string ConnectionString {
-            get { return _baseConnection.ConnectionString; }
-            set { _baseConnection.ConnectionString = value; }
+            get { return BaseConnection.ConnectionString; }
+            set { BaseConnection.ConnectionString = value; }
         }
 
         /// <summary>
@@ -493,7 +486,7 @@ namespace Medo.Data {
         /// </summary>
         /// <returns>The time (in seconds) to wait for a connection to open. The default value is 15 seconds.</returns>
         internal protected int ConnectionTimeout {
-            get { return _baseConnection.ConnectionTimeout; }
+            get { return BaseConnection.ConnectionTimeout; }
         }
 
         /// <summary>
@@ -501,7 +494,7 @@ namespace Medo.Data {
         /// </summary>
         /// <returns>A Command object associated with the connection.</returns>
         internal protected IDbCommand CreateCommand() {
-            return _baseConnection.CreateCommand();
+            return BaseConnection.CreateCommand();
         }
 
         /// <summary>
@@ -509,7 +502,7 @@ namespace Medo.Data {
         /// </summary>
         /// <returns>The name of the current database or the name of the database to be used once a connection is open. The default value is an empty string.</returns>
         internal protected string Database {
-            get { return _baseConnection.Database; }
+            get { return BaseConnection.Database; }
         }
 
         /// <summary>
@@ -517,7 +510,7 @@ namespace Medo.Data {
         /// </summary>
         public void Open() {
             try {
-                _baseConnection.Open();
+                BaseConnection.Open();
             } catch {
                 throw;
             }
@@ -528,7 +521,7 @@ namespace Medo.Data {
         /// </summary>
         /// <returns>One of the System.Data.ConnectionState values.</returns>
         internal protected ConnectionState State {
-            get { return _baseConnection.State; }
+            get { return BaseConnection.State; }
         }
 
         #endregion
@@ -549,7 +542,7 @@ namespace Medo.Data {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                _baseConnection.Dispose();
+                BaseConnection.Dispose();
             }
         }
 
