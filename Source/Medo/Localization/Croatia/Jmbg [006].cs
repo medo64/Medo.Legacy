@@ -37,8 +37,8 @@ namespace Medo.Localization.Croatia {
             Value = value;
 
             if (parseOib && (value.Length == 11)) { //this is OIB
-                int sum = 10;
-                for (int i = 0; i < 10; ++i) {
+                var sum = 10;
+                for (var i = 0; i < 10; ++i) {
                     if ((value[i] >= '0') && (value[i] <= '9')) {
                         sum += (value[i] - '0');
                         if (sum > 10) { sum -= 10; }
@@ -50,7 +50,7 @@ namespace Medo.Localization.Croatia {
                     }
                 }
                 char checkDigit;
-                int sum2 = 11 - sum;
+                var sum2 = 11 - sum;
                 if (sum2 == 10) {
                     checkDigit = '0';
                 } else {
@@ -69,17 +69,17 @@ namespace Medo.Localization.Croatia {
 
             try {
                 if (value.Length >= 7) { //extract date
-                    int birthDay = int.Parse(value.Substring(0, 2), System.Globalization.CultureInfo.InvariantCulture);
-                    int birthMonth = int.Parse(value.Substring(2, 2), System.Globalization.CultureInfo.InvariantCulture);
-                    int birthYear = int.Parse(value.Substring(4, 3), System.Globalization.CultureInfo.InvariantCulture) + 1000;
+                    var birthDay = int.Parse(value.Substring(0, 2), System.Globalization.CultureInfo.InvariantCulture);
+                    var birthMonth = int.Parse(value.Substring(2, 2), System.Globalization.CultureInfo.InvariantCulture);
+                    var birthYear = int.Parse(value.Substring(4, 3), System.Globalization.CultureInfo.InvariantCulture) + 1000;
                     if (birthYear < 1800) { birthYear += 1000; }
 
                     try {
-                        DateTime birthDate = new DateTime(birthYear, birthMonth, birthDay);
+                        var birthDate = new DateTime(birthYear, birthMonth, birthDay);
                         if ((birthDate.ToString("ddMM", System.Globalization.CultureInfo.InvariantCulture) + birthDate.ToString("yyyy", System.Globalization.CultureInfo.InvariantCulture).Remove(0, 1)) != value.Substring(0, 7)) { //date is invalid
                             return;
                         }
-                        _birthDate = birthDate;
+                        BirthDate = birthDate;
                         IsBirthDateValid = birthDate <= DateTime.Today;
                     } catch (System.ArgumentOutOfRangeException) { //date is invalid
                         return;
@@ -91,9 +91,9 @@ namespace Medo.Localization.Croatia {
                 }
 
 
-                int[] digits = new int[13];
+                var digits = new int[13];
 
-                for (int i = 0; i < value.Length; i++) {
+                for (var i = 0; i < value.Length; i++) {
                     if (char.IsDigit(value[i])) {
                         digits[i] = int.Parse(value.Substring(i, 1), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture);
                     } else { //invalid characters
@@ -102,9 +102,9 @@ namespace Medo.Localization.Croatia {
                 }
 
 
-                int[] mask = new int[] { 7, 6, 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
-                int sum = 0;
-                for (int i = 0; i < 12; i++) {
+                var mask = new int[] { 7, 6, 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
+                var sum = 0;
+                for (var i = 0; i < 12; i++) {
                     sum += digits[i] * mask[i];
                 }
 
@@ -124,40 +124,40 @@ namespace Medo.Localization.Croatia {
                 }
 
 
-                string regionDigits = value.Substring(7, 2);
+                var regionDigits = value.Substring(7, 2);
                 if (regionDigits == "03") {
-                    _region = JmbgRegion.Foreign;
+                    Region = JmbgRegion.Foreign;
                 } else if (regionDigits.StartsWith("1", StringComparison.Ordinal)) {
-                    _region = JmbgRegion.BosniaAndHerzegovina;
+                    Region = JmbgRegion.BosniaAndHerzegovina;
                 } else if (regionDigits.StartsWith("2", StringComparison.Ordinal)) {
-                    _region = JmbgRegion.Montenegro;
+                    Region = JmbgRegion.Montenegro;
                 } else if (regionDigits.StartsWith("3", StringComparison.Ordinal)) {
-                    _region = JmbgRegion.Croatia;
+                    Region = JmbgRegion.Croatia;
                 } else if (regionDigits.StartsWith("4", StringComparison.Ordinal)) {
-                    _region = JmbgRegion.Macedonia;
+                    Region = JmbgRegion.Macedonia;
                 } else if (regionDigits.StartsWith("5", StringComparison.Ordinal)) {
-                    _region = JmbgRegion.Slovenia;
+                    Region = JmbgRegion.Slovenia;
                 } else if (regionDigits.StartsWith("7", StringComparison.Ordinal)) {
-                    _region = JmbgRegion.Serbia;
+                    Region = JmbgRegion.Serbia;
                 } else if (regionDigits.StartsWith("8", StringComparison.Ordinal)) {
-                    _region = JmbgRegion.SerbiaVojvodina;
+                    Region = JmbgRegion.SerbiaVojvodina;
                 } else if (regionDigits.StartsWith("9", StringComparison.Ordinal)) {
-                    _region = JmbgRegion.RepublicOfKosovo;
+                    Region = JmbgRegion.RepublicOfKosovo;
                 } else {
                     return;
                 }
 
 
                 if (int.Parse(value.Substring(9, 3), System.Globalization.CultureInfo.InvariantCulture) < 500) {
-                    _gender = JmbgGender.Male;
+                    Gender = JmbgGender.Male;
                 } else {
-                    _gender = JmbgGender.Female;
+                    Gender = JmbgGender.Female;
                 }
             } catch (FormatException) {
                 return;
             }
 
-            _isValid = true;
+            IsValid = true;
         }
 
 
@@ -166,40 +166,25 @@ namespace Medo.Localization.Croatia {
         /// </summary>
         public string Value { get; private set; }
 
-        private readonly DateTime _birthDate = DateTime.MinValue;
         /// <summary>
         /// Returns birth date.
         /// </summary>
-        public DateTime BirthDate {
-            get { return _birthDate; }
-        }
+        public DateTime BirthDate { get; private set; } = DateTime.MinValue;
 
-        private JmbgRegion _region = JmbgRegion.Unknown;
         /// <summary>
         /// Returns region.
         /// </summary>
-        public JmbgRegion Region {
-            get { return _region; }
-            private set { _region = value; }
-        }
+        public JmbgRegion Region { get; private set; } = JmbgRegion.Unknown;
 
-        private JmbgGender _gender = JmbgGender.Unknown;
         /// <summary>
         /// Returns gender.
         /// </summary>
-        public JmbgGender Gender {
-            get { return _gender; }
-            private set { _gender = value; }
-        }
+        public JmbgGender Gender { get; private set; } = JmbgGender.Unknown;
 
-        private bool _isValid;
         /// <summary>
         /// Returns true if JMBG/OIB is valid.
         /// </summary>
-        public bool IsValid {
-            get { return _isValid; }
-            private set { _isValid = value; }
-        }
+        public bool IsValid { get; private set; }
 
         /// <summary>
         /// Returns true if birth date part is valid.
