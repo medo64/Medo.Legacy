@@ -20,18 +20,14 @@ namespace Medo.Net {
         /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
         public KeyValuePacket(string key, byte[] value) {
-            _key = key;
+            Key = key;
             _value = value;
         }
 
-
-        private readonly string _key;
         /// <summary>
         /// Gets key.
         /// </summary>
-        public string Key {
-            get { return _key; }
-        }
+        public string Key { get; private set; }
 
         private readonly byte[] _value;
         /// <summary>
@@ -215,12 +211,12 @@ namespace Medo.Net {
         /// <param name="obj">A TagItem object to compare to this instance.</param>
         public override bool Equals(object obj) {
             if (obj is KeyValuePacket otherKeyValuePacket) {
-                return (_key.Equals(otherKeyValuePacket._key));
+                return (Key.Equals(otherKeyValuePacket.Key));
             }
 
             var otherString = obj as string;
             if (obj != null) {
-                return (_key.Equals(otherString));
+                return (Key.Equals(otherString));
             }
 
             return false;
@@ -253,7 +249,7 @@ namespace Medo.Net {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator ==(KeyValuePacket objA, KeyValuePacket objB) {
-            return objA._key.Equals(objB._key);
+            return objA.Key.Equals(objB.Key);
         }
 
         /// <summary>
@@ -262,7 +258,7 @@ namespace Medo.Net {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator ==(KeyValuePacket objA, string objB) {
-            return objA._key.Equals(objB);
+            return objA.Key.Equals(objB);
         }
 
         /// <summary>
@@ -271,7 +267,7 @@ namespace Medo.Net {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator ==(string objA, KeyValuePacket objB) {
-            return objB._key.Equals(objA);
+            return objB.Key.Equals(objA);
         }
 
         /// <summary>
@@ -280,7 +276,7 @@ namespace Medo.Net {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator !=(KeyValuePacket objA, KeyValuePacket objB) {
-            return !objA._key.Equals(objB._key);
+            return !objA.Key.Equals(objB.Key);
         }
 
         /// <summary>
@@ -289,7 +285,7 @@ namespace Medo.Net {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator !=(KeyValuePacket objA, string objB) {
-            return !objA._key.Equals(objB);
+            return !objA.Key.Equals(objB);
         }
 
         /// <summary>
@@ -298,7 +294,7 @@ namespace Medo.Net {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator !=(string objA, KeyValuePacket objB) {
-            return !objB._key.Equals(objA);
+            return !objB.Key.Equals(objA);
         }
 
     }
