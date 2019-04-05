@@ -39,7 +39,7 @@ namespace Medo.Data {
             if (connection == null) { throw new ArgumentNullException("connection", Resources.ExceptionConnectionCannotBeNull); }
             if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException(Resources.ExceptionTableNameCannotBeEmptyOrNull, "tableName"); }
 
-            _baseCommand = connection.CreateCommand();
+            BaseCommand = connection.CreateCommand();
 
             _tableName = tableName;
 
@@ -59,7 +59,7 @@ namespace Medo.Data {
         public void SetWhere(string format, params object[] args) {
             if (_whereParameters != null) {
                 for (var i = 0; i < _whereParameters.Count; ++i) {
-                    _baseCommand.Parameters.Remove(_whereParameters[i]);
+                    BaseCommand.Parameters.Remove(_whereParameters[i]);
                 }
             }
 
@@ -72,7 +72,7 @@ namespace Medo.Data {
                     } else {
                         var paramName = string.Format(CultureInfo.InvariantCulture, "@W{0}", i);
                         argList.Add(paramName);
-                        var param = _baseCommand.CreateParameter();
+                        var param = BaseCommand.CreateParameter();
                         param.ParameterName = paramName;
                         if ((args[i] is DateTime) && (IsRunningOnMono)) {
                             args[i] = ((DateTime)args[i]).ToString(CultureInfo.InvariantCulture);
@@ -83,7 +83,7 @@ namespace Medo.Data {
                             if (param is OleDbParameter odp) { odp.OleDbType = OleDbType.Date; }
                         }
                         _whereParameters.Add(param);
-                        _baseCommand.Parameters.Add(param);
+                        BaseCommand.Parameters.Add(param);
                     }
                 }
             }
@@ -101,15 +101,15 @@ namespace Medo.Data {
         private void UpdateCommandText() {
             if (string.IsNullOrEmpty(_whereText)) {
                 if ((Connection is SqlConnection) && _needsMonoFix) {
-                    _baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; DELETE FROM {0};", _tableName);
+                    BaseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; DELETE FROM {0};", _tableName);
                 } else {
-                    _baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0};", _tableName);
+                    BaseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0};", _tableName);
                 }
             } else {
                 if ((Connection is SqlConnection) && _needsMonoFix) {
-                    _baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; DELETE FROM {0} WHERE {1};", _tableName, _whereText.ToString());
+                    BaseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "SET LANGUAGE us_english; DELETE FROM {0} WHERE {1};", _tableName, _whereText.ToString());
                 } else {
-                    _baseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0} WHERE {1};", _tableName, _whereText.ToString());
+                    BaseCommand.CommandText = string.Format(CultureInfo.InvariantCulture, "DELETE FROM {0} WHERE {1};", _tableName, _whereText.ToString());
                 }
             }
         }
@@ -117,13 +117,10 @@ namespace Medo.Data {
 
         #region Base properties
 
-        private readonly IDbCommand _baseCommand;
         /// <summary>
         /// Gets underlying connection.
         /// </summary>
-        public IDbCommand BaseCommand {
-            get { return _baseCommand; }
-        }
+        public IDbCommand BaseCommand { get; private set; }
 
         #endregion
 
@@ -133,7 +130,7 @@ namespace Medo.Data {
         /// Attempts to cancels the execution of an System.Data.IDbCommand.
         /// </summary>
         public void Cancel() {
-            _baseCommand.Cancel();
+            BaseCommand.Cancel();
         }
 
         /// <summary>
@@ -141,39 +138,39 @@ namespace Medo.Data {
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Proper parameterization is done in code.")]
         public string CommandText {
-            get { return _baseCommand.CommandText; }
-            set { _baseCommand.CommandText = value; }
+            get { return BaseCommand.CommandText; }
+            set { BaseCommand.CommandText = value; }
         }
 
         /// <summary>
         /// Gets or sets the wait time before terminating the attempt to execute a command and generating an error.
         /// </summary>
         public int CommandTimeout {
-            get { return _baseCommand.CommandTimeout; }
-            set { _baseCommand.CommandTimeout = value; }
+            get { return BaseCommand.CommandTimeout; }
+            set { BaseCommand.CommandTimeout = value; }
         }
 
         /// <summary>
         /// Indicates or specifies how the System.Data.IDbCommand.CommandText property is interpreted.
         /// </summary>
         public CommandType CommandType {
-            get { return _baseCommand.CommandType; }
-            set { _baseCommand.CommandType = value; }
+            get { return BaseCommand.CommandType; }
+            set { BaseCommand.CommandType = value; }
         }
 
         /// <summary>
         /// Gets or sets the System.Data.IDbConnection used by this instance of the System.Data.IDbCommand.
         /// </summary>
         public IDbConnection Connection {
-            get { return _baseCommand.Connection; }
-            set { _baseCommand.Connection = value; }
+            get { return BaseCommand.Connection; }
+            set { BaseCommand.Connection = value; }
         }
 
         /// <summary>
         /// Creates a new instance of an System.Data.IDbDataParameter object.
         /// </summary>
         public IDbDataParameter CreateParameter() {
-            return _baseCommand.CreateParameter();
+            return BaseCommand.CreateParameter();
         }
 
         /// <summary>
@@ -183,7 +180,7 @@ namespace Medo.Data {
 #if DEBUG
             DebugCommand();
 #endif
-            return _baseCommand.ExecuteNonQuery();
+            return BaseCommand.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -194,7 +191,7 @@ namespace Medo.Data {
 #if DEBUG
             DebugCommand();
 #endif
-            return _baseCommand.ExecuteReader(behavior);
+            return BaseCommand.ExecuteReader(behavior);
         }
 
         /// <summary>
@@ -204,7 +201,7 @@ namespace Medo.Data {
 #if DEBUG
             DebugCommand();
 #endif
-            return _baseCommand.ExecuteReader();
+            return BaseCommand.ExecuteReader();
         }
 
         /// <summary>
@@ -214,37 +211,37 @@ namespace Medo.Data {
 #if DEBUG
             DebugCommand();
 #endif
-            return _baseCommand.ExecuteScalar();
+            return BaseCommand.ExecuteScalar();
         }
 
         /// <summary>
         /// Gets the System.Data.IDataParameterCollection.
         /// </summary>
         public IDataParameterCollection Parameters {
-            get { return _baseCommand.Parameters; }
+            get { return BaseCommand.Parameters; }
         }
 
         /// <summary>
         /// Creates a prepared (or compiled) version of the command on the data source.
         /// </summary>
         public void Prepare() {
-            _baseCommand.Prepare();
+            BaseCommand.Prepare();
         }
 
         /// <summary>
         /// Gets or sets the transaction within which the Command object of a .NET Framework data provider executes.
         /// </summary>
         public IDbTransaction Transaction {
-            get { return _baseCommand.Transaction; }
-            set { _baseCommand.Transaction = value; }
+            get { return BaseCommand.Transaction; }
+            set { BaseCommand.Transaction = value; }
         }
 
         /// <summary>
         /// Gets or sets how command results are applied to the System.Data.DataRow when used by the System.Data.IDataAdapter.Update(System.Data.DataSet) method of a System.Data.Common.DbDataAdapter.
         /// </summary>
         public UpdateRowSource UpdatedRowSource {
-            get { return _baseCommand.UpdatedRowSource; }
-            set { _baseCommand.UpdatedRowSource = value; }
+            get { return BaseCommand.UpdatedRowSource; }
+            set { BaseCommand.UpdatedRowSource = value; }
         }
 
         #endregion
@@ -265,7 +262,7 @@ namespace Medo.Data {
         /// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                _baseCommand.Dispose();
+                BaseCommand.Dispose();
             }
         }
 
@@ -275,13 +272,13 @@ namespace Medo.Data {
 #if DEBUG
         private void DebugCommand() {
             var sb = new StringBuilder();
-            sb.AppendFormat(CultureInfo.InvariantCulture, "-- {0}", _baseCommand.CommandText);
-            for (var i = 0; i < _baseCommand.Parameters.Count; ++i) {
+            sb.AppendFormat(CultureInfo.InvariantCulture, "-- {0}", BaseCommand.CommandText);
+            for (var i = 0; i < BaseCommand.Parameters.Count; ++i) {
                 sb.AppendLine();
-                if (_baseCommand.Parameters[i] is System.Data.Common.DbParameter curr) {
+                if (BaseCommand.Parameters[i] is System.Data.Common.DbParameter curr) {
                     sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}=\"{1}\" ({2})", curr.ParameterName, curr.Value, curr.DbType);
                 } else {
-                    sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}", _baseCommand.Parameters[i].ToString());
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "--     {0}", BaseCommand.Parameters[i].ToString());
                 }
             }
             Debug.WriteLine(sb.ToString());
