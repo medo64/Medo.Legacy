@@ -73,7 +73,7 @@ namespace Medo.IO {
                 bInheritHandle = true
             };
 
-            byte[] secBinary = new byte[sec.BinaryLength];
+            var secBinary = new byte[sec.BinaryLength];
             sec.GetBinaryForm(secBinary, 0);
             sa.lpSecurityDescriptor = Marshal.AllocHGlobal(secBinary.Length);
             Marshal.Copy(secBinary, 0, sa.lpSecurityDescriptor, secBinary.Length);
@@ -168,9 +168,9 @@ namespace Medo.IO {
             var available = BytesToRead;
             if (available == 0) { return new byte[] { }; }
 
-            byte[] buffer = new byte[available];
+            var buffer = new byte[available];
             uint read = 0;
-            NativeOverlapped overlapped = new NativeOverlapped();
+            var overlapped = new NativeOverlapped();
             if (!NativeMethods.ReadFile(SafeHandle, buffer, (uint)buffer.Length, ref read, ref overlapped)) {
                 throw new IOException("Cannot read from named pipe.", new Win32Exception());
             }
@@ -254,7 +254,7 @@ namespace Medo.IO {
 
 
             public class FileSafeHandle : SafeHandle {
-                private static IntPtr minusOne = new IntPtr(INVALID_HANDLE_VALUE);
+                private static readonly IntPtr minusOne = new IntPtr(INVALID_HANDLE_VALUE);
 
 
                 public FileSafeHandle()
