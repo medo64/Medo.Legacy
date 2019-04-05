@@ -15,7 +15,7 @@ namespace Medo.Math {
 	/// </summary>
 	public class MovingAverage {
 
-		private System.Collections.Generic.List<double> _items = new System.Collections.Generic.List<double>();
+		private readonly System.Collections.Generic.List<double> _items = new System.Collections.Generic.List<double>();
 		private readonly int _maxCount;
 
 
@@ -69,9 +69,9 @@ namespace Medo.Math {
 				if (IsEmpty) {
 					return double.NaN;
 				} else {
-					int count = _items.Count;
+					var count = _items.Count;
 					double sum = 0;
-					for (int i = 0; i < count; i++) {
+					for (var i = 0; i < count; i++) {
 						sum += _items[i];
 					}
 					return (sum / count);
