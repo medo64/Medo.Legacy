@@ -12,11 +12,7 @@ namespace Medo.Drawing.Printing {
 	/// Class for printing text file.
 	/// </summary>
 	public class FullText : System.IDisposable {
-
-		private System.Drawing.Brush _brush = System.Drawing.Brushes.Black;
-		private System.Drawing.Font _font = new System.Drawing.Font("Tahoma", 10);
-		private string _text;
-
+        private string _text;
 
 		/// <summary>
 		/// Creates new instance.
@@ -66,52 +62,33 @@ namespace Medo.Drawing.Printing {
             };
             Document.DefaultPageSettings.PaperSize = new System.Drawing.Printing.PaperSize(paperName, System.Convert.ToInt32(paperWidth / 25.4 * 100), System.Convert.ToInt32(paperHeight / 25.4 * 100));
 			Document.DefaultPageSettings.Margins = new System.Drawing.Printing.Margins(System.Convert.ToInt32(marginLeft / 25.4 * 100), System.Convert.ToInt32(marginRight / 25.4 * 100), System.Convert.ToInt32(marginTop / 25.4 * 100), System.Convert.ToInt32(marginBottom / 25.4 * 100));
-			Document.PrinterSettings.DefaultPageSettings.PaperSize = _document.DefaultPageSettings.PaperSize;
-			Document.PrinterSettings.DefaultPageSettings.Margins = _document.DefaultPageSettings.Margins;
+			Document.PrinterSettings.DefaultPageSettings.PaperSize = Document.DefaultPageSettings.PaperSize;
+			Document.PrinterSettings.DefaultPageSettings.Margins = Document.DefaultPageSettings.Margins;
 			Document.OriginAtMargins = true;
 
 			Document.BeginPrint += Document_BeginPrint;
 			Document.PrintPage += Document_PrintPage;
 		}
 
+        /// <summary>
+        /// Gets underlying document.
+        /// </summary>
+        public System.Drawing.Printing.PrintDocument Document { get; private set; }
 
-		private System.Drawing.Printing.PrintDocument _document;
-		/// <summary>
-		/// Gets underlying document.
-		/// </summary>
-		public System.Drawing.Printing.PrintDocument Document {
-			get { return _document; }
-			private set { _document = value; }
-		}
+        /// <summary>
+        /// Default brush to be used for text if no other brush is specified.
+        /// </summary>
+        public System.Drawing.Brush Brush { get; set; } = System.Drawing.Brushes.Black;
 
-		/// <summary>
-		/// Default brush to be used for text if no other brush is specified.
-		/// </summary>
-		public System.Drawing.Brush Brush {
-			get {
-				return _brush;
-			}
-			set {
-				_brush = value;
-			}
-		}
+        /// <summary>
+        /// Default font to be used for text if no other font is specified.
+        /// </summary>
+        public System.Drawing.Font Font { get; set; } = new System.Drawing.Font("Tahoma", 10);
 
-		/// <summary>
-		/// Default font to be used for text if no other font is specified.
-		/// </summary>
-		public System.Drawing.Font Font {
-			get {
-				return _font;
-			}
-			set {
-				_font = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets/sets text to be printed.
-		/// </summary>
-		public string Text {
+        /// <summary>
+        /// Gets/sets text to be printed.
+        /// </summary>
+        public string Text {
 			get {
 				if (string.IsNullOrEmpty(_text)) {
 					return "";
@@ -128,7 +105,7 @@ namespace Medo.Drawing.Printing {
 		/// Starts the document's printing process.
 		/// </summary>
 		public void Print() {
-			_document.Print();
+			Document.Print();
 		}
 
 		/// <summary>
@@ -162,16 +139,16 @@ namespace Medo.Drawing.Printing {
             while ((_remainingText.StartsWith(" ", System.StringComparison.Ordinal)) || (_remainingText.StartsWith(System.Convert.ToChar(13).ToString(), System.StringComparison.Ordinal)) || (_remainingText.StartsWith(System.Convert.ToChar(10).ToString(), System.StringComparison.Ordinal))) {
 				_remainingText = _remainingText.Remove(0, 1);
 			}
-			string currText = _remainingText;
+			var currText = _remainingText;
 
 			do {
-				System.Drawing.SizeF size = e.Graphics.MeasureString(currText, Font, e.MarginBounds.Width);
+				var size = e.Graphics.MeasureString(currText, Font, e.MarginBounds.Width);
 				if (e.MarginBounds.Height > size.Height) {
 					e.Graphics.DrawString(currText, Font, Brush, new System.Drawing.RectangleF(0F, 0F, (float)(e.MarginBounds.Width), (float)(e.MarginBounds.Height)));
 					_remainingText = _remainingText.Remove(0, currText.Length);
 					break;
 				} else { //remove one word
-					int i = currText.LastIndexOfAny(new char[] { ' ', System.Convert.ToChar(13), System.Convert.ToChar(10) });
+					var i = currText.LastIndexOfAny(new char[] { ' ', System.Convert.ToChar(13), System.Convert.ToChar(10) });
 					if (i == 0) {
 						currText = currText.Remove(currText.Length - 1);
 					} else {
@@ -204,8 +181,8 @@ namespace Medo.Drawing.Printing {
 		/// <param name="disposing">True if managed resources should be disposed; otherwise, false.</param>
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
-				_brush.Dispose();
-				_font.Dispose();
+				Brush.Dispose();
+				Font.Dispose();
 			}
 		}
 
@@ -215,7 +192,7 @@ namespace Medo.Drawing.Printing {
 
 			internal static string Title {
 				get {
-					object[] titleAttributes = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), true);
+					var titleAttributes = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), true);
 					if ((titleAttributes != null) && (titleAttributes.Length >= 1)) {
 						return ((System.Reflection.AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
 					} else {
