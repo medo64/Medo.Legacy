@@ -32,10 +32,10 @@ namespace Medo.Windows.Forms {
         public LoginDialog() {
         }
 
-        void cmbUserName_Leave(object sender, EventArgs e) {
+        private void cmbUserName_Leave(object sender, EventArgs e) {
             if ((cmbUserName.SelectedItem == null) && (!string.IsNullOrEmpty(cmbUserName.Text))) {
-                for (int i = 0; i < cmbUserName.Items.Count; ++i) {
-                    object iItem = cmbUserName.Items[i];
+                for (var i = 0; i < cmbUserName.Items.Count; ++i) {
+                    var iItem = cmbUserName.Items[i];
                     if (iItem.Equals(cmbUserName.Text)) {
                         cmbUserName.SelectedItem = iItem;
                     }
@@ -108,8 +108,8 @@ namespace Medo.Windows.Forms {
                         return cmbUserName.SelectedItem;
                     } else {
                         if (!string.IsNullOrEmpty(cmbUserName.Text)) {
-                            for (int i = 0; i < cmbUserName.Items.Count; ++i) {
-                                object iItem = cmbUserName.Items[i];
+                            for (var i = 0; i < cmbUserName.Items.Count; ++i) {
+                                var iItem = cmbUserName.Items[i];
                                 if (iItem.Equals(cmbUserName.Text)) {
                                     return iItem;
                                 }
@@ -160,7 +160,7 @@ namespace Medo.Windows.Forms {
         /// <param name="owner">Any object that implements System.Windows.Forms.IWin32Window that represents the top-level window that will own the modal dialog box.</param>
         public DialogResult ShowDialog(IWin32Window owner) {
             Font defaultFont;
-            Form frmOwner = owner as Form;
+            var frmOwner = owner as Form;
             if (frmOwner != null) {
                 defaultFont = frmOwner.Font;
             } else {
@@ -180,7 +180,7 @@ namespace Medo.Windows.Forms {
             cmbUserName.TextChanged += new EventHandler(cmbUserName_TextChanged);
             cmbUserName.Leave += new EventHandler(cmbUserName_Leave);
 
-            Label lblUserName = new Label {
+            var lblUserName = new Label {
                 Anchor = AnchorStyles.Left | AnchorStyles.Top,
                 AutoSize = true,
                 Font = defaultFont
@@ -197,7 +197,7 @@ namespace Medo.Windows.Forms {
             };
             txtPassword.KeyDown += new KeyEventHandler(txtPassword_KeyDown);
 
-            Label lblPassword = new Label {
+            var lblPassword = new Label {
                 Anchor = AnchorStyles.Left | AnchorStyles.Top,
                 AutoSize = true,
                 Font = defaultFont
@@ -210,7 +210,7 @@ namespace Medo.Windows.Forms {
             txtPassword.Left = System.Math.Max(lblUserName.Right, lblPassword.Right) + 42;
             txtPassword.Width = lblPassword.Height * 14;
 
-            Button btnCancel = new Button {
+            var btnCancel = new Button {
                 Anchor = AnchorStyles.Right | AnchorStyles.Bottom,
                 DialogResult = DialogResult.Cancel,
                 Font = defaultFont,
@@ -256,9 +256,9 @@ namespace Medo.Windows.Forms {
             btnOK.Location = new Point(btnCancel.Left - btnOK.Width - 7, _form.ClientRectangle.Bottom - btnOK.Height - 7);
 
             if (_users != null) {
-                IEnumerator eUsers = _users.GetEnumerator();
+                var eUsers = _users.GetEnumerator();
                 while (eUsers.MoveNext()) {
-                    object iUser = eUsers.Current;
+                    var iUser = eUsers.Current;
                     if (iUser is IIdentity iIdentity) {
                         cmbUserName.AutoCompleteCustomSource.Add(iIdentity.Name);
                     }
