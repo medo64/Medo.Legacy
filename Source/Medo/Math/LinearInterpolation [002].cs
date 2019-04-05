@@ -16,7 +16,7 @@ namespace Medo.Math {
     /// </summary>
     public class LinearInterpolation {
 
-        private SortedDictionary<double, double> _referencePoints = new SortedDictionary<double, double>();
+        private readonly SortedDictionary<double, double> _referencePoints = new SortedDictionary<double, double>();
 
         /// <summary>
         /// Creates new instance.
@@ -63,16 +63,16 @@ namespace Medo.Math {
                 return value + (itemBelowN.Value.Key - itemBelowN.Value.Value) * percentageBelow + (itemAboveN.Value.Key - itemAboveN.Value.Value) * percentageAbove;
             } else if (itemBelowN.HasValue) { //just lower reference point
                 if (itemBelowF.HasValue) {
-                    double m = (itemBelowF.Value.Key - itemBelowN.Value.Key) / ((itemBelowF.Value.Value - itemBelowN.Value.Value));
-                    double b = itemBelowN.Value.Key - m * itemBelowN.Value.Value;
+                    var m = (itemBelowF.Value.Key - itemBelowN.Value.Key) / ((itemBelowF.Value.Value - itemBelowN.Value.Value));
+                    var b = itemBelowN.Value.Key - m * itemBelowN.Value.Value;
                     return m * value + b;
                 } else {
                     return value + (itemBelowN.Value.Key - itemBelowN.Value.Value); //just offset
                 }
             } else if (itemAboveN.HasValue) { //just upper reference point
                 if (itemAboveF.HasValue) {
-                    double m = (itemAboveF.Value.Key - itemAboveN.Value.Key) / ((itemAboveF.Value.Value - itemAboveN.Value.Value));
-                    double b = itemAboveN.Value.Key - m * itemAboveN.Value.Value;
+                    var m = (itemAboveF.Value.Key - itemAboveN.Value.Key) / ((itemAboveF.Value.Value - itemAboveN.Value.Value));
+                    var b = itemAboveN.Value.Key - m * itemAboveN.Value.Value;
                     return m * value + b;
                 } else {
                     return value + (itemAboveN.Value.Key - itemAboveN.Value.Value); //just offset
