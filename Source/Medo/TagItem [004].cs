@@ -31,39 +31,26 @@ namespace Medo {
         /// <param name="value">Value.</param>
         /// <param name="tag">Additional object.</param>
         public TagItem(TKey key, TValue value, object tag) {
-            _key = key;
-            _value = value;
-            _tag = tag;
+            Key = key;
+            Value = value;
+            Tag = tag;
         }
-
-
-        private readonly TKey _key;
-        private TValue _value;
-        private object _tag;
 
 
         /// <summary>
         /// Gets key.
         /// </summary>
-        public TKey Key {
-            get { return _key; }
-        }
+        public TKey Key { get; private set; }
 
         /// <summary>
         /// Gets value.
         /// </summary>
-        public TValue Value {
-            get { return _value; }
-            set { _value = value; }
-        }
+        public TValue Value { get; set; }
 
         /// <summary>
         /// Gets/sets value of tag.
         /// </summary>
-        public object Tag {
-            get { return _tag; }
-            set { _tag = value; }
-        }
+        public object Tag { get; set; }
 
 
         /// <summary>
@@ -72,10 +59,10 @@ namespace Medo {
         /// <param name="obj">A TagItem object to compare to this instance.</param>
         public override bool Equals(object obj) {
             if (obj is TagItem<TKey, TValue> other) {
-                return (_key.Equals(other._key));
+                return (Key.Equals(other.Key));
             }
             if (obj is TKey otherKey) {
-                return (_key.Equals(otherKey));
+                return (Key.Equals(otherKey));
             }
             return false;
         }
@@ -106,7 +93,7 @@ namespace Medo {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator ==(TagItem<TKey, TValue> objA, TagItem<TKey, TValue> objB) {
-            return objA._key.Equals(objB._key);
+            return objA.Key.Equals(objB.Key);
         }
 
         /// <summary>
@@ -115,7 +102,7 @@ namespace Medo {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator !=(TagItem<TKey, TValue> objA, TagItem<TKey, TValue> objB) {
-            return !objA._key.Equals(objB._key);
+            return !objA.Key.Equals(objB.Key);
         }
 
     }
@@ -143,39 +130,26 @@ namespace Medo {
         /// <param name="value">Value.</param>
         /// <param name="tag">Additional object.</param>
         public TagItem(int key, string value, object tag) {
-            _key = key;
-            _value = value;
-            _tag = tag;
+            Key = key;
+            Value = value;
+            Tag = tag;
         }
-
-
-        private readonly int _key;
-        private string _value;
-        private object _tag;
 
 
         /// <summary>
         /// Gets key.
         /// </summary>
-        public int Key {
-            get { return _key; }
-        }
+        public int Key { get; private set; }
 
         /// <summary>
         /// Gets value.
         /// </summary>
-        public string Value {
-            get { return _value; }
-            set { _value = value; }
-        }
+        public string Value { get; set; }
 
         /// <summary>
         /// Gets/sets value of tag.
         /// </summary>
-        public object Tag {
-            get { return _tag; }
-            set { _tag = value; }
-        }
+        public object Tag { get; set; }
 
 
         /// <summary>
@@ -184,13 +158,13 @@ namespace Medo {
         /// <param name="obj">A TagItem object to compare to this instance.</param>
         public override bool Equals(object obj) {
             if (obj is TagItem other) {
-                return (_key.Equals(other._key));
+                return (Key.Equals(other.Key));
             }
             if (obj is TagItem<int, string> other2) {
-                return (_key.Equals(other2.Key));
+                return (Key.Equals(other2.Key));
             }
             if (obj is int other3) {
-                return (_key.Equals(other3));
+                return (Key.Equals(other3));
             }
             return false;
         }
@@ -222,7 +196,7 @@ namespace Medo {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator ==(TagItem objA, TagItem objB) {
-            return objA._key.Equals(objB._key);
+            return objA.Key.Equals(objB.Key);
         }
 
         /// <summary>
@@ -231,7 +205,7 @@ namespace Medo {
         /// <param name="objA">First object.</param>
         /// <param name="objB">Second object.</param>
         public static bool operator !=(TagItem objA, TagItem objB) {
-            return !objA._key.Equals(objB._key);
+            return !objA.Key.Equals(objB.Key);
         }
 
     }
