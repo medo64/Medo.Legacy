@@ -32,30 +32,22 @@ namespace Medo.Windows.Forms {
         [System.ComponentModel.DefaultValue(false)]
         public bool UseFocusColor { get; set; }
 
-        private Color _focusedBackColor = SystemColors.Info;
         /// <summary>
         /// The background color when control has focus.
         /// </summary>
         [System.ComponentModel.Category("Appearance")]
         [System.ComponentModel.DefaultValue("Info")]
-        public Color FocusedBackColor {
-            get { return _focusedBackColor; }
-            set { _focusedBackColor = value; }
-        }
+        public Color FocusedBackColor { get; set; } = SystemColors.Info;
 
-        private Color _focusedForeColor = SystemColors.InfoText;
         /// <summary>
         /// The foreground color when control has focus.
         /// </summary>
         [System.ComponentModel.Category("Appearance")]
         [System.ComponentModel.DefaultValue("InfoText")]
-        public Color FocusedForeColor {
-            get { return _focusedForeColor; }
-            set { _focusedForeColor = value; }
-        }
+        public Color FocusedForeColor { get; set; } = SystemColors.InfoText;
 
 
-		private Color _lastBackColor;
+        private Color _lastBackColor;
 		private Color _lastForeColor;
 
 
