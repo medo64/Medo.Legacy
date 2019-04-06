@@ -12,9 +12,6 @@ namespace Medo.Security.Checksum {
     /// </summary>
     public class Lrc8 {
 
-        private byte _currDigest;
-
-
         /// <summary>
         /// Returns Eltra implementation.
         /// You would need to use DigestAsAscii30 on this also.
@@ -29,7 +26,7 @@ namespace Medo.Security.Checksum {
         /// </summary>
         /// <param name="initialValue">Starting digest.</param>
         public Lrc8(byte initialValue) {
-            _currDigest = initialValue;
+            Digest = initialValue;
         }
 
 
@@ -54,8 +51,8 @@ namespace Medo.Security.Checksum {
         /// <exception cref="System.ArgumentNullException">Value cannot be null.</exception>
         public void Append(byte[] value, int index, int length) {
             if (value == null) { throw new System.ArgumentNullException("value", Resources.ExceptionValueCannotBeNull); }
-            for (int i = index; i < index + length; i++) {
-                _currDigest = (byte)(_currDigest ^ value[i]);
+            for (var i = index; i < index + length; i++) {
+                Digest = (byte)(Digest ^ value[i]);
             }
         }
 
@@ -77,9 +74,7 @@ namespace Medo.Security.Checksum {
         /// <summary>
         /// Gets current digest.
         /// </summary>
-        public byte Digest {
-            get { return _currDigest; }
-        }
+        public byte Digest { get; private set; }
 
         /// <summary>
         /// Gets current digest in splitted in two halfs with 0x30 added to each one.
@@ -87,8 +82,8 @@ namespace Medo.Security.Checksum {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "This is in order to have similar properties for all Medo.Security.Checksum namespace classes.")]
         public byte[] DigestAsAscii30 {
             get {
-                byte part1 = (byte)(0x30 + (Digest >> 4));
-                byte part2 = (byte)(0x30 + (Digest & 0x0f));
+                var part1 = (byte)(0x30 + (Digest >> 4));
+                var part2 = (byte)(0x30 + (Digest & 0x0f));
                 return new byte[] { part1, part2 };
             }
         }
