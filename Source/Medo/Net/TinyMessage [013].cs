@@ -811,26 +811,20 @@ namespace Medo.Net {
         /// </summary>
         public static int DefaultPort { get { return 5104; } }
 
-
-        private static readonly IPEndPoint _defaultIPv4BroadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, TinyMessage.DefaultPort);
         /// <summary>
         /// Default IPv4 broadcast endpoint for TinyMessage protocol.
         /// </summary>
-        public static IPEndPoint DefaultIPv4BroadcastEndpoint { get { return _defaultIPv4BroadcastEndpoint; } }
+        public static IPEndPoint DefaultIPv4BroadcastEndpoint { get; } = new IPEndPoint(IPAddress.Broadcast, TinyMessage.DefaultPort);
 
-
-        private static readonly IPEndPoint _defaultIPv6MulticastEndpoint = new IPEndPoint(IPAddress.Parse("ff08:0::152"), TinyMessage.DefaultPort);
         /// <summary>
         /// Default IPv6 multicast endpoint for TinyMessage protocol.
         /// </summary>
-        public static IPEndPoint DefaultIPv6MulticastEndpoint { get { return _defaultIPv6MulticastEndpoint; } }
+        public static IPEndPoint DefaultIPv6MulticastEndpoint { get; } = new IPEndPoint(IPAddress.Parse("ff08:0::152"), TinyMessage.DefaultPort);
 
-
-        private static readonly IPEndPoint _defaultIPv4MulticastEndpoint = new IPEndPoint(IPAddress.Parse("239.192.111.17"), TinyMessage.DefaultPort);
         /// <summary>
         /// Default IPv4 multicast endpoint for TinyMessage protocol.
         /// </summary>
-        public static IPEndPoint DefaultIPv4MulticastEndpoint { get { return _defaultIPv4MulticastEndpoint; } }
+        public static IPEndPoint DefaultIPv4MulticastEndpoint { get; } = new IPEndPoint(IPAddress.Parse("239.192.111.17"), TinyMessage.DefaultPort);
 
 
 
