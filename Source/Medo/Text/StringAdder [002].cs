@@ -96,10 +96,10 @@ namespace Medo.Text {
 		/// <returns>A reference to this instance with format appended. Any format specification in format is replaced by the string representation of the corresponding object argument.</returns>
 		public StringAdder AppendFormat(IFormatProvider provider, string format, params object[] args) {
 			if (StringBuilder.Length == 0) {
-				_stringBuilder.AppendFormat(provider, format, args);
+				StringBuilder.AppendFormat(provider, format, args);
 			} else {
 				StringBuilder.Append(Separator);
-				_stringBuilder.AppendFormat(provider, format, args);
+				StringBuilder.AppendFormat(provider, format, args);
 			}
 			return this;
 		}
@@ -114,25 +114,16 @@ namespace Medo.Text {
 		}
 
 
+        /// <summary>
+        /// Gets or sets string to use for separating different values.
+        /// </summary>
+        public string Separator { get; set; }
 
-		private string _separator;
-		/// <summary>
-		/// Gets or sets string to use for separating different values.
-		/// </summary>
-		public string Separator {
-			get { return _separator; }
-			set { _separator = value; }
-		}
+        /// <summary>
+        /// Gets underlying string builder.
+        /// </summary>
+        public System.Text.StringBuilder StringBuilder { get; private set; }
 
-		private System.Text.StringBuilder _stringBuilder;
-		/// <summary>
-		/// Gets underlying string builder.
-		/// </summary>
-		public System.Text.StringBuilder StringBuilder {
-			get { return _stringBuilder; }
-			private set { _stringBuilder = value; }
-		}
-
-	}
+    }
 
 }
