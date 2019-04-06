@@ -93,7 +93,7 @@ namespace Medo.Xml {
             if (localName == null) { return; }
             if (attributesAndValues == null) { return; }
             XmlTextWriter.WriteStartElement(localName);
-            for (int i = 0; i < attributesAndValues.Length - 1; i += 2) {
+            for (var i = 0; i < attributesAndValues.Length - 1; i += 2) {
                 XmlTextWriter.WriteAttributeString(attributesAndValues[i], attributesAndValues[i + 1]);
             }
             if (attributesAndValues.Length % 2 != 0) {
@@ -129,16 +129,10 @@ namespace Medo.Xml {
             EndTag();
         }
 
-
-
-        private System.Xml.XmlTextWriter _xmlTextWriter;
         /// <summary>
         /// Gets underlyings XmlTextWriter.
         /// </summary>
-        public System.Xml.XmlTextWriter XmlTextWriter {
-            get { return _xmlTextWriter; }
-            private set { _xmlTextWriter = value; }
-        }
+        public System.Xml.XmlTextWriter XmlTextWriter { get; private set; }
 
 
         /// <summary>
