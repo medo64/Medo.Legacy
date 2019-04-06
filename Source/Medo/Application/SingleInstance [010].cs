@@ -329,17 +329,14 @@ namespace Medo.Application {
         /// <param name="commandLine">Command line.</param>
         /// <param name="commandLineArgs">String array containing the command line arguments.</param>
         public NewInstanceEventArgs(string commandLine, string[] commandLineArgs) {
-            _commandLine = commandLine;
+            CommandLine = commandLine;
             _commandLineArgs = commandLineArgs;
         }
 
-        private readonly string _commandLine;
         /// <summary>
         /// Gets the command line.
         /// </summary>
-        public string CommandLine {
-            get { return _commandLine; }
-        }
+        public string CommandLine { get; private set; }
 
         private readonly string[] _commandLineArgs;
         /// <summary>
