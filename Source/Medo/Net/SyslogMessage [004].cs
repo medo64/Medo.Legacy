@@ -160,14 +160,14 @@ namespace Medo.Net {
             if (message == null) { message = string.Empty; }
 
 
-            _facility = facility;
-            _severity = severity;
-            _timestamp = timestamp;
+            Facility = facility;
+            Severity = severity;
+            Timestamp = timestamp;
             _hostName = hostName;
             _applicationName = applicationName;
             _processId = processId;
             _messageId = messageId;
-            _message = message;
+            Message = message;
 
             if (includeOrigin) {
                 var sd = new SyslogStructuredData("origin");
@@ -307,33 +307,20 @@ namespace Medo.Net {
             return _structuredDatas.ToArray();
         }
 
-
-        private SyslogFacilityCode _facility;
         /// <summary>
         /// Gets/sets facility designation.
         /// </summary>
-        public SyslogFacilityCode Facility {
-            get { return _facility; }
-            set { _facility = value; }
-        }
+        public SyslogFacilityCode Facility { get; set; }
 
-         private SyslogSeverityCode _severity;
         /// <summary>
         /// Gets/sets severity designation.
         /// </summary>
-        public SyslogSeverityCode Severity {
-            get { return _severity; }
-            set { _severity = value; }
-        }
+        public SyslogSeverityCode Severity { get; set; }
 
-        private System.DateTime _timestamp;
         /// <summary>
         /// Gets/sets timestamp.
         /// </summary>
-        public System.DateTime Timestamp {
-            get { return _timestamp; }
-            set { _timestamp = value; }
-        }
+        public System.DateTime Timestamp { get; set; }
 
         private string _hostName;
         /// <summary>
@@ -384,14 +371,10 @@ namespace Medo.Net {
             }
         }
 
-        private string _message;
         /// <summary>
         /// Gets/sets message.
         /// </summary>
-        public string Message {
-            get { return _message; }
-            set { _message = value; }
-        }
+        public string Message { get; set; }
 
 
         #region Overrides
@@ -420,11 +403,11 @@ namespace Medo.Net {
             var sb = new System.Collections.Generic.List<byte>();
 
             sb.AddRange(Helper.ToAscii("<"));
-            sb.AddRange(Helper.ToAscii(((int)_facility * 8 + (int)_severity).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(((int)Facility * 8 + (int)Severity).ToString(System.Globalization.CultureInfo.InvariantCulture)));
             sb.AddRange(Helper.ToAscii(">"));
             sb.AddRange(Helper.ToAscii("1"));
             sb.AddRange(Helper.ToAscii(" "));
-            sb.AddRange(Helper.ToAscii(_timestamp.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'ffffff'Z'", System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(Timestamp.ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'ffffff'Z'", System.Globalization.CultureInfo.InvariantCulture)));
             sb.AddRange(Helper.ToAscii(" "));
             if (!string.IsNullOrEmpty(_hostName)) { sb.AddRange(Helper.ToAscii(_hostName)); } else { sb.AddRange(Helper.ToAscii("-")); }
             sb.AddRange(Helper.ToAscii(" "));
@@ -441,13 +424,13 @@ namespace Medo.Net {
             } else {
                 sb.AddRange(Helper.ToAscii("-"));
             }
-            if (!string.IsNullOrEmpty(_message)) {
+            if (!string.IsNullOrEmpty(Message)) {
                 sb.AddRange(Helper.ToAscii(" "));
-                if (Helper.IsAllAscii(_message)) {
-                    sb.AddRange(Helper.ToAscii(_message));
+                if (Helper.IsAllAscii(Message)) {
+                    sb.AddRange(Helper.ToAscii(Message));
                 } else {
                     sb.AddRange(new byte[] { 0xEF, 0xBB, 0xBF });
-                    sb.AddRange(Helper.ToUtf8(_message));
+                    sb.AddRange(Helper.ToUtf8(Message));
                 }
             }
 
@@ -461,13 +444,13 @@ namespace Medo.Net {
         public byte[] ToBsdByteArray() {
             var sb = new System.Collections.Generic.List<byte>();
             sb.AddRange(Helper.ToAscii("<"));
-            sb.AddRange(Helper.ToAscii(((int)_facility * 8 + (int)_severity).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(((int)Facility * 8 + (int)Severity).ToString(System.Globalization.CultureInfo.InvariantCulture)));
             sb.AddRange(Helper.ToAscii(">"));
-            sb.AddRange(Helper.ToAscii(_timestamp.ToString("MMM", System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(Timestamp.ToString("MMM", System.Globalization.CultureInfo.InvariantCulture)));
             sb.Add(32);
-            sb.AddRange(Helper.ToAscii(_timestamp.Day.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2)));
+            sb.AddRange(Helper.ToAscii(Timestamp.Day.ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(2)));
             sb.Add(32);
-            sb.AddRange(Helper.ToAscii(_timestamp.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
+            sb.AddRange(Helper.ToAscii(Timestamp.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
             sb.Add(32);
             sb.AddRange(Helper.ToAscii(_hostName));
             sb.Add(32);
@@ -479,7 +462,7 @@ namespace Medo.Net {
                 sb.AddRange(Helper.ToAscii(":"));
                 sb.Add(32);
             }
-            sb.AddRange(Helper.ToAscii(_message));
+            sb.AddRange(Helper.ToAscii(Message));
             return sb.ToArray();
         }
 
@@ -515,14 +498,14 @@ namespace Medo.Net {
                 //Facility/Severity
                 var priVal = int.Parse(Helper.FromAscii(messageBuffer, 1, priR - 3), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture);
                 if ((priVal < 0) || (priVal > 191)) { throw new System.FormatException(Resources.ExceptionPriMustBe0To191); }
-                ret._facility = (SyslogFacilityCode)(priVal / 8);
-                ret._severity = (SyslogSeverityCode)(priVal % 8);
+                ret.Facility = (SyslogFacilityCode)(priVal / 8);
+                ret.Severity = (SyslogSeverityCode)(priVal % 8);
 
                 //Timestamp
                 var timeL = priR + 1;
                 var timeR = Helper.FindByteValue(messageBuffer, timeL, 32);
                 var timeValue = Helper.FromAscii(messageBuffer, timeL, timeR - timeL);
-                ret._timestamp = System.DateTime.Parse(timeValue, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
+                ret.Timestamp = System.DateTime.Parse(timeValue, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None);
 
                 //Host name
                 var hostL = timeR + 1;
@@ -738,16 +721,16 @@ namespace Medo.Net {
                     if ((messageBuffer[sdI + 1] == 0xEF) && (messageBuffer[sdI + 2] == 0xBB) && (messageBuffer[sdI + 3] == 0xBF)) { //UTF8 BOF
                         var messL = sdI + 4;
                         var messR = messageBuffer.Length;
-                        ret._message = Helper.FromUtf8(messageBuffer, messL, messR - messL);
+                        ret.Message = Helper.FromUtf8(messageBuffer, messL, messR - messL);
                     } else { //ASCII
                         var messL = sdI + 1;
                         var messR = messageBuffer.Length;
-                        ret._message = Helper.FromAscii(messageBuffer, messL, messR - messL);
+                        ret.Message = Helper.FromAscii(messageBuffer, messL, messR - messL);
                     }
 
                 } else {
 
-                    ret._message = string.Empty;
+                    ret.Message = string.Empty;
 
                 }
 
@@ -791,8 +774,8 @@ namespace Medo.Net {
                         var priFacility = priInt / 8;
                         var priSeverity = priInt % 8;
 
-                        ret._facility = (SyslogFacilityCode)priFacility;
-                        ret._severity = (SyslogSeverityCode)priSeverity;
+                        ret.Facility = (SyslogFacilityCode)priFacility;
+                        ret.Severity = (SyslogSeverityCode)priSeverity;
 
                         if (messageBuffer.Length > (priR + 15)) { //Check Timestamp
                             var timestampStr = rawMessage.Substring(priR + 1, 15);
@@ -801,14 +784,14 @@ namespace Medo.Net {
                             }
 
                             if (timestamp > System.DateTime.MinValue) { //Valid TIMESTAMP
-                                ret._timestamp = timestamp;
+                                ret.Timestamp = timestamp;
                                 var hostL = rawMessage.IndexOf(" ", priR + 15, System.StringComparison.Ordinal);
                                 var hostR = rawMessage.IndexOf(" ", hostL + 1, System.StringComparison.Ordinal);
 
                                 if ((hostL > 0) && (hostR > hostL)) { //Found host
                                     ret._hostName = rawMessage.Substring(hostL + 1, hostR - hostL - 1);
 
-                                    ret._message = null;
+                                    ret.Message = null;
 
                                     var tagL = hostR + 1;
                                     var tagR = rawMessage.IndexOf(": ", hostR, System.StringComparison.Ordinal);
@@ -845,15 +828,15 @@ namespace Medo.Net {
                                             if ((pidL > -1) && (pidR > -1) && (pidR == tagStr.Length - 1)) { //both brackets are there - pid.
                                                 ret._applicationName = tagStr.Substring(0, pidL);
                                                 ret._processId = tagStr.Substring(pidL + 1, pidR - pidL - 1);
-                                                ret._message = rawMessage.Substring(tagR + 2);
+                                                ret.Message = rawMessage.Substring(tagR + 2);
                                             } else if ((pidL == -1) && (pidR == -1)) { //no brackets are there.
                                                 ret._applicationName = tagStr;
                                                 ret._processId = string.Empty;
-                                                ret._message = rawMessage.Substring(tagR + 2);
+                                                ret.Message = rawMessage.Substring(tagR + 2);
                                             }
                                         }//if
                                     }
-                                    if (ret._message == null) { ret._message = rawMessage.Substring(hostR + 1); }
+                                    if (ret.Message == null) { ret.Message = rawMessage.Substring(hostR + 1); }
                                     return ret; //valid message
                                 }
 
@@ -863,7 +846,7 @@ namespace Medo.Net {
                                 } else {
                                     ret._hostName = string.Empty;
                                 }
-                                ret._message = rawMessage.Substring(priR + 1); //Just drop PRI part
+                                ret.Message = rawMessage.Substring(priR + 1); //Just drop PRI part
                                 //ret._isRawMessageOk = false;
                                 return ret; //not quite valid message
 
@@ -871,28 +854,28 @@ namespace Medo.Net {
                         } //if
 
                         //Valid PRI, Invalid Timestamp
-                        ret._timestamp = System.DateTime.Now;
+                        ret.Timestamp = System.DateTime.Now;
                         if (endpoint != null) {
                             ret._hostName = endpoint.Address.ToString();
                         } else {
                             ret._hostName = string.Empty;
                         }
-                        ret._message = rawMessage.Substring(priR + 1);
+                        ret.Message = rawMessage.Substring(priR + 1);
                         return ret; //not quite valid message
                     } //if //Valid PRI
                 }
             } //if ((priL == 0) && (priR > priL))
 
             //No PRI
-            ret._facility = SyslogFacilityCode.UserLevel;
-            ret._severity = SyslogSeverityCode.Notice;
-            ret._timestamp = System.DateTime.Now;
+            ret.Facility = SyslogFacilityCode.UserLevel;
+            ret.Severity = SyslogSeverityCode.Notice;
+            ret.Timestamp = System.DateTime.Now;
             if (endpoint != null) {
                 ret._hostName = endpoint.Address.ToString();
             } else {
                 ret._hostName = string.Empty;
             }
-            ret._message = rawMessage;
+            ret.Message = rawMessage;
 
             return ret; //not quite valid message
         }
@@ -1062,7 +1045,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Argument cannot be null or empty.</exception>
         public SyslogStructuredData(string ianaName) {
             if (string.IsNullOrEmpty(ianaName)) { throw new System.ArgumentNullException("ianaName", Resources.ExceptionArgumentCannotBeNullOrEmpty); }
-            _id = ianaName;
+            Id = ianaName;
         }
 
         /// <summary>
@@ -1122,7 +1105,7 @@ namespace Medo.Net {
         /// <exception cref="System.ArgumentNullException">Argument cannot be null or empty.</exception>
         public SyslogStructuredData(string name, int enterpriseId) {
             if (string.IsNullOrEmpty(name)) { throw new System.ArgumentNullException("name", Resources.ExceptionArgumentCannotBeNullOrEmpty); }
-            _id = name + "@" + enterpriseId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            Id = name + "@" + enterpriseId.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -1173,14 +1156,10 @@ namespace Medo.Net {
             AddParameter(parameterName3, parameterValue3);
         }
 
-
-        private readonly string _id;
         /// <summary>
         /// Gets Id of this class.
         /// </summary>
-        public string Id {
-            get { return _id; }
-        }
+        public string Id { get; private set; }
 
 
         private readonly System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>> _params = new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, string>>();
@@ -1245,7 +1224,7 @@ namespace Medo.Net {
             var sb = new System.Collections.Generic.List<byte>();
 
             sb.AddRange(Helper.ToAscii("["));
-            sb.AddRange(Helper.ToAscii(_id));
+            sb.AddRange(Helper.ToAscii(Id));
 
             for (var i = 0; i < _params.Count; i++) {
                 sb.AddRange(Helper.ToAscii(" "));
