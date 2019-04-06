@@ -17,13 +17,10 @@ namespace Medo.Configuration {
 
         private const string runSubkey = @"Software\Microsoft\Windows\CurrentVersion\Run";
 
-        private static readonly RunOnStartup _current = new RunOnStartup();
         /// <summary>
         /// Settings for current executable.
         /// </summary>
-        public static RunOnStartup Current {
-            get { return _current; }
-        }
+        public static RunOnStartup Current { get; } = new RunOnStartup();
 
 
         /// <summary>
@@ -50,8 +47,8 @@ namespace Medo.Configuration {
         /// <param name="arguments">Arguments for executable file.</param>
         public RunOnStartup(string title, string executablePath, string arguments) {
             if (title == null) {
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetEntryAssembly();
-                object[] titleAttributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), true);
+                var assembly = System.Reflection.Assembly.GetEntryAssembly();
+                var titleAttributes = assembly.GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), true);
                 if ((titleAttributes != null) && (titleAttributes.Length >= 1)) {
                     Title = ((System.Reflection.AssemblyTitleAttribute)titleAttributes[titleAttributes.Length - 1]).Title;
                 } else {
@@ -121,7 +118,7 @@ namespace Medo.Configuration {
         /// <exception cref="System.UnauthorizedAccessException">Attempted to perform an unauthorized operation.</exception>
         public bool RunForCurrentUser {
             get {
-                using (Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(runSubkey, false)) {
+                using (var rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(runSubkey, false)) {
                     if (rk != null) {
                         var value = rk.GetValue(Title, null);
                         if (value != null) {
@@ -136,7 +133,7 @@ namespace Medo.Configuration {
             set {
                 if (value == true) { //add it to registry.
                     if (RunForCurrentUser == false) {
-                        using (Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(runSubkey, true)) {
+                        using (var rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(runSubkey, true)) {
                             if (rk != null) {
                                 rk.SetValue(Title, ExecutablePathWithQuotesAndArguments, Microsoft.Win32.RegistryValueKind.String);
                             } else {
@@ -146,7 +143,7 @@ namespace Medo.Configuration {
                     }
                 } else { //delete if from registry.
                     if (RunForCurrentUser == true) {
-                        using (Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(runSubkey, true)) {
+                        using (var rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(runSubkey, true)) {
                             if (rk != null) {
                                 rk.DeleteValue(Title, false);
                             } else {
@@ -165,7 +162,7 @@ namespace Medo.Configuration {
         /// <exception cref="System.UnauthorizedAccessException">Attempted to perform an unauthorized operation.</exception>
         public bool RunForAllUsers {
             get {
-                using (Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(runSubkey, false)) {
+                using (var rk = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(runSubkey, false)) {
                     if (rk != null) {
                         var value = rk.GetValue(Title, null);
                         if (value != null) {
@@ -180,7 +177,7 @@ namespace Medo.Configuration {
             set {
                 if (value == true) { //add it to registry.
                     if (RunForAllUsers == false) {
-                        using (Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(runSubkey, true)) {
+                        using (var rk = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(runSubkey, true)) {
                             if (rk != null) {
                                 rk.SetValue(Title, ExecutablePathWithQuotesAndArguments, Microsoft.Win32.RegistryValueKind.String);
                             } else {
@@ -190,7 +187,7 @@ namespace Medo.Configuration {
                     }
                 } else { //delete if from registry.
                     if (RunForAllUsers == true) {
-                        using (Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(runSubkey, true)) {
+                        using (var rk = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(runSubkey, true)) {
                             if (rk != null) {
                                 rk.DeleteValue(Title, false);
                             } else {
