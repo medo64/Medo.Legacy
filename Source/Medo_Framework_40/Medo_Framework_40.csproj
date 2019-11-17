@@ -167,8 +167,8 @@
     <Compile Include="..\Medo\Device\SerialGps [001].cs">
       <Link>Device\SerialGps [001].cs</Link>
     </Compile>
-    <Compile Include="..\Medo\Diagnostics\ErrorReport [019].cs">
-      <Link>Diagnostics\ErrorReport [019].cs</Link>
+    <Compile Include="..\Medo\Diagnostics\ErrorReport [020].cs">
+      <Link>Diagnostics\ErrorReport [020].cs</Link>
     </Compile>
     <Compile Include="..\Medo\Diagnostics\ExceptionReport [001].cs">
       <Link>Diagnostics\ExceptionReport [001].cs</Link>
