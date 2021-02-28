@@ -19,7 +19,7 @@ do
 
     function tinymessage.dissector(buffer, pinfo, tree)
         local subtree = tree:add(tinymessage, buffer())
-        
+
         local count = buffer:len()
         local start = 0
         local index = 0
@@ -88,7 +88,7 @@ do
 
 
         subtree:append_text (", " .. valueProduct .. " " .. valueOperation)
-        
+
         pinfo.cols.protocol = "TINYMESSAGE"
         pinfo.cols.info = valueProduct .. " " .. valueOperation
     end
