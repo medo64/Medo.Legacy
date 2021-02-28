@@ -4,7 +4,7 @@ VisualStudioVersion = 15.0.27004.2008
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo_Framework_40", "Medo_Framework_40\Medo_Framework_40.csproj", "{961279A9-0B9D-434D-9836-4F316A05ED7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo_Framework_47", "Medo_Framework_47\Medo_Framework_47.csproj", "{4C58CA83-E0D1-4FAE-92FC-C062C13D7C28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo_Framework_48", "Medo_Framework_48\Medo_Framework_48.csproj", "{4C58CA83-E0D1-4FAE-92FC-C062C13D7C28}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medo_Framework_Test", "Medo_Framework_Test\Medo_Framework_Test.csproj", "{1091D8E2-5CC3-4AAF-8E73-0271E302E1A0}"
 EndProject
